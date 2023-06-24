@@ -254,7 +254,7 @@ let end_proof kwd =
 (* Like Str.global_replace but don't interpret '\1' etc in replacement text *)
 let global_replace re subst txt =
   Str.global_substitute re (fun _ -> subst) txt
-  
+
 let start_html_page modname =
   output_string !oc
     (global_replace (Str.regexp "\\$NAME") modname Resources.header)
@@ -331,6 +331,11 @@ and coq = parse
       { start_string();
         string lexbuf;
         end_string();
+        coq lexbuf }
+  | (". ") (space* as s) (start_proof as sp)
+      { newline();
+        start_proof s sp;
+	skip_newline lexbuf ;
         coq lexbuf }
   | "\n"
       { newline(); coq_bol lexbuf }
@@ -508,7 +513,7 @@ let write_file txt filename =
   let oc = open_out filename in
   output_string oc txt;
   close_out oc
-  
+
 let _ =
   let v_files = ref [] and glob_files = ref [] in
   let process_file f =
