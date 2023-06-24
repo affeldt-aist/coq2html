@@ -48,6 +48,7 @@ let add_reference curmod pos dp sp id ty =
   then Hashtbl.add xref_table (curmod, pos) (Ref(dp, path sp id, ty))
 
 let add_definition curmod pos sp id ty =
+  (*eprintf "add_definition %s %d %s %s %s\n" curmod pos sp id ty;*)
   if not (Hashtbl.mem xref_table (curmod, pos))
   then Hashtbl.add xref_table (curmod, pos) (Def(path sp id, ty))
 
@@ -293,6 +294,12 @@ rule coq_bol = parse
       { if !in_proof then (space s; start_comment());
 	comment lexbuf;
         if !in_proof then coq lexbuf else skip_newline lexbuf }
+  | space* ("(***" "*"+ "***)" "\n" as s)
+      { fprintf !oc "<pre>\n%s" s;
+        ssr_doc lexbuf;
+	fprintf !oc "%s" "</pre>\n";
+	skip_newline lexbuf
+      }
   | eof
       { () }
   | space* as s
@@ -405,6 +412,23 @@ and doc = parse
       { () }
   | _ as c
       { character c; doc lexbuf }
+
+and ssr_doc_bol = parse
+  | "\n"
+      { ssr_doc_bol lexbuf }
+  | ""
+      { ssr_doc lexbuf }
+
+and ssr_doc = parse
+  | space* ("(***" "*"+ "***)" "\n" as s)
+      { fprintf !oc "%s" s;
+        () }
+  | "\n"
+      { character '\n'; ssr_doc_bol lexbuf }
+  | eof
+      { () }
+  | _ as c
+      { character c; ssr_doc lexbuf }
 
 and verbatim = parse
   | "\n>>" space* "\n"
