@@ -14,16 +14,13 @@
 
 {
 open Printf
+open Generate_index
 
 (** Cross-referencing *)
 
 let current_module = ref ""
 
 (* Record cross-references found in .glob files *)
-
-type xref =
-  | Def of string * string    (* path, type *)
-  | Ref of string * string * string (* unit, path, type *)
 
 (* (name of module, character position in file) -> cross-reference *)
 let xref_table : (string * int, xref) Hashtbl.t = Hashtbl.create 273
@@ -558,6 +555,8 @@ let _ =
   end;
   List.iter process_glob_file (List.rev !glob_files);
   List.iter process_v_file (List.rev !v_files);
+  Generate_index.generate !output_dir xref_table;
+  write_file Resources.js (Filename.concat !output_dir "coq2html.js");
   if !generate_css then
     write_file Resources.css (Filename.concat !output_dir "coq2html.css")
 }

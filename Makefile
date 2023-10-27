@@ -1,8 +1,8 @@
 OCAMLOPT=ocamlopt -I +str
 OCAMLLEX=ocamllex
 
-coq2html: resources.cmx coq2html.cmx
-	$(OCAMLOPT) -o coq2html str.cmxa resources.cmx coq2html.cmx
+coq2html: resources.cmx generate_index.cmi generate_index.cmx coq2html.cmx
+	$(OCAMLOPT) -o coq2html str.cmxa resources.cmx generate_index.cmx coq2html.cmx
 
 %.cmx: %.ml
 	$(OCAMLOPT) -c $*.ml
@@ -12,6 +12,7 @@ coq2html: resources.cmx coq2html.cmx
 
 %.ml: %.mll
 	$(OCAMLLEX) $*.mll
+
 
 coq2html.cmx: resources.cmx
 resources.cmx: resources.cmi
@@ -36,4 +37,3 @@ BINDIR=$(PREFIX)/bin
 
 install:
 	install coq2html $(BINDIR)/coq2html
-
