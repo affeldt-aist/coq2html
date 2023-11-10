@@ -50,9 +50,9 @@ let table xrefs =
                 (function (_key, (_name,_pos,_path, typ)) when is_kind kind typ -> true
                          |_ -> false) xrefs
            then
-             !%{|"<td><a href="index_%s_%c.html">%c</a></td>|} (linkname_of_kind kind) c c
+             !%{|<td><a href="index_%s_%c.html">%c</a></td>|} (linkname_of_kind kind) c c
            else
-             !%{|"<td>%c</td>|} c) xrefs
+             !%{|<td>%c</td>|} c) xrefs
     |> String.concat "")
     |> fun s -> "<tr>" ^ s ^ "</tr>"
   in
