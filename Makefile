@@ -1,8 +1,10 @@
 OCAMLOPT=ocamlopt -I +str
 OCAMLLEX=ocamllex
 
-coq2html: resources.cmx generate_index.cmi generate_index.cmx coq2html.cmx
-	$(OCAMLOPT) -o coq2html str.cmxa resources.cmx generate_index.cmx coq2html.cmx
+GEN_IDX=generate_index
+
+coq2html: $(GEN_IDX).cmi $(GEN_IDX).cmx coq2html.cmx
+	$(OCAMLOPT) -o coq2html str.cmxa resources.cmx $(GEN_IDX).cmx coq2html.cmx
 
 %.cmx: %.ml
 	$(OCAMLOPT) -c $*.ml
