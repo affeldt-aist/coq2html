@@ -57,6 +57,7 @@ let table xrefs =
   ^ (List.map mkrow kinds |> String.concat "")
   ^ "</tbody></table>"
 
+(* generate an html file e.g. mathcomp.classical.functions.html *)
 let generate_with_capital output_dir table kind (c, xrefs) =
   if xrefs = [] then () else
     let body =
@@ -68,6 +69,11 @@ let generate_with_capital output_dir table kind (c, xrefs) =
       |> (^) (!%"%s<h2>%s</h2>" table h2)
     in
     write_html_file body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c))
+
+(* generate index.html *)
+let generate_topfile output_dir xrefs =
+  let body = table xrefs in
+  write_html_file body (Filename.concat output_dir "index.html")
 
 let generate output_dir xref_table =
   let xrefs = 
@@ -86,5 +92,6 @@ let generate output_dir xref_table =
   in
   List.iter (fun kind ->
       List.iter (generate_with_capital output_dir (table xrefs) kind) xrefs)
-    kinds
+    kinds;
+  generate_topfile output_dir xrefs
 
