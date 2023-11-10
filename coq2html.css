@@ -14,8 +14,9 @@
 */
 
 body {
-  color: black;
-  background: white;
+  font-family: Arial, Helvetica;
+  margin-left: 5em;
+  font-size: large;
 }
 
 h1.title {
@@ -24,13 +25,19 @@ h1.title {
 }
 
 h1 {
-  font-size: 1.5em;
+  margin-left: 0em;
+  padding: 0px;
+  text-align: center
 }
 h2 {
-  font-size: 1.17em;
+  margin-left: 0em;
+  padding: 0px;
+  color: #580909
 }
 h3 {
-  font-size: 1em;
+  margin-left: 1em;
+  padding: 0px;
+  color: #C05001;
 }
 
 h1, h2, h3 {
