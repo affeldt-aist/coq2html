@@ -21,18 +21,15 @@ let write_html_file txt filename =
 type kind = Global | EntryKind of string
 
 let kinds = [Global;
-             EntryKind "mod";
-             EntryKind "var";
-             EntryKind "thm";
+             EntryKind "def";
+             EntryKind "prf";
              EntryKind "abbrev";
-             EntryKind "def"]
+            ]
 
-let skind = function Global -> "Global Index"
-                   | EntryKind "mod" -> "Module Index"
-                   | EntryKind "var" -> "Variable Index"
-                   | EntryKind "thm" -> "Theorem Index"
-                   | EntryKind "abbrev" -> "Abbreviation Index"
-                   | EntryKind "def" -> "Definition Index"
+let skind = function Global -> "Global"
+                   | EntryKind "def" -> "Definition"
+                   | EntryKind "prf" -> "Lemma"
+                   | EntryKind "abbrev" -> "Abbreviation"
                    | EntryKind other -> other
 
 let is_kind = function
@@ -44,7 +41,7 @@ let linkname_of_kind = function Global -> "global"
 
 let table xrefs =
   let mkrow kind =
-    (!%"<td>%s</td>" (skind kind))
+    (!%"<td>%s Index</td>" (skind kind))
     ^ (List.map (fun (c, xrefs) ->
            if List.exists
                 (function (_key, (_name,_pos,_path, typ)) when is_kind kind typ -> true
@@ -63,11 +60,12 @@ let table xrefs =
 let generate_with_capital output_dir table kind (c, xrefs) =
   if xrefs = [] then () else
     let body =
+      let h2 = if kind = Global then !%"%c" c else !%"%c (%s)" c (skind kind) in
       List.filter (fun (_, (_, _, _, typ)) -> is_kind kind typ) xrefs
       |> List.map (fun (key, (name, pos, path, typ)) ->
              !%{|<a href="%s.html#%s">%s</a> [%s, in %s:%d]|} name path path typ name pos)
       |> String.concat "<br>"
-      |> (^) (!%"%s<h2>%c</h2>" table c)
+      |> (^) (!%"%s<h2>%s</h2>" table h2)
     in
     write_html_file body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c))
 
