@@ -1,5 +1,24 @@
 # coq2html: an HTML documentation generator for Coq
 
+## Fork by yoshihiro503
+
+* The branch is [yoshihiro503%40generate_index](https://github.com/yoshihiro503/coq2html/tree/yoshihiro503%40generate_index)
+
+### The Additional Features of this fork
+* Generate Indexes
+* `-Q <dir> <coqdir>` option
+* TODO: Markdown support
+
+### pages
+
+https://yoshihiro503.github.io/coq2html/
+
+### Usage
+In the case using in mathcomp analysis directory:
+```
+../coq2html/coq2html -d html/ -base mathcomp -Q theories analysis -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ classical/*.v classical/*.glob theories/*.v theories/*.glob
+```
+
 ## Overview
 
 coq2html is an HTML documentation generator for Coq source files.  It is an alternative to the standard coqdoc documentation generator distributed along with Coq.  The major feature of coq2html is its ability to fold proof scripts: in the generated HTML, proof scripts are initially hidden, but can be revealed one by one by clicking on the "Proof" keyword.  Here is an example of [folding in action](https://compcert.org/doc/html/compcert.common.Memory.html#Mem.valid_access_dec)
