@@ -307,6 +307,7 @@ rule coq_bol = parse
       { if !in_proof then (space s; start_comment());
 	comment lexbuf;
         if !in_proof then coq lexbuf else skip_newline lexbuf }
+  (* Enter verbatim mode *)
   | space* ("(***" "*"+ "***)" "\n" as s)
       { fprintf !oc "<pre>\n%s" s;
         ssr_doc lexbuf;
@@ -431,6 +432,7 @@ and doc = parse
   | _ as c
       { character c; doc lexbuf }
 
+(* beginning of line *)
 and ssr_doc_bol = parse
   | "\n"
       { ssr_doc_bol lexbuf }
@@ -438,6 +440,7 @@ and ssr_doc_bol = parse
       { ssr_doc lexbuf }
 
 and ssr_doc = parse
+  (* Leave verbatim mode *)
   | space* ("(***" "*"+ "***)" "\n" as s)
       { fprintf !oc "%s" s;
         () }

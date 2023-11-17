@@ -16,6 +16,7 @@
 body {
   font-family: Arial, Helvetica;
   margin-left: 5em;
+  margin-right: 5em;
   font-size: large;
 }
 
@@ -47,7 +48,7 @@ h1, h2, h3 {
 
 div.coq {
   margin-left: 15%;
-  margin-right: 5%;
+  margin-right: 15%;
   font-family: monospace;
 }
 
@@ -56,6 +57,7 @@ div.doc {
   margin-top: 0.2em;
   margin-bottom: 0.5em;
   font-family: serif;
+  background-color: #f2f1f1;
 }
 
 summary.toggleproof {
