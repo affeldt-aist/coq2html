@@ -1,0 +1,67 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.summability</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.summability" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module mathcomp.analysis.summability</h1>
+<div class="coq">
+<span class="kwd">Require</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Reals.Reals.html">Reals</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrint</span> <span class="id">ssrnum</span> <span class="id">finmap</span> <span class="id">matrix</span>.<br/>
+<span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">interval</span> <span class="id">zmodp</span>.<br/>
+<span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.boolp.html">boolp</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html">classical_sets</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.Rstruct.html">Rstruct</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span>.<br/>
+<br/>
+<span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
+<span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>
+<span class="id">Unset</span> <span class="id">Printing</span> <span class="kwd">Implicit</span> <span class="id">Defensive</span>.<br/>
+<span class="kwd">Import</span> <span class="id">GRing.Theory</span> <span class="id">Num.Def</span> <span class="id">Num.Theory</span>.<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">classical_set_scope</span>.<br/>
+<br/>
+<div class="doc">For Pierre-Yves : definition of sums </div>
+<br/>
+<span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="id">fintype</span> <span class="id">bigop</span> <span class="id">finmap</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="totally">totally</a></span>.<br/>
+<br/>
+<span class="kwd">Import</span> <span class="id">fintype</span> <span class="id">bigop</span> <span class="id">finmap</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">fset_scope</span>.<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="totally">totally</a></span> {<span class="id">I</span> : <span class="id">choiceType</span>} : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> (<span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> {<span class="id">fset</span> <span class="id">I</span>}) :=<br/>
+&nbsp;&nbsp;<span class="id"><a href="mathcomp.analysis.topology.html#filter_from">filter_from</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> (<span class="kwd">fun</span> <span class="id">A</span> =&gt; [<span class="id">set</span> <span class="id">B</span> | <span class="id">A</span> `&lt;=` <span class="id">B</span>]).<br/>
+<br/>
+<span class="kwd">Canonical</span> <span class="id"><a name="totally_filter_source">totally_filter_source</a></span> {<span class="id">I</span> : <span class="id">choiceType</span>} <span class="id">X</span> :=<br/>
+&nbsp;&nbsp;@<span class="id"><a href="mathcomp.analysis.topology.html#Filtered.Source">Filtered.Source</a></span> <span class="id">X</span> <span class="id">_</span> {<span class="id">fset</span> <span class="id">I</span>} (<span class="kwd">fun</span> <span class="id">f</span> =&gt; <span class="id">f</span> @ <span class="id"><a href="mathcomp.analysis.summability.html#totally">totally</a></span>).<br/>
+<br/>
+<span class="kwd">Instance</span> <span class="id"><a name="totally_filter">totally_filter</a></span> {<span class="id">I</span> : <span class="id">choiceType</span>} : <span class="id"><a href="mathcomp.analysis.topology.html#ProperFilter">ProperFilter</a></span> (@<span class="id"><a href="mathcomp.analysis.summability.html#totally">totally</a></span> <span class="id">I</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof1')">Proof.</span></div>
+<div class="proofscript" id="proof1">
+<span class="id">eapply</span> <span class="id"><a href="mathcomp.analysis.topology.html#filter_from_proper">filter_from_proper</a></span>; <span class="id">last</span> <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">A</span> <span class="id">_</span>; <span class="kwd">exists</span> <span class="id">A</span>; <span class="id">rewrite</span> /= <span class="id">fsubset_refl</span>.<br/>
+<span class="id">apply</span>: <span class="id"><a href="mathcomp.analysis.topology.html#filter_fromT_filter">filter_fromT_filter</a></span>; <span class="id">first</span> <span class="kwd">by</span> <span class="kwd">exists</span> <span class="id">fset0</span>.<br/>
+<span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">A</span> <span class="id">B</span> /=; <span class="kwd">exists</span> (<span class="id">A</span> `|` <span class="id">B</span>) =&gt; <span class="id">P</span> /=; <span class="id">rewrite</span> <span class="id">fsubUset</span> =&gt; /<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#andP">andP</a></span>[].<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="partial_sum">partial_sum</a></span> {<span class="id">I</span> : <span class="id">choiceType</span>} {<span class="id">R</span> : <span class="id">zmodType</span>}<br/>
+&nbsp;&nbsp;(<span class="id">x</span> : <span class="id">I</span> -&gt; <span class="id">R</span>) (<span class="id">A</span> : {<span class="id">fset</span> <span class="id">I</span>}) : <span class="id">R</span> := \<span class="id">sum_</span>(<span class="id">i</span> : <span class="id">A</span>) <span class="id">x</span> (<span class="id">val</span> <span class="id">i</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sum">sum</a></span> (<span class="id">I</span> : <span class="id">choiceType</span>) {<span class="id">K</span> : <span class="id">numDomainType</span>} {<span class="id">R</span> : <span class="id"><a href="mathcomp.analysis.normedtype.html#NormedModule.Exports.normedModType">normedModType</a></span> <span class="id">K</span>}<br/>
+&nbsp;&nbsp;&nbsp;(<span class="id">x</span> : <span class="id">I</span> -&gt; <span class="id">R</span>) : <span class="id">R</span> := <span class="id"><a href="mathcomp.analysis.topology.html#lim">lim</a></span> (<span class="id"><a href="mathcomp.analysis.summability.html#partial_sum">partial_sum</a></span> <span class="id">x</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="summable">summable</a></span> (<span class="id">I</span> : <span class="id">choiceType</span>) {<span class="id">K</span> : <span class="id"><a href="mathcomp.analysis.reals.html#Real.Exports.realType">realType</a></span>} {<span class="id">R</span> : <span class="id"><a href="mathcomp.analysis.normedtype.html#NormedModule.Exports.normedModType">normedModType</a></span> <span class="id">K</span>}<br/>
+&nbsp;&nbsp;&nbsp;(<span class="id">x</span> : <span class="id">I</span> -&gt; <span class="id">R</span>) :=<br/>
+&nbsp;&nbsp;&nbsp;\<span class="kwd">forall</span> <span class="id">M</span> \<span class="id">near</span> +<span class="id">oo</span>%<span class="id">R</span>, \<span class="kwd">forall</span> <span class="id">J</span> \<span class="id">near</span> <span class="id"><a href="mathcomp.analysis.summability.html#totally">totally</a></span>,<br/>
+&nbsp;&nbsp;&nbsp;(<span class="id"><a href="mathcomp.analysis.summability.html#partial_sum">partial_sum</a></span> (<span class="kwd">fun</span> <span class="id">i</span> =&gt; `|<span class="id">x</span> <span class="id">i</span>|) <span class="id">J</span> &lt;= <span class="id">M</span>)%<span class="id">R</span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="mathcomp.analysis.summability.html#totally">totally</a></span>.<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/tree/yoshihiro503%40generate_index">a fork of coq2html</a></div>
+</body>
+</html>

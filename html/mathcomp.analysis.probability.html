@@ -1,0 +1,912 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.probability</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.probability" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module mathcomp.analysis.probability</h1>
+<div class="coq">
+<span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span>.<br/>
+<span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">ssralg</span> <span class="id">poly</span> <span class="id">ssrnum</span> <span class="id">ssrint</span> <span class="id">interval</span> <span class="id">finmap</span>.<br/>
+<span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html">mathcomp_extra</a></span> <span class="id"><a href="mathcomp.classical.boolp.html">boolp</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html">classical_sets</a></span> <span class="id"><a href="mathcomp.classical.functions.html">functions</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.cardinality.html">cardinality</a></span>.<br/>
+<span class="kwd">From</span> <span class="id">HB</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">structures</span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.exp.html">exp</a></span> <span class="id"><a href="mathcomp.analysis.numfun.html">numfun</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_measure.html">lebesgue_measure</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html">lebesgue_integral</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.sequences.html">sequences</a></span> <span class="id"><a href="mathcomp.analysis.esum.html">esum</a></span> <span class="id"><a href="mathcomp.analysis.measure.html">measure</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.exp.html">exp</a></span> <span class="id"><a href="mathcomp.analysis.numfun.html">numfun</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_measure.html">lebesgue_measure</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html">lebesgue_integral</a></span>.<br/>
+<br/>
+<pre>
+(******************************************************************************)
+(*                       Probability (experimental)                           *)
+(*                                                                            *)
+(* This file provides basic notions of probability theory. See measure.v for  *)
+(* the type probability T R (a measure that sums to 1).                       *)
+(*                                                                            *)
+(*          {RV P &gt;-&gt; R} == real random variable: a measurable function from  *)
+(*                          the measurableType of the probability P to R      *)
+(*        distribution X == measure image of P by X : {RV P -&gt; R}, declared   *)
+(*                          as an instance of probability measure             *)
+(*               'E_P[X] == expectation of the real measurable function X     *)
+(*        covariance X Y == covariance between real random variable X and Y   *)
+(*               'V_P[X] == variance of the real random variable X            *)
+(*         mmt_gen_fun X == moment generating function of the random variable *)
+(*                          X *)
+(*       {dmfun T &gt;-&gt; R} == type of discrete real-valued measurable functions *)
+(*         {dRV P &gt;-&gt; R} == real-valued discrete random variable              *)
+(*             dRV_dom X == domain of the discrete random variable X          *)
+(*            dRV_enum X == bijection between the domain and the range of X   *)
+(*               pmf X r := fine (P (X @^-1` [set r]))                        *)
+(*         enum_prob X k == probability of the kth value in the range of X    *)
+(*                                                                            *)
+(******************************************************************************)
+</pre>
+<span class="kwd">Reserved</span> <span class="kwd">Notation</span> "'{' '<span class="id">RV</span>' <span class="id">P</span> &gt;-&gt; <span class="id">R</span> '}'"<br/>
+&nbsp;&nbsp;(<span class="kwd">at</span> <span class="id">level</span> 0, <span class="id">format</span> "'{' '<span class="id">RV</span>'  <span class="id">P</span>  '&gt;-&gt;'  <span class="id">R</span> '}'").<br/>
+<span class="kwd">Reserved</span> <span class="kwd">Notation</span> "''<span class="id">E_</span>' <span class="id">P</span> [ <span class="id">X</span> ]" (<span class="id">format</span> "''<span class="id">E_</span>' <span class="id">P</span> [ <span class="id">X</span> ]", <span class="kwd">at</span> <span class="id">level</span> 5).<br/>
+<span class="kwd">Reserved</span> <span class="kwd">Notation</span> "''<span class="id">V_</span>' <span class="id">P</span> [ <span class="id">X</span> ]" (<span class="id">format</span> "''<span class="id">V_</span>' <span class="id">P</span> [ <span class="id">X</span> ]", <span class="kwd">at</span> <span class="id">level</span> 5).<br/>
+<span class="kwd">Reserved</span> <span class="kwd">Notation</span> "{ '<span class="id">dmfun</span>' <span class="id">aT</span> &gt;-&gt; <span class="id">T</span> }"<br/>
+&nbsp;&nbsp;(<span class="kwd">at</span> <span class="id">level</span> 0, <span class="id">format</span> "{ '<span class="id">dmfun</span>'  <span class="id">aT</span>  &gt;-&gt;  <span class="id">T</span> }").<br/>
+<span class="kwd">Reserved</span> <span class="kwd">Notation</span> "'{' '<span class="id">dRV</span>' <span class="id">P</span> &gt;-&gt; <span class="id">R</span> '}'"<br/>
+&nbsp;&nbsp;(<span class="kwd">at</span> <span class="id">level</span> 0, <span class="id">format</span> "'{' '<span class="id">dRV</span>'  <span class="id">P</span>  '&gt;-&gt;'  <span class="id">R</span> '}'").<br/>
+<br/>
+<span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
+<span class="id">Unset</span> <span class="id"><a href="mathcomp.analysis.topology.html#numFieldTopology.Exports">Strict</a></span> <span class="kwd">Implicit</span>.<br/>
+<span class="id">Unset</span> <span class="id">Printing</span> <span class="kwd">Implicit</span> <span class="id">Defensive</span>.<br/>
+<br/>
+<span class="kwd">Import</span> <span class="id">Order.TTheory</span> <span class="id">GRing.Theory</span> <span class="id">Num.Def</span> <span class="id">Num.Theory</span>.<br/>
+<span class="kwd">Import</span> <span class="id">numFieldTopology.Exports</span>.<br/>
+<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id"><a href="mathcomp.analysis.reals.html#Real.Exports.realType">classical_set_scope</a></span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">ring_scope</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">random_variable</span> (<span class="id">d</span> : <span class="id">_</span>) (<span class="id"><a href="mathcomp.analysis.probability.html#random_variable">T</a></span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>)<br/>
+&nbsp;&nbsp;(<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>) := {<span class="id">mfun</span> <span class="id">T</span> &gt;-&gt; <span class="id">R</span>}.<br/>
+<br/>
+<span class="kwd">Notation</span> "{ '<span class="id">RV</span>' <span class="id">P</span> &gt;-&gt; <span class="id">R</span> }" := (@<span class="id">random_variable</span> <span class="id">_</span> <span class="id">_</span> <span class="id">R</span> <span class="id">P</span>) : <span class="id">form_scope</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">notin_range_measure</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">P</span> : {<span class="id">measure</span> <span class="id">set</span> <span class="id">T</span> -&gt; \<span class="id">bar</span> <span class="id">R</span>}) (<span class="id">X</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) <span class="id">r</span> :<br/>
+&nbsp;&nbsp;<span class="id"><a name="probability_range">r</a></span> \<span class="id">notin</span> <span class="id">range</span> <span class="id">X</span> -&gt; <span class="id">P</span> (<span class="id">X</span> @^-1` [<span class="id">set</span> <span class="id">r</span>]) = 0%<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof1')">Proof.</span></div>
+<div class="proofscript" id="proof1">
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id"><a href="mathcomp.analysis.measure.html#Probability.Exports.probability">notin_set</a></span> =&gt; <span class="id">hr</span>; <span class="id">rewrite</span> <span class="id">preimage10</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#range">probability_range</a></span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>)<br/>
+&nbsp;&nbsp;(<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>) (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) : <span class="id">P</span> (<span class="id">X</span> @^-1` <span class="id">range</span> <span class="id">X</span>) = 1%<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof2')">Proof.</span></div>
+<div class="proofscript" id="proof2">
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">preimage_range</span> <span class="id">probability_setT</span>. Qed.</div>
+<br/>
+<span class="kwd">Definition</span> <span class="id">distribution</span> (<span class="id">d</span> : <span class="id">_</span>) (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>) (<span class="id">X</span> : {<span class="id">mfun</span> <span class="id">T</span> &gt;-&gt; <span class="id">R</span>}) :=<br/>
+&nbsp;&nbsp;<span class="id">pushforward</span> <span class="id">P</span> (@<span class="id">measurable_funP</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">X</span>).<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">distribution_is_probability</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">X</span> : {<span class="id">mfun</span> <span class="id">T</span> &gt;-&gt; <span class="id">R</span>}).<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">distribution0</span> : <span class="id">distribution</span> <span class="id"><a href="mathcomp.analysis.measure.html#measure_ge0">P</a></span> <span class="id">X</span> <span class="id">set0</span> = 0%<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof3')">Proof.</span></div>
+<div class="proofscript" id="proof3">
+ <span class="id"><a name="distribution_is_probability.distribution_sigma_additive">exact</a></span>: <span class="id">measure0</span>. Qed.</div>
+<br/>
+<span class="kwd">Let</span> <span class="id">distribution_ge0</span> <span class="id">A</span> : (0 &lt;= <span class="id">distribution</span> <span class="id">P</span> <span class="id">X</span> <span class="id">A</span>)%<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof4')">Proof.</span></div>
+<div class="proofscript" id="proof4">
+ <span class="id"><a href="mathcomp.analysis.measure.html#measure_semi_sigma_additive">exact</a></span>: <span class="id">measure_ge0</span>. Qed.</div>
+<br/>
+<span class="kwd">Let</span> <span class="id">distribution_sigma_additive</span> : <span class="id">semi_sigma_additive</span> (<span class="id">distribution</span> <span class="id">P</span> <span class="id">X</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof5')">Proof.</span></div>
+<div class="proofscript" id="proof5">
+ <span class="id">exact</span>: <span class="id">measure_semi_sigma_additive</span>. Qed.</div>
+<br/>
+<span class="id">HB.instance</span> <span class="kwd">Definition</span> <span class="id">_</span> := <span class="id">isMeasure.Build</span> <span class="id">_</span> <span class="id">_</span> <span class="id">R</span> (<span class="id">distribution</span> <span class="id">P</span> <span class="id">X</span>)<br/>
+&nbsp;&nbsp;<span class="id">distribution0</span> <span class="id">distribution_ge0</span> <span class="id">distribution_sigma_additive</span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">distribution_is_probability</span> : <span class="id">distribution</span> <span class="id">P</span> <span class="id">X</span> [<span class="id">set</span>: <span class="id">_</span>] = 1%:<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof6')">Proof.</span></div>
+<div class="proofscript" id="proof6">
+<span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">distribution</span> /= /<span class="id">pushforward</span> /= <span class="id">preimage_setT</span> <span class="id">probability_setT</span>.<br/>
+Qed.</div>
+<br/>
+<span class="id">HB.instance</span> <span class="kwd">Definition</span> <span class="id">_</span> := <span class="id">Measure_isProbability.Build</span> <span class="id">_</span> <span class="id">_</span> <span class="id">R</span><br/>
+&nbsp;&nbsp;(<span class="id">distribution</span> <span class="id">P</span> <span class="id">X</span>) <span class="id">distribution_is_probability</span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id">distribution_is_probability</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">transfer_probability</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">ereal_scope</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id"><a href="mathcomp.analysis.probability.html#transfer_probability.P">P</a></span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">probability_distribution</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) <span class="id">r</span> :<br/>
+&nbsp;&nbsp;<span class="id">P</span> [<span class="id">set</span> <span class="id">x</span> | <span class="id">X</span> <span class="id">x</span> = <span class="id">r</span>] = <span class="id">distribution</span> <span class="id">P</span> <span class="id">X</span> [<span class="id">set</span> <span class="id">r</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof7')">Proof.</span></div>
+<div class="proofscript" id="proof7">
+ <span class="kwd">by</span> []. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">integral_distribution</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) (<span class="id"><a href="mathcomp.analysis.probability.html#transfer_probability.P">f</a></span> : <span class="id">R</span> -&gt; \<span class="id">bar</span> <span class="id">R</span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">measurable_fun</span> [<span class="id">set</span>: <span class="id">R</span>] <span class="id">f</span> -&gt; (<span class="kwd">forall</span> <span class="id">y</span>, 0 &lt;= <span class="id">f</span> <span class="id">y</span>) -&gt;<br/>
+&nbsp;&nbsp;\<span class="id">int</span>[<span class="id">distribution</span> <span class="id">P</span> <span class="id">X</span>]<span class="id">_y</span> <span class="id">f</span> <span class="id">y</span> = \<span class="id">int</span>[<span class="id">P</span>]<span class="id">_x</span> (<span class="id">f</span> \<span class="id">o</span> <span class="id">X</span>) <span class="id">x</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof8')">Proof.</span></div>
+<div class="proofscript" id="proof8">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">mf</span> <span class="id">f0</span>; <span class="id">rewrite</span> <span class="id">integral_pushforward</span>. Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">transfer_probability</span>.<br/>
+<br/>
+<span class="id">HB.lock</span> <span class="kwd">Definition</span> <span class="id">expectation</span> {<span class="id">d</span>} {<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>} {<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssreflect.html#Unlockable">R</a></span> : <span class="id">realType</span>}<br/>
+&nbsp;&nbsp;(<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>) (<span class="id">X</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) := (\<span class="id">int</span>[<span class="id">P</span>]<span class="id">_w</span> (<span class="id">X</span> <span class="id">w</span>)%:<span class="id">E</span>)%<span class="id">E</span>.<br/>
+<span class="kwd">Canonical</span> <span class="id">expectation_unlockable</span> := <span class="id">Unlockable</span> <span class="id">expectation.unlock</span>.<br/>
+<span class="kwd">Arguments</span> <span class="id">expectation</span> {<span class="id">d</span> <span class="id">T</span> <span class="id">R</span>} <span class="id">P</span> <span class="id">_</span>%<span class="id">R</span>.<br/>
+<span class="kwd">Notation</span> "''<span class="id">E_</span>' <span class="id">P</span> [ <span class="id">X</span> ]" := (@<span class="id">expectation</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">P</span> <span class="id">X</span>) : <span class="id">ereal_scope</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">expectation_lemmas</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">ereal_scope</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">expectation_fin_num</span> (<span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#integral_fune_fin_num">X</a></span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) : <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">E_P</span>[<span class="id">X</span>] \<span class="id">is</span> <span class="id">a</span> <span class="id">fin_num</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof9')">Proof.</span></div>
+<div class="proofscript" id="proof9">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; ?; <span class="id">rewrite</span> <span class="id">unlock</span> <span class="id">integral_fune_fin_num</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">expectation_cst</span> <span class="id">r</span> : '<span class="id">E_P</span>[<span class="id">cst</span> <span class="id">r</span>] = <span class="id">r</span>%:<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof10')">Proof.</span></div>
+<div class="proofscript" id="proof10">
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">unlock</span>/= <span class="id">integral_cst</span>//= <span class="id">probability_setT</span> <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#integral_indic">mule1</a></span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">expectation_indic</span> (<span class="id">A</span> : <span class="id">set</span> <span class="id">T</span>) (<span class="id">mA</span> : <span class="id">measurable</span> <span class="id">A</span>) : '<span class="id">E_P</span>[\1<span class="id">_A</span>] = <span class="id">P</span> <span class="id"><a href="mathcomp.analysis.probability.html#expectation_lemmas.P">A</a></span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof11')">Proof.</span></div>
+<div class="proofscript" id="proof11">
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">unlock</span> <span class="id">integral_indic</span>// <span class="id">setIT</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">integrable_expectation</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>})<br/>
+&nbsp;&nbsp;(<span class="id">iX</span> : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>)) : `| '<span class="id">E_P</span>[<span class="id">X</span>] | &lt; +<span class="id">oo</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof12')">Proof.</span></div>
+<div class="proofscript" id="proof12">
+<span class="id">move</span>: <span class="id">iX</span> =&gt; /<span class="id">integrableP</span>[? <span class="id">Xoo</span>]; <span class="id"><a href="mathcomp.analysis.probability.html#expectation_lemmas.P">rewrite</a></span> (<span class="id">le_lt_trans</span> <span class="id">_</span> <span class="id">Xoo</span>)// <span class="id">unlock</span>.<br/>
+<span class="id">exact</span>: <span class="id">le_trans</span> (<span class="id">le_abse_integral</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>).<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">expectationM</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) (<span class="id">iX</span> : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>))<br/>
+&nbsp;&nbsp;(<span class="id">k</span> : <span class="id">R</span>) : '<span class="id">E_P</span>[<span class="id">k</span> \<span class="id">o</span>* <span class="id">X</span>] = <span class="id">k</span>%:<span class="id">E</span> * '<span class="id">E_P</span> [<span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof13')">Proof.</span></div>
+<div class="proofscript" id="proof13">
+<span class="id">rewrite</span> <span class="id">unlock</span>; <span class="id">under</span> <span class="id">eq_integral</span> <span class="id">do</span> <span class="id"><a href="mathcomp.analysis.probability.html#expectation_lemmas.P">rewrite</a></span> <span class="id">EFinM</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">integralZl</span>//; <span class="id">under</span> <span class="id">eq_integral</span> <span class="id">do</span> <span class="id">rewrite</span> <span class="id">muleC</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#integral_ge0">expectation_ge0</a></span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#lee_fin">R</a></span>}) :<br/>
+&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id">X</span> <span class="id">x</span>)%<span class="id">R</span> -&gt; 0 &lt;= '<span class="id">E_P</span>[<span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof14')">Proof.</span></div>
+<div class="proofscript" id="proof14">
+<span class="kwd">by</span> <span class="id">move</span>=&gt; ?; <span class="id">rewrite</span> <span class="id">unlock</span> <span class="id">integral_ge0</span>// =&gt; <span class="id">x</span> <span class="id">_</span>; <span class="id">rewrite</span> <span class="id">lee_fin</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">expectation_le</span> (<span class="id">X</span> <span class="id">Y</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">measurable_fun</span> [<span class="id">set</span>: <span class="id">T</span>] <span class="id">X</span> -&gt; <span class="id">measurable_fun</span> [<span class="id">set</span>: <span class="id">T</span>] <span class="id">Y</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id">X</span> <span class="id">x</span>)%<span class="id">R</span> -&gt; (<span class="kwd">forall</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssreflect.html#unlock">x</a></span>, 0 &lt;= <span class="id">Y</span> <span class="id">x</span>)%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;{<span class="id">ae</span> <span class="id">P</span>, (<span class="kwd">forall</span> <span class="id">x</span>, <span class="id">X</span> <span class="id">x</span> &lt;= <span class="id">Y</span> <span class="id">x</span>)%<span class="id">R</span>} -&gt; '<span class="id">E_P</span>[<span class="id">X</span>] &lt;= '<span class="id">E_P</span>[<span class="id">Y</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof15')">Proof.</span></div>
+<div class="proofscript" id="proof15">
+<span class="id">move</span>=&gt; <span class="id">mX</span> <span class="id">mY</span> <span class="id">X0</span> <span class="id">Y0</span> <span class="id">XY</span>; <span class="id">rewrite</span> <span class="id">unlock</span> <span class="id">ae_ge0_le_integral</span> =&gt; //.<br/>
+- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">t</span> <span class="id">_</span>; <span class="id">apply</span>: <span class="id">X0</span>.<br/>
+- <span class="id">exact</span>/<span class="id">EFin_measurable_fun</span>.<br/>
+- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">t</span> <span class="id">_</span>; <span class="id">apply</span>: <span class="id">Y0</span>.<br/>
+- <span class="id">exact</span>/<span class="id">EFin_measurable_fun</span>.<br/>
+- <span class="id">move</span>: <span class="id">XY</span> =&gt; [<span class="id">N</span> [<span class="id">mN</span> <span class="id">PN</span> <span class="id">XYN</span>]]; <span class="kwd">exists</span> <span class="id">N</span>; <span class="id">split</span> =&gt; // <span class="id">t</span> /= <span class="id">h</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">XYN</span> =&gt; /=; <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">apply</a></span>: <span class="id">contra_not</span> <span class="id">h</span>; <span class="id">rewrite</span> <span class="id">lee_fin</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">expectationD</span> (<span class="id">X</span> <span class="id">Y</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">E_P</span>[<span class="id">X</span> \+ <span class="id">Y</span>] = '<span class="id">E_P</span>[<span class="id">X</span>] + '<span class="id">E_P</span>[<span class="id">Y</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof16')">Proof.</span></div>
+<div class="proofscript" id="proof16">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; ? ?; <span class="id">rewrite</span> <span class="id">unlock</span> <span class="id">integralD_EFin</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">expectationB</span> (<span class="id">X</span> <span class="id">Y</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">E_P</span>[<span class="id">X</span> \- <span class="id">Y</span>] = '<span class="id">E_P</span>[<span class="id"><a href="mathcomp.analysis.probability.html#expectation_lemmas.R">X</a></span>] - '<span class="id">E_P</span>[<span class="id">Y</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof17')">Proof.</span></div>
+<div class="proofscript" id="proof17">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; ? ?; <span class="id">rewrite</span> <span class="id">unlock</span> <span class="id">integralB_EFin</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id"><a href="mathcomp.analysis.probability.html#expectation_lemmas.P">expectation_sum</a></span> (<span class="id">X</span> : <span class="id">seq</span> {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">Xi</span>, <span class="id">Xi</span> \<span class="kwd">in</span> <span class="id">X</span> -&gt; <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Xi</span>)) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">E_P</span>[\<span class="id">sum_</span>(<span class="id">Xi</span> &lt;- <span class="id">X</span>) <span class="id">Xi</span>] = \<span class="id">sum_</span>(<span class="id">Xi</span> &lt;- <span class="id">X</span>) '<span class="id">E_P</span>[<span class="id">Xi</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof18')">Proof.</span></div>
+<div class="proofscript" id="proof18">
+<span class="id">elim</span>: <span class="id">X</span> =&gt; [|<span class="id">X0</span> <span class="id">X</span> <span class="id">IHX</span>] <span class="id">intX</span>; <span class="id">first</span> <span class="kwd">by</span> <span class="id">rewrite</span> !<span class="id">big_nil</span> <span class="id">expectation_cst</span>.<br/>
+<span class="id">have</span> <span class="id"><a href="mathcomp.analysis.probability.html#expectation_lemmas.P">intX0</a></span> : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X0</span>).<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">intX</span>; <span class="id">rewrite</span> <span class="id">in_cons</span> <span class="id">eqxx</span>.<br/>
+<span class="id">have</span> {}<span class="id">intX</span> <span class="id">Xi</span> : <span class="id">Xi</span> \<span class="kwd">in</span> <span class="id">X</span> -&gt; <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Xi</span>).<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">XiX</span>; <span class="id">apply</span>: <span class="id">intX</span>; <span class="id">rewrite</span> <span class="id">in_cons</span> <span class="id">XiX</span> <span class="id">orbT</span>.<br/>
+<span class="id">rewrite</span> !<span class="id">big_cons</span> <span class="id">expectationD</span> ?<span class="id">IHX</span>// (<span class="id">_</span> : <span class="id">_</span> \<span class="id">o</span> <span class="id">_</span> = <span class="kwd">fun</span> <span class="id">x</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;\<span class="id">sum_</span>(<span class="id">f</span> &lt;- <span class="id">map</span> (<span class="kwd">fun</span> <span class="id">x</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>} =&gt; <span class="id">EFin</span> \<span class="id">o</span> <span class="id">x</span>) <span class="id">X</span>) <span class="id">f</span> <span class="id">x</span>).<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">integrable_sum</span> =&gt; // <span class="id">_</span> /<span class="id">mapP</span>[<span class="id">h</span> <span class="id">hX</span> -&gt;]; <span class="id">exact</span>: <span class="id">intX</span>.<br/>
+<span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funext</span> =&gt; <span class="id">t</span>/=; <span class="id">rewrite</span> <span class="id">big_map</span> <span class="id">sumEFin</span> <span class="id">mfun_sum</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">expectation_lemmas</span>.<br/>
+<br/>
+<span class="id">HB.lock</span> <span class="kwd">Definition</span> <span class="id">covariance</span> {<span class="id">d</span>} {<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>} {<span class="id">R</span> : <span class="id">realType</span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a name="covariance_unlockable">P</a></span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>) (<span class="id">X</span> <span class="id">Y</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) :=<br/>
+&nbsp;&nbsp;'<span class="id">E_P</span>[(<span class="id">X</span> \- <span class="id">cst</span> (<span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">X</span>])) * (<span class="id">Y</span> \- <span class="id">cst</span> (<span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">Y</span>]))]%<span class="id">E</span>.<br/>
+<span class="kwd">Canonical</span> <span class="id">covariance_unlockable</span> := <span class="id">Unlockable</span> <span class="id">covariance.unlock</span>.<br/>
+<span class="kwd">Arguments</span> <span class="id">covariance</span> {<span class="id"><a href="mathcomp.analysis.reals.html#Real.Exports.realType">d</a></span> <span class="id">T</span> <span class="id">R</span>} <span class="id">P</span> <span class="id">_</span>%<span class="id">R</span> <span class="id">_</span>%<span class="id"><a href="mathcomp.analysis.measure.html#Probability.Exports.probability">R</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">covariance_lemmas</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">ereal_scope</a></span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceE</span> (<span class="id">X</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">Y</a></span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">X</a></span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span> = '<span class="id">E_P</span>[<span class="id">X</span> * <span class="id">Y</span>] - '<span class="id">E_P</span>[<span class="id">X</span>] * '<span class="id">E_P</span>[<span class="id">Y</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof19')">Proof.</span></div>
+<div class="proofscript" id="proof19">
+<span class="id">move</span>=&gt; <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#fin_num">X1</a></span> <span class="id">Y1</span> <span class="id">XY1</span>.<br/>
+<span class="id">have</span> ? : '<span class="id">E_P</span>[<span class="id">X</span>] \<span class="id">is</span> <span class="id">a</span> <span class="id">fin_num</span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">fin_num_abs</span>// <span class="id">integrable_expectation</span>.<br/>
+<span class="id">have</span> ? : '<span class="id">E_P</span>[<span class="id">Y</span>] \<span class="id">is</span> <span class="id">a</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">fin_num</a></span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">fin_num_abs</span>// <span class="id">integrable_expectation</span>.<br/>
+<span class="id">rewrite</span> <span class="id">unlock</span> [<span class="id">X</span> <span class="kwd">in</span> '<span class="id">E_P</span>[<span class="id">X</span>]](<span class="id">_</span> : <span class="id">_</span> = (<span class="id">X</span> \* <span class="id">Y</span> \- <span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">X</span>] \<span class="id">o</span>* <span class="id">Y</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;\- <span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">Y</span>] \<span class="id">o</span>* <span class="id">X</span> \+ <span class="id">fine</span> ('<span class="id">E_P</span>[<span class="id">X</span>] * '<span class="id">E_P</span>[<span class="id">Y</span>]) \<span class="id">o</span>* <span class="id">cst</span> 1)%<span class="id">R</span>); <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id">x</span> /=; <span class="id">rewrite</span> <span class="id">mulrDr</span> !<span class="id">mulrDl</span>/= <span class="id">mul1r</span> <span class="id">fineM</span>// <span class="id">mulrNN</span> <span class="id">addrA</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulrN</span> <span class="id">mulNr</span> [<span class="id">Z</span> <span class="kwd">in</span> (<span class="id">X</span> <span class="id">x</span> * <span class="id">Y</span> <span class="id">x</span> - <span class="id">Z</span>)%<span class="id">R</span>]<span class="id">mulrC</span>.<br/>
+<span class="id">have</span> ? : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> \* <span class="id">Y</span> \- <span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">X</span>] \<span class="id">o</span>* <span class="id">Y</span>)%<span class="id">R</span>).<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compreBr</span> ?<span class="id">integrableB</span>// <span class="id">compre_scale</span> ?<span class="id">integrableZl</span>.<br/>
+<span class="id">rewrite</span> <span class="id">expectationD</span>/=; <span class="id">last</span> 2 <span class="id">first</span>.<br/>
+&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compreBr</span>// <span class="id">integrableB</span>// <span class="id"><a href="mathcomp.analysis.probability.html#expectationB">compre_scale</a></span> ?<span class="id">integrableZl</span>.<br/>
+&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span>// <span class="id">integrableZl</span>// <span class="id">finite_measure_integrable_cst</span>.<br/>
+<span class="id">rewrite</span> 2?<span class="id">expectationB</span>//= ?<span class="id">compre_scale</span>// ?<span class="id">integrableZl</span>//.<br/>
+<span class="id">rewrite</span> 3?<span class="id">expectationM</span>//= ?<span class="id">finite_measure_integrable_cst</span>//.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">expectation_cst</span> <span class="id">mule1</span> <span class="id">fineM</span>// <span class="id">EFinM</span> !<span class="id">fineK</span>// <span class="id">muleC</span> <span class="id">subeK</span> ?<span class="id">fin_numM</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceC</span> (<span class="id">X</span> <span class="id">Y</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) : <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span> = <span class="id">covariance</span> <span class="id">P</span> <span class="id">Y</span> <span class="id">X</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof20')">Proof.</span></div>
+<div class="proofscript" id="proof20">
+<span class="kwd">by</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">rewrite</a></span> <span class="id">unlock</span>; <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">congr</a></span> <span class="id">expectation</span>; <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id">x</span> /=; <span class="id">rewrite</span> <span class="id">mulrC</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covariance_fin_num</span> (<span class="id">X</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">Y</a></span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span> \<span class="id">is</span> <span class="id">a</span> <span class="id">fin_num</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof21')">Proof.</span></div>
+<div class="proofscript" id="proof21">
+<span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">Y1</span> <span class="id">XY1</span>; <span class="id">rewrite</span> <span class="id">covarianceE</span>// <span class="id">fin_numB</span> <span class="id">fin_numM</span> <span class="id">expectation_fin_num</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covariance_cst_l</span> <span class="id">c</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) : <span class="id">covariance</span> <span class="id">P</span> (<span class="id">cst</span> <span class="id">c</span>) <span class="id">X</span> = 0.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof22')">Proof.</span></div>
+<div class="proofscript" id="proof22">
+<span class="id">rewrite</span> <span class="id">unlock</span> <span class="id">expectation_cst</span>/=.<br/>
+<span class="id">rewrite</span> [<span class="id">X</span> <span class="kwd">in</span> '<span class="id">E_P</span>[<span class="id">X</span>]](<span class="id">_</span> : <span class="id">_</span> = <span class="id">cst</span> 0%<span class="id">R</span>) ?<span class="id">expectation_cst</span>//.<br/>
+<span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id">x</span>; <span class="id">rewrite</span> /<span class="id">GRing.mul</span>/= <span class="id">subrr</span> <span class="id">mul0r</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covariance_cst_r</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) <span class="id">c</span> : <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">covariance</a></span> <span class="id">P</span> <span class="id">X</span> (<span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">cst</a></span> <span class="id">c</span>) = 0.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof23')">Proof.</span></div>
+<div class="proofscript" id="proof23">
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">covarianceC</span> <span class="id">covariance_cst_l</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceZl</span> <span class="id">a</span> (<span class="id">X</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">Y</a></span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> (<span class="id">a</span> \<span class="id">o</span>* <span class="id"><a href="mathcomp.classical.boolp.html#funeqP">X</a></span>)%<span class="id">R</span> <span class="id">Y</span> = <span class="id">a</span>%:<span class="id">E</span> * <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof24')">Proof.</span></div>
+<div class="proofscript" id="proof24">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">Y1</span> <span class="id">XY1</span>.<br/>
+<span class="id">have</span> <span class="id">aXY</span> : (<span class="id">a</span> \<span class="id">o</span>* <span class="id">X</span> * <span class="id">Y</span> = <span class="id">a</span> \<span class="id">o</span>* (<span class="id">X</span> * <span class="id"><a href="mathcomp.analysis.ereal.html#compre_scale">Y</a></span>))%<span class="id">R</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id">x</span>; <span class="id">rewrite</span> <span class="id">mulrAC</span>.<br/>
+<span class="id">rewrite</span> [<span class="id">LHS</span>]<span class="id">covarianceE</span> =&gt; [||//|] /=; <span class="id">last</span> 2 <span class="id">first</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span> ?<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#muleA">integrableZl</a></span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">aXY</span> <span class="id">compre_scale</span> ?<span class="id">integrableZl</span>.<br/>
+<span class="id">rewrite</span> <span class="id">covarianceE</span>// <span class="id">aXY</span> !<span class="id">expectationM</span>//.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">muleA</span> -<span class="id">muleBr</span>// <span class="id">fin_num_adde_defr</span>// <span class="id">expectation_fin_num</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceZr</span> <span class="id">a</span> (<span class="id">X</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">Y</a></span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> (<span class="id">a</span> \<span class="id">o</span>* <span class="id">Y</span>)%<span class="id">R</span> = <span class="id">a</span>%:<span class="id">E</span> * <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof25')">Proof.</span></div>
+<div class="proofscript" id="proof25">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">Y1</span> <span class="id">XY1</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> [<span class="kwd">in</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">RHS</a></span>]<span class="id">covarianceC</span> <span class="id">covarianceC</span> <span class="id">covarianceZl</span>; <span class="id">last</span> <span class="id">rewrite</span> <span class="id">mulrC</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceNl</span> (<span class="id">X</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">Y</a></span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> (\- <span class="id">X</span>)%<span class="id">R</span> <span class="id">Y</span> = - <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof26')">Proof.</span></div>
+<div class="proofscript" id="proof26">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">Y1</span> <span class="id">XY1</span>.<br/>
+<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#mul1e">have</a></span> -&gt; : (\- <span class="id">X</span> = -1 \<span class="id">o</span>* <span class="id">X</span>)%<span class="id">R</span> <span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.R">x</a></span> /=; <span class="id">rewrite</span> <span class="id">mulrN</span> <span class="id">mulr1</span>.<br/>
+<span class="kwd">by</span> <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">rewrite</a></span> <span class="id">covarianceZl</span>// <span class="id">EFinN</span> <span class="id">mulNe</span> <span class="id">mul1e</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceNr</span> (<span class="id">X</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">Y</a></span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covarianceC">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id"><a href="mathcomp.analysis.probability.html#covarianceNl">X</a></span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> (\- <span class="id"><a name="covarianceNN">Y</a></span>)%<span class="id">R</span> = - <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">Y</a></span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof27')">Proof.</span></div>
+<div class="proofscript" id="proof27">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">Y1</span> <span class="id">XY1</span>; <span class="id">rewrite</span> !(<span class="id">covarianceC</span> <span class="id">X</span>) <span class="id">covarianceNl</span> 1?<span class="id">mulrC</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceNN</span> (<span class="id">X</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">Y</a></span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">R</a></span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> (\- <span class="id">X</span>)%<span class="id">R</span> (\- <span class="id">Y</span>)%<span class="id">R</span> = <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof28')">Proof.</span></div>
+<div class="proofscript" id="proof28">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id"><a href="mathcomp.analysis.probability.html#covarianceNr">Y1</a></span> <span class="id">XY1</span>.<br/>
+<span class="id">have</span> <span class="id">NY</span> : <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#integrableN">EFin</a></span> \<span class="id">o</span> (\- <span class="id">Y</span>)%<span class="id">R</span>) <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compreN</span> ?<span class="id">integrableN</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">covarianceNl</span> ?<span class="id">covarianceNr</span> ?<span class="id">oppeK</span>//= <span class="id">mulrN</span> <span class="id">compreN</span> ?<span class="id">integrableN</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceDl</span> (<span class="id">X</span> <span class="id">Y</span> <span class="id">Z</span> : {<span class="id"><a href="mathcomp.classical.classical_sets.html#setT">RV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Z</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Z</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Z</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> * <span class="id">Z</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> (<span class="id">X</span> \+ <span class="id">Y</span>)%<span class="id">R</span> <span class="id">Z</span> = <span class="id">covariance</span> <span class="id">P</span> <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#integrableD">X</a></span> <span class="id">Z</span> + <span class="id">covariance</span> <span class="id">P</span> <span class="id">Y</span> <span class="id">Z</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof29')">Proof.</span></div>
+<div class="proofscript" id="proof29">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span> <span class="id">Y1</span> <span class="id">Y2</span> <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#muleDl">Z1</a></span> <span class="id">Z2</span> <span class="id">XZ1</span> <span class="id">YZ1</span>.<br/>
+<span class="id">rewrite</span> [<span class="id">LHS</span>]<span class="id">covarianceE</span>//= ?<span class="id">mulrDl</span> ?<span class="id">compreDr</span>// ?<span class="id">integrableD</span>//.<br/>
+<span class="id">rewrite</span> 2?<span class="id">expectationD</span>//=.<br/>
+<span class="id">rewrite</span> <span class="id">muleDl</span> ?<span class="id">fin_num_adde_defr</span> ?<span class="id">expectation_fin_num</span>//.<br/>
+<span class="id">rewrite</span> <span class="id">oppeD</span> ?<span class="id">fin_num_adde_defr</span> ?<span class="id">fin_numM</span> ?<span class="id">expectation_fin_num</span>//.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">addeACA</span> 2?<span class="id">covarianceE</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceDr</span> (<span class="id">X</span> <span class="id">Y</span> <span class="id">Z</span> : {<span class="id"><a href="mathcomp.classical.classical_sets.html#setT">RV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Z</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Z</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Z</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> (<span class="id">Y</span> \+ <span class="id">Z</span>)%<span class="id">R</span> = <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span> + <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Z</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof30')">Proof.</span></div>
+<div class="proofscript" id="proof30">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span> <span class="id">Y1</span> <span class="id">Y2</span> <span class="id">Z1</span> <span class="id">Z2</span> <span class="id">XY1</span> <span class="id">XZ1</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">covarianceC</span> <span class="id">covarianceDl</span> ?(<span class="id">covarianceC</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">X</a></span>) 1?<span class="id">mulrC</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceBl</span> (<span class="id">X</span> <span class="id">Y</span> <span class="id">Z</span> : {<span class="id"><a href="mathcomp.classical.classical_sets.html#setT">RV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Z</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Z</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Z</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> * <span class="id">Z</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> (<span class="id">X</span> \- <span class="id">Y</span>)%<span class="id">R</span> <span class="id">Z</span> = <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Z</span> - <span class="id">covariance</span> <span class="id">P</span> <span class="id">Y</span> <span class="id">Z</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof31')">Proof.</span></div>
+<div class="proofscript" id="proof31">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span> <span class="id">Y1</span> <span class="id">Y2</span> <span class="id">Z1</span> <span class="id">Z2</span> <span class="id">XZ1</span> <span class="id">YZ1</span>.<br/>
+<span class="id">rewrite</span> -[(<span class="id">X</span> \- <span class="id">Y</span>)%<span class="id">R</span>]/(<span class="id">X</span> \+ (\- <span class="id">Y</span>))%<span class="id">R</span> <span class="id">covarianceDl</span> ?<span class="id">covarianceNl</span>//=.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compreN</span>// <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">integrableN</a></span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulrNN</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulNr</span> <span class="id">compreN</span>// <span class="id">integrableN</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covarianceBr</span> (<span class="id">X</span> <span class="id">Y</span> <span class="id">Z</span> : {<span class="id"><a href="mathcomp.classical.classical_sets.html#setT">RV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Z</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Z</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Z</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> (<span class="id">Y</span> \- <span class="id">Z</span>)%<span class="id">R</span> = <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span> - <span class="id">covariance</span> <span class="id"><a href="mathcomp.analysis.probability.html#covariance_lemmas">P</a></span> <span class="id">X</span> <span class="id">Z</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof32')">Proof.</span></div>
+<div class="proofscript" id="proof32">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span> <span class="id">Y1</span> <span class="id">Y2</span> <span class="id">Z1</span> <span class="id">Z2</span> <span class="id">XY1</span> <span class="id">XZ1</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> !(<span class="id">covarianceC</span> <span class="id">X</span>) <span class="id">covarianceBl</span> 1?(<span class="id">mulrC</span> <span class="id">_</span> <span class="id">X</span>).<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">covariance_lemmas</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">variance</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">ereal_scope</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id"><a name="varianceE">R</a></span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">variance</span> (<span class="id">X</span> : <span class="id">T</span> -&gt; <span class="id"><a href="mathcomp.analysis.probability.html#variance.P">R</a></span>) := <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">X</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Notation</span> "''<span class="id">V_</span>' <span class="id">P</span> [ <span class="id">X</span> ]" := (<span class="id">variance</span> <span class="id">X</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceE</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#covarianceE">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">V_P</span>[<span class="id">X</span>] = '<span class="id">E_P</span>[<span class="id">X</span> ^+ 2] - ('<span class="id">E_P</span>[<span class="id">X</span>]) ^+ 2.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof33')">Proof.</span></div>
+<div class="proofscript" id="proof33">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span>; <span class="id">rewrite</span> /<span class="id">variance</span> <span class="id">covarianceE</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">variance_fin_num</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span> ^+ 2)%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;'<span class="id"><a href="mathcomp.analysis.probability.html#variance.R">V_P</a></span>[<span class="id">X</span>] \<span class="id">is</span> <span class="id">a</span> <span class="id">fin_num</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof34')">Proof.</span></div>
+<div class="proofscript" id="proof34">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; /[<span class="id">dup</span>]; <span class="id">apply</span>: <span class="id">covariance_fin_num</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">variance_ge0</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) : (0 &lt;= '<span class="id">V_P</span>[<span class="id">X</span>])%<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof35')">Proof.</span></div>
+<div class="proofscript" id="proof35">
+<span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">variance</span> <span class="id">unlock</span>; <span class="id">apply</span>: <span class="id">expectation_ge0</span> =&gt; <span class="id">x</span>; <span class="id">apply</span>: <span class="id">sqr_ge0</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">variance_cst</span> <span class="id">r</span> : '<span class="id">V_P</span>[<span class="id">cst</span> <span class="id">r</span>] = 0%<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof36')">Proof.</span></div>
+<div class="proofscript" id="proof36">
+<span class="id">rewrite</span> /<span class="id">variance</span> <span class="id">unlock</span> <span class="id">expectation_cst</span>/=.<br/>
+<span class="id">rewrite</span> [<span class="id">X</span> <span class="kwd">in</span> '<span class="id">E_P</span>[<span class="id">X</span>]](<span class="id">_</span> : <span class="id">_</span> = <span class="id">cst</span> 0%<span class="id">R</span>) ?<span class="id">expectation_cst</span>//.<br/>
+<span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funext</span> =&gt; <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">x</a></span>; <span class="id">rewrite</span> /<span class="id">GRing.exp</span>/<span class="id">GRing.mul</span>/= <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">subrr</a></span> <span class="id">mulr0</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceZ</span> <span class="id">a</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">V_P</span>[(<span class="id">a</span> \<span class="id">o</span>* <span class="id">X</span>)%<span class="id">R</span>] = (<span class="id">a</span> ^+ 2)%:<span class="id">E</span> * '<span class="id">V_P</span>[<span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof37')">Proof.</span></div>
+<div class="proofscript" id="proof37">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span>; <span class="id">rewrite</span> /<span class="id">variance</span> <span class="id">covarianceZl</span>//=.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">covarianceZr</span>// <span class="id">muleA</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span>// <span class="id">integrableZl</span>.<br/>
+- <span class="id">rewrite</span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>](<span class="id">_</span> : <span class="id">_</span> = (<span class="id">a</span> \<span class="id">o</span>* <span class="id">X</span> ^+ 2)%<span class="id">R</span>); <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id">x</span>; <span class="id">rewrite</span> <span class="id">mulrA</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span>// <span class="id">integrableZl</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceN</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id"><a href="mathcomp.analysis.probability.html#variance.P">V_P</a></span>[(\- <span class="id">X</span>)%<span class="id">R</span>] = '<span class="id">V_P</span>[<span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof38')">Proof.</span></div>
+<div class="proofscript" id="proof38">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span>; <span class="id">rewrite</span> /<span class="id">variance</span> <span class="id">covarianceNN</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceD</span> (<span class="id">X</span> <span class="id">Y</span> : {<span class="id"><a href="mathcomp.classical.classical_sets.html#setT">RV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#variance.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">V_P</span>[<span class="id">X</span> \+ <span class="id"><a href="mathcomp.analysis.probability.html#variance.P">Y</a></span>]%<span class="id">R</span> = '<span class="id">V_P</span>[<span class="id">X</span>] + '<span class="id">V_P</span>[<span class="id">Y</span>] + 2%:<span class="id">E</span> * <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof39')">Proof.</span></div>
+<div class="proofscript" id="proof39">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span> <span class="id">Y1</span> <span class="id">Y2</span> <span class="id">XY1</span>.<br/>
+<span class="id">rewrite</span> -['<span class="id"><a href="mathcomp.analysis.ereal.html#compreDr">V_P</a></span>[<span class="id">_</span>]]/(<span class="id">covariance</span> <span class="id">P</span> (<span class="id">X</span> \+ <span class="id">Y</span>)%<span class="id">R</span> (<span class="id">X</span> \+ <span class="id">Y</span>)%<span class="id">R</span>).<br/>
+<span class="id">have</span> <span class="id">XY</span> : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id"><a href="mathcomp.analysis.ereal.html#compreDr">o</a></span> (<span class="id">X</span> \+ <span class="id">Y</span>)%<span class="id">R</span>).<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compreDr</span>// <span class="id">integrableD</span>.<br/>
+<span class="id">rewrite</span> <span class="id">covarianceDl</span>//=; <span class="id">last</span> 3 <span class="id">first</span>.<br/>
+- <span class="id">rewrite</span> -<span class="id"><a href="mathcomp.analysis.ereal.html#compre_scale">expr2</a></span> <span class="id">sqrrD</span> <span class="id">compreDr</span> ?<span class="id">integrableD</span>// <span class="id">compreDr</span>// <span class="id">integrableD</span>//.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> -<span class="id">mulr_natr</span> -[(<span class="id">_</span> * 2)%<span class="id">R</span>]/(2 \<span class="id">o</span>* (<span class="id">X</span> * <span class="id"><a href="mathcomp.analysis.ereal.html#compreDr">Y</a></span>))%<span class="id">R</span> <span class="id">compre_scale</span>//.<br/>
+&nbsp;&nbsp;<span class="id">exact</span>: <span class="id"><a href="mathcomp.analysis.probability.html#covarianceDr">integrableZl</a></span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulrDr</span> <span class="id">compreDr</span> ?<span class="id">integrableD</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulrDr</span> <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#addeA">mulrC</a></span> <span class="id">compreDr</span> ?<span class="id">integrableD</span>.<br/>
+<span class="id">rewrite</span> <span class="id">covarianceDr</span>// <span class="id">covarianceDr</span> ?(<span class="id">mulrC</span> <span class="id">Y</span> <span class="id">X</span>)//.<br/>
+<span class="id">rewrite</span> (<span class="id">covarianceC</span> <span class="id">P</span> <span class="id">Y</span> <span class="id">X</span>) [<span class="id">LHS</span>]<span class="id"><a name="varianceB">addeA</a></span> [<span class="id">LHS</span>](<span class="id">ACl</span> (1*4*(2*3)))/=.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> -[2%<span class="id">R</span>]/(1 + 1)%<span class="id">R</span> <span class="id">EFinD</span> <span class="id">muleDl</span> ?<span class="id">mul1e</span>// <span class="id">covariance_fin_num</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceB</span> (<span class="id">X</span> <span class="id">Y</span> : {<span class="id"><a href="mathcomp.classical.classical_sets.html#setT">RV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#variance.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">V_P</span>[(<span class="id">X</span> \- <span class="id">Y</span>)%<span class="id">R</span>] = '<span class="id">V_P</span>[<span class="id">X</span>] + '<span class="id">V_P</span>[<span class="id">Y</span>] - 2%:<span class="id">E</span> * <span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof40')">Proof.</span></div>
+<div class="proofscript" id="proof40">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span> <span class="id">Y1</span> <span class="id">Y2</span> <span class="id">XY1</span>.<br/>
+<span class="id">rewrite</span> -[(<span class="id">X</span> \- <span class="id">Y</span>)%<span class="id">R</span>]/(<span class="id">X</span> \+ (\- <span class="id">Y</span>))%<span class="id">R</span>.<br/>
+<span class="id">rewrite</span> <span class="id">varianceD</span>/= ?<span class="id">varianceN</span> ?<span class="id">covarianceNr</span> ?<span class="id">muleN</span>//.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compreN</span> ?<span class="id"><a href="mathcomp.analysis.probability.html#variance.P">integrableN</a></span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulrNN</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulrN</span> <span class="id">compreN</span> ?<span class="id">integrableN</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceD_cst_l</span> <span class="id">c</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id"><a href="mathcomp.analysis.probability.html#varianceD">o</a></span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#finite_measure_integrable_cst">X</a></span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">V_P</span>[(<span class="id">cst</span> <span class="id">c</span> \+ <span class="id">X</span>)%<span class="id">R</span>] = '<span class="id">V_P</span>[<span class="id"><a href="mathcomp.analysis.ereal.html#compre_scale">X</a></span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof41')">Proof.</span></div>
+<div class="proofscript" id="proof41">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span>.<br/>
+<span class="id">rewrite</span> <span class="id">varianceD</span>//=; <span class="id">last</span> 3 <span class="id">first</span>.<br/>
+- <span class="id">exact</span>: <span class="id">finite_measure_integrable_cst</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span>// <span class="id">integrableZl</span>// <span class="id">finite_measure_integrable_cst</span>.<br/>
+- <span class="kwd">by</span> <span class="id"><a name="varianceD_cst_r">rewrite</a></span> <span class="id">mulrC</span> <span class="id">compre_scale</span> ?<span class="id">integrableZl</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">variance_cst</span> <span class="id">add0e</span> <span class="id">covariance_cst_l</span> <span class="id">mule0</span> <span class="id">adde0</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceD_cst_r</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) <span class="id">c</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id"><a href="mathcomp.classical.functions.html#cst">P</a></span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">V_P</span>[(<span class="id">X</span> \+ <span class="id">cst</span> <span class="id">c</span>)%<span class="id">R</span>] = '<span class="id"><a href="mathcomp.analysis.probability.html#varianceD_cst_l">V_P</a></span>[<span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof42')">Proof.</span></div>
+<div class="proofscript" id="proof42">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span>.<br/>
+<span class="id"><a name="varianceB_cst_l">have</a></span> -&gt; : (<span class="id">X</span> \+ <span class="id">cst</span> <span class="id">c</span> = <span class="id">cst</span> <span class="id">c</span> \+ <span class="id"><a href="mathcomp.analysis.probability.html#variance.R">X</a></span>)%<span class="id">R</span> <span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">x</a></span> /=; <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">rewrite</a></span> <span class="id">addrC</span>.<br/>
+<span class="id">exact</span>: <span class="id">varianceD_cst_l</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceB_cst_l</span> <span class="id">c</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">V_P</span>[(<span class="id">cst</span> <span class="id">c</span> \- <span class="id">X</span>)%<span class="id">R</span>] = '<span class="id">V_P</span>[<span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof43')">Proof.</span></div>
+<div class="proofscript" id="proof43">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span>.<br/>
+<span class="id">rewrite</span> -[(<span class="id">cst</span> <span class="id">c</span> \- <span class="id">X</span>)%<span class="id">R</span>]/(<span class="id">cst</span> <span class="id">c</span> \+ (\- <span class="id">X</span>))%<span class="id">R</span> <span class="id">varianceD_cst_l</span>/=; <span class="id">last</span> 2 <span class="id">first</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compreN</span> ?<span class="id">integrableN</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulrNN</span>; <span class="id">apply</span>: <span class="id">X2</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">varianceN</a></span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">varianceB_cst_r</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) <span class="id">c</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id"><a href="mathcomp.classical.functions.html#cst">integrable</a></span> <span class="id">setT</span> (<span class="id"><a href="mathcomp.classical.functions.html#cst">EFin</a></span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">V_P</span>[(<span class="id">X</span> \- <span class="id">cst</span> <span class="id">c</span>)%<span class="id"><a name="covariance_le">R</a></span>] = '<span class="id">V_P</span>[<span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof44')">Proof.</span></div>
+<div class="proofscript" id="proof44">
+<span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id"><a href="mathcomp.analysis.probability.html#variance.R">X1</a></span> <span class="id">X2</span>; <span class="id">rewrite</span> -[(<span class="id">X</span> \- <span class="id">cst</span> <span class="id">c</span>)%<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">R</a></span>]/(<span class="id">X</span> \+ (<span class="id">cst</span> (- <span class="id">c</span>)))%<span class="id">R</span> <span class="id">varianceD_cst_r</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">covariance_le</span> (<span class="id">X</span> <span class="id">Y</span> : {<span class="id"><a href="mathcomp.classical.classical_sets.html#setT">RV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id"><a href="mathcomp.analysis.probability.html#variance.P">setT</a></span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id"><a href="mathcomp.analysis.probability.html#variance_ge0">X</a></span> * <span class="id">Y</span>)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;<span class="id">covariance</span> <span class="id">P</span> <span class="id">X</span> <span class="id">Y</span> &lt;= <span class="id">sqrte</span> '<span class="id">V_P</span>[<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#sqr_sqrte">X</a></span>] * <span class="id">sqrte</span> '<span class="id">V_P</span>[<span class="id">Y</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof45')">Proof.</span></div>
+<div class="proofscript" id="proof45">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span> <span class="id">Y1</span> <span class="id">Y2</span> <span class="id">XY1</span>.<br/>
+<span class="id">rewrite</span> -<span class="id">sqrteM</span> ?<span class="id">variance_ge0</span>//.<br/>
+<span class="id">rewrite</span> <span class="id">lee_sqrE</span> ?<span class="id">sqrte_ge0</span>// <span class="id">sqr_sqrte</span> ?<span class="id">mule_ge0</span> ?<span class="id">variance_ge0</span>//.<br/>
+<span class="id">rewrite</span> -(<span class="id">fineK</span> (<span class="id">variance_fin_num</span> <span class="id">X1</span> <span class="id">X2</span>)) -(<span class="id">fineK</span> (<span class="id">variance_fin_num</span> <span class="id">Y1</span> <span class="id">Y2</span>)).<br/>
+<span class="id">rewrite</span> -(<span class="id">fineK</span> (<span class="id">covariance_fin_num</span> <span class="id">X1</span> <span class="id">Y1</span> <span class="id">XY1</span>)).<br/>
+<span class="id">rewrite</span> -<span class="id">EFin_expe</span> -<span class="id">EFinM</span> <span class="id">lee_fin</span> -(@<span class="id">ler_pmul2l</span> <span class="id">_</span> 4%:<span class="id">R</span>) ?<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#lee_fin">ltr0n</a></span>// [<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFinD">leRHS</a></span>]<span class="id">mulrA</span>.<br/>
+<span class="id">rewrite</span> [<span class="kwd">in</span> <span class="id">leLHS</span>](<span class="id">natrM</span> <span class="id">_</span> 2 2) <span class="id">mulrACA</span> -<span class="id"><a href="mathcomp.analysis.probability.html#varianceZ">expr2</a></span> -<span class="id">subr_le0</span>.<br/>
+<span class="id">apply</span>: <span class="id">deg_le2_ge0</span> =&gt; <span class="id">r</span>; <span class="id">rewrite</span> -<span class="id">lee_fin</span> !<span class="id">EFinD</span>.<br/>
+<span class="id">rewrite</span> <span class="id">EFinM</span> <span class="id">fineK</span> ?<span class="id">variance_fin_num</span>// <span class="id">muleC</span> -<span class="id">varianceZ</span>//.<br/>
+<span class="id">rewrite</span> -<span class="id">mulrA</span> <span class="id">EFinM</span> <span class="id">mulrC</span> <span class="id">EFinM</span> ?<span class="id">fineK</span> ?<span class="id">covariance_fin_num</span>// -<span class="id">covarianceZl</span>//.<br/>
+<span class="id">rewrite</span> <span class="id">addeAC</span> -<span class="id">varianceD</span> ?<span class="id">variance_ge0</span>//=.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span> ?<span class="id">integrableZl</span>.<br/>
+- <span class="id">rewrite</span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id"><a href="mathcomp.analysis.ereal.html#compre_scale">EFin</a></span> \<span class="id">o</span> <span class="id">X</span>](<span class="id">_</span> : <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#integrableZl">_</a></span> = <span class="id">r</span> ^+2 \<span class="id">o</span>* <span class="id">X</span> ^+ 2)%<span class="id">R</span> 1?<span class="id">mulrACA</span>//.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span> ?<span class="id">integrableZl</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">mulrAC</span> <span class="id">compre_scale</span>// <span class="id">integrableZl</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">variance</span>.<br/>
+<span class="kwd">Notation</span> "'<span class="id">V_</span> <span class="id">P</span> [ <span class="id">X</span> ]" := (<span class="id">variance</span> <span class="id">P</span> <span class="id">X</span>).<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">markov_chebyshev_cantelli</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">ereal_scope</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id"><a href="mathcomp.analysis.measure.html#measurable_fun">realType</a></span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">markov</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) (<span class="id">f</span> : <span class="id">R</span> -&gt; <span class="id">R</span>) (<span class="id">eps</span> : <span class="id">R</span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(0 &lt; <span class="id">eps</span>)%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">measurable_fun</span> [<span class="id">set</span>: <span class="id">R</span>] <span class="id">f</span> -&gt; (<span class="kwd">forall</span> <span class="id">r</span>, 0 &lt;= <span class="id">f</span> <span class="id">r</span>)%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="kwd">in</span> <span class="id">Num.nneg</span> &amp;, {<span class="id">homo</span> <span class="id">f</span> : <span class="id">x</span> <span class="id">y</span> / <span class="id">x</span> &lt;= <span class="id">y</span>}}%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;(<span class="id">f</span> <span class="id">eps</span>)%:<span class="id">E</span> * <span class="id">P</span> [<span class="id">set</span> <span class="id">x</span> | <span class="id">eps</span>%:<span class="id">E</span> &lt;= `| (<span class="id">X</span> <span class="id">x</span>)%:<span class="id">E</span> | ] &lt;=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;'<span class="id">E_P</span>[<span class="id">f</span> \<span class="id">o</span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; `| <span class="id">x</span> |%<span class="id">R</span>) \<span class="id">o</span> <span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof46')">Proof.</span></div>
+<div class="proofscript" id="proof46">
+<span class="id">move</span>=&gt; <span class="id">e0</span> <span class="id">mf</span> <span class="id">f0</span> <span class="id">f_nd</span>; <span class="id">rewrite</span> -(<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#er_map">setTI</a></span> [<span class="id">set</span> <span class="id">_</span> | <span class="id">_</span>]).<br/>
+<span class="id">apply</span>: (<span class="id">le_trans</span> (@<span class="id">le_integral_comp_abse</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">P</span> <span class="id">_</span> <span class="id">measurableT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>)<br/>
+&nbsp;&nbsp;<span class="id">eps</span> (<span class="id">er_map</span> <span class="id">f</span>) <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">e0</span>)) =&gt; //=.<br/>
+- <span class="id">exact</span>: <span class="id">measurable_er_map</span>.<br/>
+- <span class="kwd">by</span> <span class="id">case</span> =&gt; //= <span class="id">r</span> <span class="id">_</span>; <span class="id">exact</span>: <span class="id">f0</span>.<br/>
+- <span class="id">move</span>=&gt; [<span class="id">x</span>| |] [<span class="id">y</span>| |]; <span class="id">rewrite</span> !<span class="id">inE</span>/= !<span class="id">in_itv</span>/= ?<span class="id">andbT</span> ?<span class="id">lee_fin</span> ?<span class="id">leey</span>//.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">move</span>=&gt; ? ? ?; <span class="id">rewrite</span> <span class="id">f_nd</span>.<br/>
+- <span class="id">exact</span>/<span class="id">EFin_measurable_fun</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">unlock</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Definition</span> <span class="id">mmt_gen_fun</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) (<span class="id">t</span> : <span class="id">R</span>) := '<span class="id">E_P</span>[<span class="id">expR</span> \<span class="id">o</span> <span class="id">t</span> \<span class="id">o</span>* <span class="id">X</span>].<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">chernoff</span> (<span class="id">X</span> : {<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#mul1e">RV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#leey">R</a></span>}) (<span class="id">r</span> <span class="id">a</span> : <span class="id">R</span>) : (0 &lt; <span class="id">r</span>)%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id">P</span> [<span class="id">set</span> <span class="id">x</span> | <span class="id">X</span> <span class="id">x</span> &gt;= <span class="id">a</span>]%<span class="id">R</span> * (<span class="id">expR</span> (<span class="id">r</span> * <span class="id">a</span>))%:<span class="id">E</span> &lt;= <span class="id">mmt_gen_fun</span> <span class="id">X</span> <span class="id">r</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof47')">Proof.</span></div>
+<div class="proofscript" id="proof47">
+<span class="id">move</span>=&gt; <span class="id">t0</span>; <span class="id">rewrite</span> /<span class="id">mmt_gen_fun</span>; <span class="id">have</span> -&gt; : <span class="id">expR</span> \<span class="id">o</span> <span class="id">r</span> \<span class="id">o</span>* <span class="id">X</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">normr</span> \<span class="id">o</span> <span class="id">normr</span>) \<span class="id">o</span> [<span class="id">the</span> {<span class="id">mfun</span> <span class="id">T</span> &gt;-&gt; <span class="id">R</span>} <span class="id">of</span> <span class="id">expR</span> \<span class="id">o</span> <span class="id">r</span> \<span class="id">o</span>* <span class="id">X</span>].<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">funext</span> =&gt; <span class="id">t</span> /=; <span class="id">rewrite</span> <span class="id">normr_id</span> <span class="id">ger0_norm</span> ?<span class="id">expR_ge0</span>.<br/>
+<span class="id">rewrite</span> (<span class="id">le_trans</span> <span class="id">_</span> (<span class="id">markov</span> <span class="id">_</span> (<span class="id">expR_gt0</span> (<span class="id">r</span> * <span class="id">a</span>)) <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>))//; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact</span>: (<span class="id">monoW_in</span> (@<span class="id">ger0_le_norm</span> <span class="id">_</span>)).<br/>
+<span class="id">rewrite</span> <span class="id">ger0_norm</span> ?<span class="id">expR_ge0</span>// <span class="id">muleC</span> <span class="id">lee_pmul2l</span>// ?<span class="id">lte_fin</span> ?<span class="id">expR_gt0</span>//.<br/>
+<span class="id">rewrite</span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id">_</span> &lt;= <span class="id">P</span> <span class="id">X</span>](<span class="id">_</span> : <span class="id">_</span> = [<span class="id">set</span> <span class="id">x</span> | <span class="id">a</span> &lt;= <span class="id">X</span> <span class="id">x</span>]%<span class="id">R</span>)//; <span class="id">apply</span>: <span class="id">eq_set</span> =&gt; <span class="id">t</span>/=.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ger0_norm</span> ?<span class="id">expR_ge0</span>// <span class="id">lee_fin</span> <span class="id">ler_expR</span>  <span class="id">mulrC</span> <span class="id">ler_pmul2r</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">chebyshev</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) (<span class="id">eps</span> : <span class="id">R</span>) : (0 &lt; <span class="id">eps</span>)%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id">P</span> [<span class="id">set</span> <span class="id">x</span> | (<span class="id">eps</span> &lt;= `| <span class="id">X</span> <span class="id">x</span> - <span class="id">fine</span> ('<span class="id">E_P</span>[<span class="id"><a href="mathcomp.analysis.probability.html#markov_chebyshev_cantelli.T">X</a></span>])|)%<span class="id"><a href="mathcomp.analysis.probability.html#markov_chebyshev_cantelli.R">R</a></span> ] &lt;= (<span class="id">eps</span> ^- 2)%:<span class="id">E</span> * '<span class="id">V_P</span>[<span class="id">X</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof48')">Proof.</span></div>
+<div class="proofscript" id="proof48">
+<span class="id">move</span> =&gt; <span class="id">heps</span>; <span class="id">have</span> [-&gt;|<span class="id">hv</span>] := <span class="id">eqVneq</span> '<span class="id">V_P</span>[<span class="id">X</span>] +<span class="id">oo</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssreflect.html#unlock">rewrite</a></span> <span class="id">mulr_infty</span> <span class="id">gtr0_sg</span> ?<span class="id">mul1e</span>// ?<span class="id">leey</span>// <span class="id"><a href="mathcomp.analysis.probability.html#markov_chebyshev_cantelli.R">invr_gt0</a></span>// <span class="id">exprn_gt0</span>.<br/>
+<span class="id">have</span> <span class="id">h</span> (<span class="id">Y</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span> [<span class="id"><a href="mathcomp.analysis.probability.html#markov_chebyshev_cantelli.P">set</a></span> <span class="id">x</span> | (<span class="id">eps</span> &lt;= `|<span class="id">Y</span> <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">x</a></span>|)%<span class="id">R</span>] &lt;= (<span class="id">eps</span> ^- 2)%:<span class="id">E</span> * '<span class="id">E_P</span>[<span class="id">Y</span> ^+ 2].<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> -<span class="id">lee_pdivr_mull</span>; <span class="id">last</span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">invr_gt0</span>// <span class="id">exprn_gt0</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">exprnN</span> <span class="id">expfV</span> <span class="id">exprz_inv</span> <span class="id">opprK</span> -<span class="id">exprnP</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span>: (@<span class="id">le_trans</span> <span class="id">_</span> <span class="id">_</span> ('<span class="id">E_P</span>[(@<span class="id">GRing.exp</span> <span class="id">R</span> ^~ 2%<span class="id">N</span> \<span class="id">o</span> <span class="id">normr</span>) \<span class="id">o</span> <span class="id">Y</span>])).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span>: (@<span class="id">markov</span> <span class="id">Y</span> (@<span class="id">GRing.exp</span> <span class="id">R</span> ^~ 2%<span class="id">N</span>)) =&gt; //.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">r</span>; <span class="id">apply</span>: <span class="id">sqr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">move</span>=&gt; <span class="id">x</span> <span class="id">y</span>; <span class="id">rewrite</span> !<span class="id">nnegrE</span> =&gt; <span class="id">x0</span> <span class="id">y0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ler_sqr</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span>: <span class="id">expectation_le</span> =&gt; //.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">apply</span>: <span class="id">measurableT_comp</span> =&gt; //; <span class="id">exact</span>: <span class="id">measurableT_comp</span>.<br/>
+&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">x</span> /=; <span class="id">apply</span>: <span class="id">sqr_ge0</span>.<br/>
+&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">x</span> /=; <span class="id">apply</span>: <span class="id">sqr_ge0</span>.<br/>
+&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">apply</span>/<span class="id">aeW</span> =&gt; <span class="id">t</span> /=; <span class="id">rewrite</span> <span class="id">real_normK</span>// <span class="id">num_real</span>.<br/>
+<span class="id">have</span> := <span class="id">h</span> [<span class="id">the</span> {<span class="id">mfun</span> <span class="id">T</span> &gt;-&gt; <span class="id">R</span>} <span class="id">of</span> (<span class="id">X</span> \- <span class="id">cst</span> (<span class="id">fine</span> ('<span class="id">E_P</span>[<span class="id">X</span>])))%<span class="id">R</span>].<br/>
+<span class="kwd">by</span> <span class="id">move</span>=&gt; /<span class="id">le_trans</span>; <span class="id">apply</span>; <span class="id">rewrite</span> /<span class="id">variance</span> [<span class="kwd">in</span> <span class="id">leRHS</span>]<span class="id">unlock</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">cantelli</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) (<span class="id">lambda</span> : <span class="id">R</span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; <span class="id">P</span>.-<span class="id">integrable</span> <span class="id">setT</span> (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">X</span> ^+ 2)%<span class="id">R</span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(0 &lt; <span class="id"><a href="mathcomp.analysis.probability.html#markov_chebyshev_cantelli.P">lambda</a></span>)%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id">P</span> [<span class="id">set</span> <span class="id">x</span> | <span class="id">lambda</span>%:<span class="id">E</span> &lt;= (<span class="id">X</span> <span class="id">x</span>)%:<span class="id">E</span> - '<span class="id">E_P</span>[<span class="id">X</span>]]<br/>
+&nbsp;&nbsp;&lt;= (<span class="id">fine</span> '<span class="id">V_P</span>[<span class="id">X</span>] / (<span class="id">fine</span> '<span class="id">V_P</span>[<span class="id">X</span>] + <span class="id">lambda</span>^2))%:<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof49')">Proof.</span></div>
+<div class="proofscript" id="proof49">
+<span class="id">move</span>=&gt; <span class="id">X1</span> <span class="id">X2</span> <span class="id">lambda_gt0</span>.<br/>
+<span class="id">have</span> <span class="id">finEK</span> : (<span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">X</span>])%:<span class="id">E</span> = '<span class="id">E_P</span>[<span class="id">X</span>].<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">fineK</span> ?<span class="id">unlock</span> ?<span class="id">integral_fune_fin_num</span>.<br/>
+<span class="id">have</span> <span class="id">finVK</span> : (<span class="id">fine</span> '<span class="id">V_P</span>[<span class="id">X</span>])%:<span class="id">E</span> = '<span class="id">V_P</span>[<span class="id">X</span>] <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">fineK</span> ?<span class="id">variance_fin_num</span>.<br/>
+<span class="id">pose</span> <span class="id">Y</span> := (<span class="id">X</span> \- <span class="id">cst</span> (<span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">X</span>]))%<span class="id">R</span>.<br/>
+<span class="id">have</span> <span class="id">Y1</span> : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">Y</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">compreBr</span> =&gt; [|//]; <span class="id">apply</span>: <span class="id">integrableB</span> <span class="id">X1</span> <span class="id">_</span> =&gt; [//|].<br/>
+&nbsp;&nbsp;<span class="id">exact</span>: <span class="id">finite_measure_integrable_cst</span>.<br/>
+<span class="id">have</span> <span class="id">Y2</span> : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id">Y</span> ^+ 2)%<span class="id">R</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">sqrrD</span>/= <span class="id">compreDr</span> =&gt; [|//].<br/>
+&nbsp;&nbsp;<span class="id">apply</span>: <span class="id">integrableD</span> =&gt; [//||]; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> -[(<span class="id">_</span> ^+ 2)%<span class="id">R</span>]/(<span class="id">cst</span> ((- <span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">X</span>]) ^+ 2)%<span class="id">R</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact</span>: <span class="id">finite_measure_integrable_cst</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">compreDr</span> =&gt; [|//]; <span class="id">apply</span>: <span class="id">integrableD</span> <span class="id">X2</span> <span class="id">_</span> =&gt; [//|].<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>](<span class="id">_</span> : <span class="id">_</span> = (- <span class="id">fine</span> '<span class="id">E_P</span>[<span class="id">X</span>] * 2) \<span class="id">o</span>* <span class="id">X</span>)%<span class="id">R</span>; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id">x</span> /=; <span class="id">rewrite</span> -<span class="id">mulr_natl</span> <span class="id">mulrC</span> <span class="id">mulrA</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span> =&gt; [|//]; <span class="id">apply</span>: <span class="id">integrableZl</span> <span class="id">X1</span>.<br/>
+<span class="id">have</span> <span class="id">EY</span> : '<span class="id">E_P</span>[<span class="id">Y</span>] = 0.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">expectationB</span>/= ?<span class="id">finite_measure_integrable_cst</span>//.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">expectation_cst</span> <span class="id">finEK</span> <span class="id">subee</span>//.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">unlock</span>; <span class="id">apply</span>: <span class="id">integral_fune_fin_num</span> <span class="id">X1</span>.<br/>
+<span class="id">have</span> <span class="id">VY</span> : '<span class="id">V_P</span>[<span class="id">Y</span>] = '<span class="id">V_P</span>[<span class="id">X</span>] <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">varianceB_cst_r</span>.<br/>
+<span class="id"><a href="mathcomp.analysis.probability.html#markov_chebyshev_cantelli.P">have</a></span> <span class="id">le</span> (<span class="id">u</span> : <span class="id">R</span>) : (0 &lt;= <span class="id">u</span>)%<span class="id">R</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span> [<span class="id">set</span> <span class="id">x</span> | <span class="id">lambda</span>%:<span class="id">E</span> &lt;= (<span class="id">X</span> <span class="id">x</span>)%:<span class="id">E</span> - '<span class="id">E_P</span>[<span class="id">X</span>]]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;= ((<span class="id"><a href="mathcomp.classical.functions.html#cst">fine</a></span> '<span class="id">V_P</span>[<span class="id">X</span>] + <span class="id">u</span>^2) / (<span class="id">lambda</span> + <span class="id">u</span>)^2)%:<span class="id">E</span>.<br/>
+&nbsp;&nbsp;<span class="id">move</span>=&gt; <span class="id">uge0</span>; <span class="id">rewrite</span> <span class="id">EFinM</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span> <span class="id">YU1</span> : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id"><a href="mathcomp.analysis.probability.html#varianceE">set</a></span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> (<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#expe2">Y</a></span> \+ <span class="id">cst</span> <span class="id">u</span>)%<span class="id">R</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">compreDr</span> =&gt; [|//]; <span class="id">apply</span>: <span class="id">integrableD</span> <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFinM">Y1</a></span> <span class="id">_</span> =&gt; [//|].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact</span>: <span class="id">finite_measure_integrable_cst</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span> <span class="id">YU2</span> : <span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> ((<span class="id">Y</span> \+ <span class="id">cst</span> <span class="id">u</span>) ^+ 2)%<span class="id">R</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">sqrrD</span>/= <span class="id">compreDr</span> =&gt; [|//].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span>: <span class="id">integrableD</span> =&gt; [//||]; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFinD">rewrite</a></span> -[(<span class="id">_</span> ^+ 2)%<span class="id">R</span>]/(<span class="id">cst</span> (<span class="id">u</span> ^+ 2))%<span class="id">R</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact</span>: <span class="id">finite_measure_integrable_cst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">compreDr</span> =&gt; [|//]; <span class="id">apply</span>: <span class="id">integrableD</span> <span class="id">Y2</span> <span class="id">_</span> =&gt; [//|].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>](<span class="id">_</span> : <span class="id">_</span> = (2 * <span class="id">u</span>) \<span class="id">o</span>* <span class="id">Y</span>)%<span class="id">R</span>; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id">x</span> /=; <span class="id">rewrite</span> -<span class="id">mulr_natl</span> <span class="id">mulrCA</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">compre_scale</span> =&gt; [|//]; <span class="id">apply</span>: <span class="id">integrableZl</span> <span class="id">Y1</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span> -&gt; : (<span class="id">fine</span> '<span class="id">V_P</span>[<span class="id">X</span>] + <span class="id">u</span>^2)%:<span class="id">E</span> = '<span class="id">E_P</span>[(<span class="id">Y</span> \+ <span class="id">cst</span> <span class="id">u</span>)^+2]%<span class="id">R</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> -<span class="id">VY</span> -[<span class="id">RHS</span>](@<span class="id"><a href="mathcomp.analysis.measure.html#le_measure">subeK</a></span> <span class="id">_</span> <span class="id">_</span> (('<span class="id">E_P</span>[(<span class="id">Y</span> \+ <span class="id">cst</span> <span class="id">u</span>)%<span class="id">R</span>])^+2)); <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">fin_numX</span> ?<span class="id">unlock</span> ?<span class="id">integral_fune_fin_num</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> -<span class="id">varianceE</span>/= -/<span class="id">Y</span> -?<span class="id">expe2</span>//.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">expectationD</span>/= ?<span class="id">EY</span> ?<span class="id">add0e</span> ?<span class="id">expectation_cst</span> -?<span class="id">EFinM</span>; <span class="id">last</span> 2 <span class="id">first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">rewrite</span> <span class="id">compreBr</span> =&gt; [|//]; <span class="id">apply</span>: <span class="id">integrableB</span> <span class="id">X1</span> <span class="id">_</span> =&gt; [//|].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact</span>: <span class="id">finite_measure_integrable_cst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">exact</span>: <span class="id">finite_measure_integrable_cst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> (<span class="id">varianceD_cst_r</span> <span class="id">_</span> <span class="id">Y1</span> <span class="id">Y2</span>) <span class="id">EFinD</span> <span class="id">fineK</span> ?(<span class="id">variance_fin_num</span> <span class="id">Y1</span> <span class="id">Y2</span>).<br/>
+&nbsp;&nbsp;<span class="id">have</span> <span class="id">le</span> : [<span class="id">set</span> <span class="id">x</span> | <span class="id">lambda</span>%:<span class="id">E</span> &lt;= (<span class="id">X</span> <span class="id">x</span>)%:<span class="id">E</span> - '<span class="id">E_P</span>[<span class="id">X</span>]]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`&lt;=` [<span class="id">set</span> <span class="id">x</span> | ((<span class="id">lambda</span> + <span class="id">u</span>)^2)%:<span class="id">E</span> &lt;= ((<span class="id">Y</span> <span class="id">x</span> + <span class="id">u</span>)^+2)%:<span class="id">E</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move</span>=&gt; <span class="id">x</span> /= <span class="id">le</span>; <span class="id">rewrite</span> <span class="id">lee_fin</span>; <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#muleC">apply</a></span>: <span class="id">ler_expn2r</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">exact</span>: <span class="id">addr_ge0</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#leRHS">ltW</a></span> <span class="id">lambda_gt0</span>) <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#lee_fin">_</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">apply</span>/(<span class="id">addr_ge0</span> <span class="id">_</span> <span class="id">uge0</span>)/(<span class="id">le_trans</span> (<span class="id">ltW</span> <span class="id">lambda_gt0</span>) <span class="id">_</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">lee_fin</span> <span class="id">EFinB</span> <span class="id">finEK</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ler_add2r</span> -<span class="id">lee_fin</span> <span class="id">EFinB</span> <span class="id">finEK</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span>: (<span class="id"><a href="mathcomp.analysis.probability.html#markov">le_trans</a></span> (<span class="id">le_measure</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">le</span>)).<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> -[[<span class="id">set</span> <span class="id">_</span> | <span class="id">_</span>]]<span class="id">setTI</span> <span class="id">inE</span>; <span class="id">apply</span>: <span class="id">emeasurable_fun_c_infty</span> =&gt; [//|].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">emeasurable_funB</span> =&gt; //; <span class="id">exact</span>: <span class="id">measurable_int</span> <span class="id">X1</span>.<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> -[[<span class="id"><a href="mathcomp.classical.boolp.html#funeqP">set</a></span> <span class="id">_</span> | <span class="id">_</span>]]<span class="id">setTI</span> <span class="id">inE</span>; <span class="id">apply</span>: <span class="id">emeasurable_fun_c_infty</span> =&gt; [//|].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">EFin_measurable_fun</span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id">measurable_fun</span> <span class="id">_</span> <span class="id">X</span>](<span class="id">_</span> : <span class="id">_</span> =<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id">x</span> ^+ 2) \<span class="id">o</span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id">Y</span> <span class="id">x</span> + <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#lee_fin">u</a></span>))%<span class="id">R</span>//.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply</span>/<span class="id">measurableT_comp</span> =&gt; //; <span class="id">apply</span>/<span class="id">measurable_funD</span> =&gt; //.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">EFin_measurable_fun</span>; <span class="id">apply</span>: <span class="id">measurable_int</span> <span class="id">Y1</span>.<br/>
+&nbsp;&nbsp;<span class="id">set</span> <span class="id">eps</span> := ((<span class="id">lambda</span> + <span class="id">u</span>) ^ 2)%<span class="id">R</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span> <span class="id">peps</span> : (0 &lt; <span class="id">eps</span>)%<span class="id">R</span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">exprz_gt0</span> ?<span class="id">ltr_paddr</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> (<span class="id">lee_pdivl_mulr</span> <span class="id">_</span> <span class="id">_</span> <span class="id">peps</span>) <span class="id">muleC</span>.<br/>
+&nbsp;&nbsp;<span class="id">under</span> <span class="id">eq_set</span> =&gt; <span class="id">x</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> -[<span class="id">leRHS</span>]<span class="id">gee0_abs</span> ?<span class="id">lee_fin</span> ?<span class="id">sqr_ge0</span> -?<span class="id">lee_fin</span> =&gt; [|//].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> -[(<span class="id">_</span> ^+ 2)%<span class="id">R</span>]/(((<span class="id">Y</span> \+ <span class="id">cst</span> <span class="id">u</span>) ^+ 2) <span class="id">x</span>)%<span class="id">R</span>; <span class="id">over</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> -[<span class="id">X</span> <span class="kwd">in</span> <span class="id">X</span>%:<span class="id">E</span> * <span class="id">_</span>]<span class="id">gtr0_norm</span> =&gt; [|//].<br/>
+&nbsp;&nbsp;<span class="id">apply</span>: (<span class="id">le_trans</span> (<span class="id">markov</span> <span class="id">_</span> <span class="id">peps</span> <span class="id"><a name="MeasurableFun_isDiscrete">_</a></span> <span class="id">_</span> <span class="id">_</span>)) =&gt; //=.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">x</span> <span class="id">y</span> /[!<span class="id">nnegrE</span>] /<span class="id">ger0_norm</span>-&gt; /<span class="id">ger0_norm</span>-&gt;.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> -/<span class="id">Y</span> <span class="id">le_eqVlt</span>; <span class="id">apply</span>/<span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#MeasurableFun">orP</a></span>; <span class="id">left</span>; <span class="id">apply</span>/<span class="id">eqP</span>; <span class="id">congr</span> <span class="id">expectation</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>/<span class="id">funeqP</span> =&gt; <span class="id">x</span> /=; <span class="id">rewrite</span> -<span class="id">expr2</span> <span class="id">normr_id</span> <span class="id">ger0_norm</span> ?<span class="id">sqr_ge0</span>.<br/>
+<span class="id">pose</span> <span class="id">u0</span> := (<span class="id"><a href="mathcomp.analysis.measure.html#Measurable.Exports.measurableType">fine</a></span> '<span class="id">V_P</span>[<span class="id">X</span>] / <span class="id">lambda</span>)%<span class="id">R</span>.<br/>
+<span class="id">have</span> <span class="id">u0ge0</span> : (0 &lt;= <span class="id">u0</span>)%<span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#isMeasurableFun">R</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">divr_ge0</span> (<span class="id">ltW</span> <span class="id">lambda_gt0</span>); <span class="id">rewrite</span> -<span class="id">lee_fin</span> <span class="id">finVK</span> <span class="id">variance_ge0</span>.<br/>
+<span class="id">apply</span>: <span class="id">le_trans</span> (<span class="id">le</span> <span class="id">_</span> <span class="id">u0ge0</span>) <span class="id">_</span>; <span class="id">rewrite</span> <span class="id">lee_fin</span> <span class="id">le_eqVlt</span>; <span class="id">apply</span>/<span class="id">orP</span>; <span class="id">left</span>.<br/>
+<span class="id">rewrite</span> <span class="id">GRing.eqr_div</span>; [|<span class="id">apply</span>: <span class="id">lt0r_neq0</span>..]; <span class="id">last</span> 2 <span class="id">first</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">exprz_gt0</span> -1?[<span class="id"><a href="mathcomp.analysis.measure.html#Probability.Exports.probability">ltLHS</a></span>]<span class="id">addr0</span> ?<span class="id">ltr_le_add</span>.<br/>
+- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ltr_paddl</span> ?<span class="id">fine_ge0</span> ?<span class="id">variance_ge0</span> ?<span class="id">exprz_gt0</span>.<br/>
+<span class="id">apply</span>/<span class="id">eqP</span>; <span class="id">have</span> -&gt; : <span class="id">fine</span> '<span class="id">V_P</span>[<span class="id">X</span>] = (<span class="id">u0</span> * <span class="id">lambda</span>)%<span class="id">R</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">u0</span> -<span class="id">mulrA</span> <span class="id">mulVr</span> ?<span class="id">mulr1</span> ?<span class="id">unitfE</span> ?<span class="id">gt_eqF</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">mulrDl</span> -<span class="id">mulrDr</span> (<span class="id">addrC</span> <span class="id">u0</span>) [<span class="kwd">in</span> <span class="id">RHS</span>](<span class="id">mulrAC</span> <span class="id">u0</span>) -<span class="id">exprnP</span> <span class="id">expr2</span> !<span class="id">mulrA</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">markov_chebyshev_cantelli</span>.<br/>
+<br/>
+<span class="id">HB.mixin</span> <span class="kwd">Record</span> <span class="id">MeasurableFun_isDiscrete</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">X</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) <span class="id">of</span> @<span class="id">MeasurableFun</span> <span class="id">d</span> <span class="id">T</span> <span class="id">R</span> <span class="id">X</span> := {<br/>
+&nbsp;&nbsp;<span class="id">countable_range</span> : <span class="id">countable</span> (<span class="id">range</span> <span class="id">X</span>)<br/>
+}.<br/>
+<br/>
+<span class="id">HB.structure</span> <span class="kwd">Definition</span> <span class="id">discreteMeasurableFun</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">R</span> : <span class="id">realType</span>) := {<br/>
+&nbsp;&nbsp;<span class="id">X</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#range">of</a></span> <span class="id">isMeasurableFun</span> <span class="id">d</span> <span class="id">T</span> <span class="id">R</span> <span class="id">X</span> &amp; <span class="id">MeasurableFun_isDiscrete</span> <span class="id">d</span> <span class="id">T</span> <span class="id">R</span> <span class="id">X</span><br/>
+}.<br/>
+<br/>
+<span class="kwd">Notation</span> "{ '<span class="id">dmfun</span>' <span class="id">aT</span> &gt;-&gt; <span class="id">T</span> }" :=<br/>
+&nbsp;&nbsp;(@<span class="id">discreteMeasurableFun.type</span> <span class="id"><a href="mathcomp.analysis.probability.html#dRV_dom">_</a></span> <span class="id">aT</span> <span class="id">T</span>) : <span class="id">form_scope</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">discrete_random_variable</span> (<span class="id">d</span> : <span class="id">_</span>) (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>)<br/>
+&nbsp;&nbsp;(<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>) := {<span class="id">dmfun</span> <span class="id">T</span> &gt;-&gt; <span class="id">R</span>}.<br/>
+<br/>
+<span class="kwd">Notation</span> "{ '<span class="id">dRV</span>' <span class="id">P</span> &gt;-&gt; <span class="id">R</span> }" :=<br/>
+&nbsp;&nbsp;(@<span class="id"><a href="mathcomp.analysis.probability.html#distribution_dRV.R">discrete_random_variable</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">R</span> <span class="id">P</span>) : <span class="id">form_scope</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">dRV_definitions</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id"><a href="mathcomp.analysis.probability.html#enum_prob">d</a></span>) (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">dRV_dom_enum</span> (<span class="id">X</span> : {<span class="id">dRV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;{ <span class="id">B</span> : <span class="id"><a name="distribution_dRV">set</a></span> <span class="id">nat</span> &amp; {<span class="id">splitbij</span> <span class="id">B</span> &gt;-&gt; <span class="id">range</span> <span class="id">X</span>}}.<br/>
+<span class="id">have</span> /<span class="id">countable_bijP</span>/<span class="id">cid</span>[<span class="id">B</span>] := @<span class="id">countable_range</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">X</span>.<br/>
+<span class="id"><a href="mathcomp.analysis.probability.html#dRV_enum">move</a></span>/<span class="id">card_esym</span>/<span class="id">ppcard_eqP</span>/<span class="id">unsquash</span> =&gt; <span class="id">f</span>.<br/>
+<span class="kwd">exists</span> <span class="id">B</span>; <span class="id">exact</span>: <span class="id"><a href="mathcomp.analysis.measure.html#pushforward">f</a></span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Definition</span> <span class="id">dRV_dom</span> (<span class="id">X</span> : {<span class="id"><a href="mathcomp.analysis.probability.html#distribution_dRV.X">dRV</a></span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) : <span class="id">set</span> <span class="id">nat</span> := <span class="id">projT1</span> (<span class="id">dRV_dom_enum</span> <span class="id"><a href="mathcomp.analysis.probability.html#distribution_dRV.X">X</a></span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">dRV_enum</span> (<span class="id">X</span> : {<span class="id">dRV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) : {<span class="id">splitbij</span> (<span class="id">dRV_dom</span> <span class="id">X</span>) &gt;-&gt; <span class="id">range</span> <span class="id">X</span>} :=<br/>
+&nbsp;&nbsp;<span class="id">projT2</span> (<span class="id">dRV_dom_enum</span> <span class="id">X</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a href="mathcomp.analysis.probability.html#distribution_dRV.X">enum_prob</a></span> (<span class="id">X</span> : {<span class="id">dRV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :=<br/>
+&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">k</span> =&gt; <span class="id">P</span> (<span class="id">X</span> @^-1` [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">k</span>])) \<span class="id">_</span> (<span class="id">dRV_dom</span> <span class="id">X</span>).<br/>
+<br/>
+<span class="kwd">End</span> <span class="id">dRV_definitions</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">distribution_dRV</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">ereal_scope</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>).<br/>
+<span class="kwd">Variable</span> <span class="id">X</span> : {<span class="id">dRV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">distribution_dRV_enum</span> (<span class="id">n</span> : <span class="id">nat</span>) : <span class="id">n</span> \<span class="kwd">in</span> <span class="id"><a href="mathcomp.analysis.measure.html#measure_bigcup">dRV_dom</a></span> <span class="id">X</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id"><a href="mathcomp.analysis.probability.html#distribution_dRV.P">distribution</a></span> <span class="id">P</span> <span class="id">X</span> [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">n</span>] = <span class="id">enum_prob</span> <span class="id">X</span> <span class="id">n</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof50')">Proof.</span></div>
+<div class="proofscript" id="proof50">
+<span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">nX</span>; <span class="id">rewrite</span> /<span class="id">distribution</span>/= /<span class="id">enum_prob</span>/= <span class="id">patchE</span> <span class="id">nX</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">distribution_dRV</span> <span class="id">A</span> : <span class="id">measurable</span> <span class="id">A</span> -&gt;<br/>
+&nbsp;&nbsp;<span class="id">distribution</span> <span class="id">P</span> <span class="id">X</span> <span class="id">A</span> = \<span class="id">sum_</span>(<span class="id">k</span> &lt;<span class="id">oo</span>) <span class="id">enum_prob</span> <span class="id">X</span> <span class="id">k</span> * \<span class="id">d_</span> (<span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">k</span>) <span class="id">A</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof51')">Proof.</span></div>
+<div class="proofscript" id="proof51">
+<span class="id">move</span>=&gt; <span class="id">mA</span>; <span class="id">rewrite</span> /<span class="id">distribution</span> /<span class="id">pushforward</span>.<br/>
+<span class="id">have</span> <span class="id">mAX</span> <span class="id">i</span> : <span class="id">dRV_dom</span> <span class="id">X</span> <span class="id">i</span> -&gt; <span class="id">measurable</span> (<span class="id">X</span> @^-1` (<span class="id">A</span> `&amp;` [<span class="id"><a href="mathcomp.analysis.measure.html#bigcup_measurable">set</a></span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">i</span>])).<br/>
+&nbsp;&nbsp;<span class="id">move</span>=&gt; <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#measurable_sfunP">_</a></span>; <span class="id">rewrite</span> <span class="id">preimage_setI</span>; <span class="id">apply</span>: <span class="id">measurableI</span> =&gt; //.<br/>
+&nbsp;&nbsp;<span class="id">exact</span>/<span class="id">measurable_sfunP</span>.<br/>
+<span class="id"><a href="mathcomp.analysis.measure.html#bigcup_measurable">have</a></span> <span class="id">tAX</span> : <span class="id">trivIset</span> (<span class="id">dRV_dom</span> <span class="id">X</span>) (<span class="kwd">fun</span> <span class="id">k</span> =&gt; <span class="id">X</span> @^-1` (<span class="id">A</span> `&amp;` [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">k</span>])).<br/>
+&nbsp;&nbsp;<span class="id">under</span> <span class="id">eq_fun</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setICr">do</a></span> <span class="id">rewrite</span> <span class="id">preimage_setI</span>; <span class="id">rewrite</span> -/(<span class="id">trivIset</span> <span class="id">_</span> <span class="id"><a href="mathcomp.analysis.probability.html#distribution_dRV.X">_</a></span>).<br/>
+&nbsp;&nbsp;<span class="id">apply</span>: <span class="id">trivIset_setIl</span>; <span class="id">apply</span>/<span class="id">trivIsetP</span> =&gt; <span class="id">i</span> <span class="id">j</span> <span class="id">iX</span> <span class="id">jX</span> /<span class="id">eqP</span> <span class="id">ij</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> -<span class="id">preimage_setI</span> (<span class="id">_</span> : <span class="id">_</span> `&amp;` <span class="id">_</span> = <span class="id">set0</span>)//.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>/<span class="id"><a href="mathcomp.classical.classical_sets.html#setCK">seteqP</a></span>; <span class="id">split</span> =&gt; //= <span class="id">x</span> [] -&gt; {<span class="id">x</span>} /<span class="id">inj</span>; <span class="id">rewrite</span> <span class="id">inE</span> <span class="id">inE</span> =&gt; /(<span class="id">_</span> <span class="id">iX</span> <span class="id">jX</span>).<br/>
+<span class="id"><a href="mathcomp.classical.functions.html#funS">have</a></span> := <span class="id">measure_bigcup</span> <span class="id">P</span> <span class="id">_</span> (<span class="kwd">fun</span> <span class="id">k</span> =&gt; <span class="id">X</span> @^-1` (<span class="id">A</span> `&amp;` [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">k</span>])) <span class="id">mAX</span> <span class="id">tAX</span>.<br/>
+<span class="id">rewrite</span> -<span class="id">preimage_bigcup</span> =&gt; {<span class="id">mAX</span> <span class="id">tAX</span>}<span class="id">PXU</span>.<br/>
+<span class="id">rewrite</span> -{1}(<span class="id">setIT</span> <span class="id">A</span>) -(<span class="id">setUv</span> (\<span class="id"><a href="mathcomp.classical.functions.html#patchE">bigcup_</a></span>(<span class="id">i</span> <span class="kwd">in</span> <span class="id">dRV_dom</span> <span class="id">X</span>) [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">i</span>])).<br/>
+<span class="id">rewrite</span> <span class="id">setIUr</span> <span class="id">preimage_setU</span> <span class="id">measureU</span>; <span class="id">last</span> 3 <span class="id">first</span>.<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> <span class="id">preimage_setI</span>; <span class="id">apply</span>: <span class="id">measurableI</span> =&gt; //.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact</span>: <span class="id">measurable_sfunP</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">measurable_sfunP</span>; <span class="id">exact</span>: <span class="id">bigcup_measurable</span>.<br/>
+&nbsp;&nbsp;- <span class="id">apply</span>: <span class="id">measurable_sfunP</span>; <span class="id">apply</span>: <span class="id">measurableI</span> =&gt; //.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">measurableC</span>; <span class="id"><a href="mathcomp.analysis.probability.html#enum_prob">exact</a></span>: <span class="id">bigcup_measurable</span>.<br/>
+&nbsp;&nbsp;- <span class="id">rewrite</span> 2!<span class="id">preimage_setI</span> <span class="id">setIACA</span> -!<span class="id">setIA</span> -<span class="id">preimage_setI</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">setICr</span> <span class="id">preimage_set0</span> 2!<span class="id">setI0</span>.<br/>
+<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssrmatching.ssrmatching.html#SsrMatchingSyntax.RHS">rewrite</a></span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id">_</span> + <span class="id">X</span> = <span class="id">_</span>](<span class="id">_</span> : <span class="id">_</span> = 0) ?<span class="id">adde0</span>; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> (<span class="id">_</span> : <span class="id">_</span> @^-1` <span class="id"><a href="mathcomp.analysis.probability.html#distribution_dRV">_</a></span> = <span class="id">set0</span>) ?<span class="id">measure0</span>//; <span class="id">apply</span>/<span class="id">disjoints_subset</span> =&gt; <span class="id">x</span> <span class="id">AXx</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">setCK</span> /<span class="id">bigcup</span> /=; <span class="kwd">exists</span> ((<span class="id">dRV_enum</span> <span class="id">X</span>)^-1 (<span class="id">X</span> <span class="id">x</span>))%<span class="id">function</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact</span>: <span class="id">funS</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">invK</span>// <span class="id">inE</span>.<br/>
+<span class="id">rewrite</span> <span class="id">setI_bigcupr</span>; <span class="id">etransitivity</span>; <span class="id">first</span> <span class="id">exact</span>: <span class="id">PXU</span>.<br/>
+<span class="id"><a href="mathcomp.analysis.constructive_ereal.html#EFin">rewrite</a></span> <span class="id">eseries_mkcond</span>; <span class="id">apply</span>: <span class="id">eq_eseriesr</span> =&gt; <span class="id">k</span> <span class="id">_</span>.<br/>
+<span class="id">rewrite</span> /<span class="id">enum_prob</span> <span class="id">patchE</span>; <span class="id">case</span>: <span class="id">ifPn</span> =&gt; <span class="id">nX</span>; <span class="id">rewrite</span> ?<span class="id">mul0e</span>//.<br/>
+<span class="id">rewrite</span> <span class="id">diracE</span>; <span class="id">have</span> [<span class="id">kA</span>|] := <span class="id">boolP</span> (<span class="id">_</span> \<span class="kwd">in</span> <span class="id">A</span>).<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mule1</span> <span class="id">setIidr</span>// =&gt; <span class="id">_</span> /= -&gt;; <span class="id">exact</span>: <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">set_mem</a></span>.<br/>
+<span class="id">rewrite</span> <span class="id">notin_set</span> =&gt; <span class="id">kA</span>.<br/>
+<span class="id">rewrite</span> <span class="id">mule0</span> (<span class="id">disjoints_subset</span> <span class="id">_</span> <span class="id">_</span>).2 ?<span class="id">preimage_set0</span> ?<span class="id">measure0</span>//.<br/>
+<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">subsetCr</span>; <span class="id">rewrite</span> <span class="id">sub1set</span> <span class="id"><a href="mathcomp.classical.functions.html#invK">inE</a></span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">sum_enum_prob</span> : \<span class="id">sum_</span>(<span class="id">n</span> &lt;<span class="id">oo</span>) (<span class="id">enum_prob</span> <span class="id">X</span>) <span class="id">n</span> = 1.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof52')">Proof.</span></div>
+<div class="proofscript" id="proof52">
+<span class="id">have</span> := <span class="id">distribution_dRV</span> <span class="id">measurableT</span>.<br/>
+<span class="id">rewrite</span> <span class="id">probability_setT</span>/= =&gt; /<span class="id">esym</span>; <span class="id">apply</span>: <span class="id">eq_trans</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> [<span class="id">RHS</span>]<span class="id">eseries_mkcond</span>; <span class="id">apply</span>: <span class="id">eq_eseriesr</span> =&gt; <span class="id"><a href="mathcomp.classical.classical_sets.html#trivIset">k</a></span> <span class="id">_</span>; <span class="id">rewrite</span> <span class="id">diracT</span> <span class="id">mule1</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">distribution_dRV</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">discrete_distribution</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">ereal_scope</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">measurableType</span> <span class="id">d</span>) (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">P</span> : <span class="id">probability</span> <span class="id">T</span> <span class="id">R</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">dRV_expectation</span> (<span class="id">X</span> : {<span class="id">dRV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt;<br/>
+&nbsp;&nbsp;'<span class="id">E_P</span>[<span class="id">X</span>] = \<span class="id"><a href="mathcomp.analysis.measure.html#measurableT">sum_</a></span>(<span class="id">n</span> &lt;<span class="id">oo</span>) <span class="id">enum_prob</span> <span class="id">X</span> <span class="id">n</span> * (<span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">n</span>)%:<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof53')">Proof.</span></div>
+<div class="proofscript" id="proof53">
+<span class="id">move</span>=&gt; <span class="id">ix</span>; <span class="id">rewrite</span> <span class="id">unlock</span>.<br/>
+<span class="id">rewrite</span> -[<span class="kwd">in</span> <span class="id">LHS</span>](<span class="id">_</span> : \<span class="id">bigcup_k</span> (<span class="kwd">if</span> <span class="id">k</span> \<span class="kwd">in</span> <span class="id">dRV_dom</span> <span class="id">X</span> <span class="kwd">then</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">X</span> @^-1` [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">k</span>] <span class="kwd">else</span> <span class="id">set0</span>) = <span class="id">setT</span>); <span class="id"><a href="mathcomp.analysis.probability.html#dRV_enum">last</a></span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span>/<span class="id">seteqP</span>; <span class="id"><a href="mathcomp.analysis.sequences.html#eq_eseriesr">split</a></span> =&gt; // <span class="id">t</span> <span class="id">_</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">exists</span> ((<span class="id">dRV_enum</span> <span class="id">X</span>)^-1%<span class="id">function</span> (<span class="id">X</span> <span class="id">t</span>)) =&gt; //.<br/>
+&nbsp;&nbsp;<span class="id">case</span>: <span class="id">ifPn</span>=&gt; [<span class="id">_</span>|].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">invK</span>// <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html#integral_set0">inE</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">notin_set</span>/=; <span class="id">apply</span>; <span class="id">apply</span>: <span class="id">funS</span>.<br/>
+<span class="id">have</span> <span class="id">tA</span> : <span class="id">trivIset</span> (<span class="id">dRV_dom</span> <span class="id">X</span>) (<span class="kwd">fun</span> <span class="id">k</span> =&gt; [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">k</span>]).<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">i</span> <span class="id">j</span> <span class="id">iX</span> <span class="id">jX</span> [<span class="id">r</span> [/= -&gt;{<span class="id">r</span>}]] /<span class="id">inj</span>; <span class="id">rewrite</span> !<span class="id">inE</span>; <span class="id">exact</span>.<br/>
+<span class="id">have</span> {<span class="id">tA</span>}/<span class="id">trivIset_mkcond</span> <span class="id">tXA</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">trivIset</span> (<span class="id">dRV_dom</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#ifPn">X</a></span>) (<span class="kwd">fun</span> <span class="id">k</span> =&gt; <span class="id">X</span> @^-1` [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">k</span>]).<br/>
+&nbsp;&nbsp;<span class="id">apply</span>/<span class="id">trivIsetP</span> =&gt; /= <span class="id">i</span> <span class="id">j</span> <span class="id">iX</span> <span class="id">jX</span> <span class="id">ij</span>.<br/>
+&nbsp;&nbsp;<span class="id">move</span>/<span class="id">trivIsetP</span> : <span class="id">tA</span> =&gt; /(<span class="id">_</span> <span class="id">i</span> <span class="id"><a href="mathcomp.analysis.constructive_ereal.html#abse1">j</a></span> <span class="id">iX</span> <span class="id">jX</span>) <span class="id">Aij</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">preimage_setI</span> <span class="id">Aij</span> ?<span class="id">preimage_set0</span>.<br/>
+<span class="id">rewrite</span> <span class="id">integral_bigcup</span> //; <span class="id">last</span> 2 <span class="id">first</span>.<br/>
+&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">k</span>; <span class="id">case</span>: <span class="id">ifPn</span>.<br/>
+&nbsp;&nbsp;- <span class="id">apply</span>: (<span class="id"><a href="mathcomp.analysis.measure.html#probability_le1">integrableS</a></span> <span class="id">measurableT</span>) =&gt; //.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">bigcup_mkcond</span>; <span class="id">exact</span>: <span class="id">bigcup_measurable</span>.<br/>
+<span class="id">transitivity</span> (\<span class="id">sum_</span>(<span class="id">i</span> &lt;<span class="id">oo</span>)<br/>
+&nbsp;&nbsp;\<span class="id">int</span>[<span class="id">P</span>]<span class="id">_</span>(<span class="id">x</span> <span class="kwd">in</span> (<span class="kwd">if</span> <span class="id">i</span> \<span class="kwd">in</span> <span class="id">dRV_dom</span> <span class="id">X</span> <span class="kwd">then</span> <span class="id">X</span> @^-1` [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">i</span>] <span class="kwd">else</span> <span class="id"><a href="mathcomp.analysis.probability.html#distribution_dRV_enum">set0</a></span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">i</span>)%:<span class="id">E</span>).<br/>
+&nbsp;&nbsp;<span class="id">apply</span>: <span class="id">eq_eseriesr</span> =&gt; <span class="id"><a href="mathcomp.analysis.probability.html#enum_prob">i</a></span> <span class="id">_</span>; <span class="id">case</span>: <span class="id">ifPn</span> =&gt; <span class="id">iX</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">eq_integral</span> =&gt; <span class="id">t</span>; <span class="id">rewrite</span> <span class="id">in_setE</span>/= =&gt; -&gt;.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> !<span class="id">integral_set0</span>.<br/>
+<span class="id">transitivity</span> (\<span class="id">sum_</span>(<span class="id">i</span> &lt;<span class="id">oo</span>) (<span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">i</span>)%:<span class="id"><a href="mathcomp.analysis.probability.html#discrete_distribution.P">E</a></span> *<br/>
+&nbsp;&nbsp;\<span class="id">int</span>[<span class="id">P</span>]<span class="id">_</span>(<span class="id">x</span> <span class="kwd">in</span> (<span class="kwd">if</span> <span class="id">i</span> \<span class="kwd">in</span> <span class="id">dRV_dom</span> <span class="id">X</span> <span class="kwd">then</span> <span class="id">X</span> @^-1` [<span class="id">set</span> <span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">i</span>] <span class="kwd">else</span> <span class="id">set0</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;1).<br/>
+&nbsp;&nbsp;<span class="id">apply</span>: <span class="id">eq_eseriesr</span> =&gt; <span class="id">i</span> <span class="id">_</span>; <span class="id">rewrite</span> -<span class="id">integralZl</span>//; <span class="id">last</span> 2 <span class="id">first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="kwd">by</span> <span class="id">case</span>: <span class="id">ifPn</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">apply</span>/<span class="id">integrableP</span>; <span class="id">split</span> =&gt; //.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> (<span class="id">eq_integral</span> (<span class="id">cst</span> 1%<span class="id">E</span>)); <span class="id">last</span> <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">x</span> <span class="id">_</span>; <span class="id">rewrite</span> <span class="id">abse1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">integral_cst</span>//; <span class="id">last</span> <span class="kwd">by</span> <span class="id">case</span>: <span class="id">ifPn</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span> <span class="id">mul1e</span> (@<span class="id">le_lt_trans</span> <span class="id">_</span> <span class="id">_</span> 1%<span class="id">E</span>) ?<span class="id">ltey</span>//.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">case</span>: <span class="id">ifPn</span> =&gt; // <span class="id">_</span>; <span class="id">exact</span>: <span class="id">probability_le1</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">eq_integral</span> =&gt; <span class="id">y</span> <span class="id">_</span>; <span class="id">rewrite</span> <span class="id">mule1</span>.<br/>
+<span class="id">apply</span>: <span class="id">eq_eseriesr</span> =&gt; <span class="id">k</span> <span class="id">_</span>; <span class="id">case</span>: <span class="id">ifPn</span> =&gt; <span class="id">kX</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> /= <span class="id">integral_cst</span>//= <span class="id">mul1e</span> <span class="id">probability_distribution</span> <span class="id">muleC</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">distribution_dRV_enum</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">integral_set0</span> <span class="id">mule0</span> /<span class="id">enum_prob</span> <span class="id">patchE</span> (<span class="id">negbTE</span> <span class="id">kX</span>) <span class="id">mul0e</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Definition</span> <span class="id">pmf</span> (<span class="id">X</span> : {<span class="id">RV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) (<span class="id">r</span> : <span class="id">R</span>) : <span class="id">R</span> := <span class="id">fine</span> (<span class="id">P</span> (<span class="id">X</span> @^-1` [<span class="id">set</span> <span class="id">r</span>])).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">expectation_pmf</span> (<span class="id">X</span> : {<span class="id">dRV</span> <span class="id">P</span> &gt;-&gt; <span class="id">R</span>}) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">P</span>.-<span class="id">integrable</span> [<span class="id">set</span>: <span class="id">T</span>] (<span class="id">EFin</span> \<span class="id">o</span> <span class="id">X</span>) -&gt; '<span class="id">E_P</span>[<span class="id">X</span>] =<br/>
+&nbsp;&nbsp;\<span class="id">sum_</span>(<span class="id">n</span> &lt;<span class="id">oo</span> | <span class="id">n</span> \<span class="kwd">in</span> <span class="id">dRV_dom</span> <span class="id">X</span>) (<span class="id">pmf</span> <span class="id">X</span> (<span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">n</span>))%:<span class="id">E</span> * (<span class="id">dRV_enum</span> <span class="id">X</span> <span class="id">n</span>)%:<span class="id">E</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof54')">Proof.</span></div>
+<div class="proofscript" id="proof54">
+<span class="id">move</span>=&gt; <span class="id">iX</span>; <span class="id">rewrite</span> <span class="id">dRV_expectation</span>// [<span class="kwd">in</span> <span class="id">RHS</span>]<span class="id">eseries_mkcond</span>.<br/>
+<span class="id">apply</span>: <span class="id">eq_eseriesr</span> =&gt; <span class="id">k</span> <span class="id">_</span>.<br/>
+<span class="id">rewrite</span> /<span class="id">enum_prob</span> <span class="id">patchE</span>; <span class="id">case</span>: <span class="id">ifPn</span> =&gt; <span class="id">kX</span>; <span class="id">last</span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mul0e</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">pmf</span> <span class="id">fineK</span>// <span class="id">fin_num_measure</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">discrete_distribution</span>.<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/tree/yoshihiro503%40generate_index">a fork of coq2html</a></div>
+</body>
+</html>

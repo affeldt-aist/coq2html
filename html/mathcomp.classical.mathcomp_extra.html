@@ -1311,182 +1311,189 @@ Qed.</div>
 (* End of mathComp &gt; 1.16 additions *)
 (************************************)
 </pre>
-<span class="kwd">Section</span> <span class="id"><a name="onem">onem</a></span>.<br/>
-<span class="kwd">Variable</span> <span class="id"><a name="onem.R">R</a></span> : <span class="id">numDomainType</span>.<br/>
-<span class="kwd">Implicit</span> <span class="id">Types</span> <span class="id">r</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem.R">R</a></span>.<br/>
+<span class="kwd">Reserved</span> <span class="kwd">Notation</span> "`1- <span class="id"><a name="onem.R">x</a></span>" (<span class="id">format</span> "`1- <span class="id">x</span>", <span class="kwd">at</span> <span class="id">level</span> 2).<br/>
 <br/>
-<span class="kwd">Definition</span> <span class="id"><a name="onem">onem</a></span> <span class="id">r</span> := 1 - <span class="id">r</span>.<br/>
-<span class="id">Local</span> <span class="kwd">Notation</span> "`1- <span class="id">r</span>" := (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">r</span>).<br/>
+<span class="kwd">Section</span> <span class="id">onem</span>.<br/>
+<span class="kwd">Variable</span> <span class="id">R</span> : <span class="id">numDomainType</span>.<br/>
+<span class="kwd">Implicit</span> <span class="id">Types</span> <span class="id">r</span> : <span class="id">R</span>.<br/>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onem0">onem0</a></span> : `1-0 = 1<br/>
+<span class="kwd">Definition</span> <span class="id">onem</span> <span class="id">r</span> := 1 - <span class="id">r</span>.<br/>
+<span class="id">Local</span> <span class="kwd">Notation</span> "`1- <span class="id">r</span>" := (<span class="id">onem</span> <span class="id">r</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">onem0</span> : `1-0 = 1<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof160')">Proof.</span></div>
 <div class="proofscript" id="proof160">
- <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">subr0</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">onem</span> <span class="id">subr0</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onem1">onem1</a></span> : `1-1 = 0<br/>
+<span class="kwd">Lemma</span> <span class="id">onem1</span> : `1-1 = 0<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof161')">Proof.</span></div>
 <div class="proofscript" id="proof161">
- <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">subrr</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">onem</span> <span class="id">subrr</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onemK">onemK</a></span> <span class="id">r</span> : `1-(`1-<span class="id">r</span>) = <span class="id">r</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">onemK</span> <span class="id">r</span> : `1-(`1-<span class="id">r</span>) = <span class="id">r</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof162')">Proof.</span></div>
 <div class="proofscript" id="proof162">
- <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">opprB</span> <span class="id">addrCA</span> <span class="id">subrr</span> <span class="id">addr0</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">onem</span> <span class="id">opprB</span> <span class="id">addrCA</span> <span class="id">subrr</span> <span class="id">addr0</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="add_onemK">add_onemK</a></span> <span class="id">r</span> : <span class="id">r</span> + `1- <span class="id">r</span> = 1.<br/>
+<span class="kwd">Lemma</span> <span class="id">add_onemK</span> <span class="id">r</span> : <span class="id">r</span> + `1- <span class="id">r</span> = 1.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof163')">Proof.</span></div>
 <div class="proofscript" id="proof163">
- <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">addrC</span> <span class="id">subrK</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">onem</span> <span class="id">addrC</span> <span class="id">subrK</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onem_gt0">onem_gt0</a></span> <span class="id">r</span> : <span class="id">r</span> &lt; 1 -&gt; 0 &lt; `1-<span class="id">r</span><br/>
+<span class="kwd">Lemma</span> <span class="id">onem_gt0</span> <span class="id">r</span> : <span class="id">r</span> &lt; 1 -&gt; 0 &lt; `1-<span class="id">r</span><br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof164')">Proof.</span></div>
 <div class="proofscript" id="proof164">
  <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">subr_gt0</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onem_ge0">onem_ge0</a></span> <span class="id">r</span> : <span class="id">r</span> &lt;= 1 -&gt; 0 &lt;= `1-<span class="id">r</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">onem_ge0</span> <span class="id">r</span> : <span class="id">r</span> &lt;= 1 -&gt; 0 &lt;= `1-<span class="id">r</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof165')">Proof.</span></div>
 <div class="proofscript" id="proof165">
- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">le_eqVlt</span> =&gt; /<span class="id">predU1P</span>[-&gt;|/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem_gt0">onem_gt0</a></span>/<span class="id">ltW</span>]; <span class="id">rewrite</span> ?<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem1">onem1</a></span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem1">rewrite</a></span> <span class="id">le_eqVlt</span> =&gt; /<span class="id">predU1P</span>[-&gt;|/<span class="id">onem_gt0</span>/<span class="id">ltW</span>]; <span class="id">rewrite</span> ?<span class="id">onem1</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onem_le1">onem_le1</a></span> <span class="id">r</span> : 0 &lt;= <span class="id">r</span> -&gt; `1-<span class="id">r</span> &lt;= 1.<br/>
+<span class="kwd">Lemma</span> <span class="id">onem_le1</span> <span class="id">r</span> : 0 &lt;= <span class="id">r</span> -&gt; `1-<span class="id">r</span> &lt;= 1.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof166')">Proof.</span></div>
 <div class="proofscript" id="proof166">
  <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ler_subl_addr</span> <span class="id">ler_addl</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onem_lt1">onem_lt1</a></span> <span class="id">r</span> : 0 &lt; <span class="id">r</span> -&gt; `1-<span class="id">r</span> &lt; 1.<br/>
+<span class="kwd">Lemma</span> <span class="id">onem_lt1</span> <span class="id">r</span> : 0 &lt; <span class="id">r</span> -&gt; `1-<span class="id">r</span> &lt; 1.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof167')">Proof.</span></div>
 <div class="proofscript" id="proof167">
  <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ltr_subl_addr</span> <span class="id">ltr_addl</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onemX_ge0">onemX_ge0</a></span> <span class="id">r</span> <span class="id">n</span> : 0 &lt;= <span class="id">r</span> -&gt; <span class="id">r</span> &lt;= 1 -&gt; 0 &lt;= `1-(<span class="id">r</span> ^+ <span class="id">n</span>).<br/>
+<span class="kwd">Lemma</span> <span class="id">onemX_ge0</span> <span class="id">r</span> <span class="id">n</span> : 0 &lt;= <span class="id">r</span> -&gt; <span class="id">r</span> &lt;= 1 -&gt; 0 &lt;= `1-(<span class="id">r</span> ^+ <span class="id">n</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof168')">Proof.</span></div>
 <div class="proofscript" id="proof168">
  <span class="kwd">by</span> <span class="id">move</span>=&gt; ? ?; <span class="id">rewrite</span> <span class="id">subr_ge0</span> <span class="id">exprn_ile1</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onemX_lt1">onemX_lt1</a></span> <span class="id">r</span> <span class="id">n</span> : 0 &lt; <span class="id">r</span> -&gt; `1-(<span class="id">r</span> ^+ <span class="id">n</span>) &lt; 1.<br/>
+<span class="kwd">Lemma</span> <span class="id">onemX_lt1</span> <span class="id">r</span> <span class="id">n</span> : 0 &lt; <span class="id">r</span> -&gt; `1-(<span class="id">r</span> ^+ <span class="id">n</span>) &lt; 1.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof169')">Proof.</span></div>
 <div class="proofscript" id="proof169">
- <span class="kwd">by</span> <span class="id">move</span>=&gt; ?; <span class="id">rewrite</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem_lt1">onem_lt1</a></span>// <span class="id">exprn_gt0</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; ?; <span class="id">rewrite</span> <span class="id">onem_lt1</span>// <span class="id">exprn_gt0</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onemD">onemD</a></span> <span class="id">r</span> <span class="id">s</span> : `1-(<span class="id">r</span> + <span class="id">s</span>) = `1-<span class="id">r</span> - <span class="id">s</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">onemD</span> <span class="id">r</span> <span class="id">s</span> : `1-(<span class="id">r</span> + <span class="id">s</span>) = `1-<span class="id">r</span> - <span class="id">s</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof170')">Proof.</span></div>
 <div class="proofscript" id="proof170">
- <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">addrAC</span> <span class="id">opprD</span> <span class="id">addrA</span> <span class="id">addrAC</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">onem</span> <span class="id">addrAC</span> <span class="id">opprD</span> <span class="id">addrA</span> <span class="id">addrAC</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onemMr">onemMr</a></span> <span class="id">r</span> <span class="id">s</span> : <span class="id">s</span> * `1-<span class="id">r</span> = <span class="id">s</span> - <span class="id">s</span> * <span class="id">r</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">onemMr</span> <span class="id">r</span> <span class="id">s</span> : <span class="id">s</span> * `1-<span class="id">r</span> = <span class="id">s</span> - <span class="id"><a name="onemM">s</a></span> * <span class="id">r</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof171')">Proof.</span></div>
 <div class="proofscript" id="proof171">
- <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">mulrBr</span> <span class="id">mulr1</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">onem</span> <span class="id">mulrBr</span> <span class="id">mulr1</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="onemM">onemM</a></span> <span class="id">r</span> <span class="id">s</span> : `1-(<span class="id">r</span> * <span class="id">s</span>) = `1-<span class="id">r</span> + `1-<span class="id">s</span> - `1-<span class="id">r</span> * `1-<span class="id">s</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">onemM</span> <span class="id">r</span> <span class="id">s</span> : `1-(<span class="id">r</span> * <span class="id">s</span>) = `1-<span class="id">r</span> + `1-<span class="id">s</span> - `1-<span class="id">r</span> * `1-<span class="id">s</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof172')">Proof.</span></div>
 <div class="proofscript" id="proof172">
-<span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">mulrBr</span> <span class="id">mulr1</span> <span class="id">mulrBl</span> <span class="id">mul1r</span> <span class="id">opprB</span> -<span class="id">addrA</span>.<br/>
+<span class="id">rewrite</span> /<span class="id">onem</span> <span class="id">mulrBr</span> <span class="id">mulr1</span> <span class="id">mulrBl</span> <span class="id">mul1r</span> <span class="id">opprB</span> -<span class="id">addrA</span>.<br/>
 <span class="kwd">by</span> <span class="id">rewrite</span> (<span class="id">addrC</span> (1 - <span class="id">r</span>)) !<span class="id">addrA</span> <span class="id">subrK</span> <span class="id">opprB</span> <span class="id">addrA</span> <span class="id">subrK</span> <span class="id">addrK</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span>.<br/>
-<span class="kwd">Notation</span> "`1- <span class="id">r</span>" := (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#onem">onem</a></span> <span class="id">r</span>) : <span class="id">ring_scope</span>.<br/>
+<span class="kwd">End</span> <span class="id">onem</span>.<br/>
+<span class="kwd">Notation</span> "`1- <span class="id">r</span>" := (<span class="id">onem</span> <span class="id">r</span>) : <span class="id">ring_scope</span>.<br/>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="lez_abs2">lez_abs2</a></span> (<span class="id">a</span> <span class="id">b</span> : <span class="id">int</span>) : 0 &lt;= <span class="id">a</span> -&gt; <span class="id">a</span> &lt;= <span class="id">b</span> -&gt; (`|<span class="id">a</span>| &lt;= `|<span class="id">b</span>|)%<span class="id">N</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">onemV</span> (<span class="id">F</span> : <span class="id">numFieldType</span>) (<span class="id">x</span> : <span class="id">F</span>) : <span class="id">x</span> != 0 -&gt; `1-(<span class="id">x</span>^-1) = (<span class="id">x</span> - 1) / <span class="id">x</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof173')">Proof.</span></div>
 <div class="proofscript" id="proof173">
- <span class="kwd">by</span> <span class="id">case</span>: <span class="id">a</span> =&gt; //= <span class="id">n</span> <span class="id">_</span>; <span class="id">case</span>: <span class="id">b</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; ?; <span class="id">rewrite</span> <span class="id">mulrDl</span> <span class="id">divff</span>// <span class="id">mulN1r</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="ler_gtP">ler_gtP</a></span> (<span class="id">R</span> : <span class="id">numFieldType</span>) (<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>) :<br/>
-&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#reflect">reflect</a></span> (<span class="kwd">forall</span> <span class="id">z</span>, <span class="id">z</span> &gt; <span class="id">y</span> -&gt; <span class="id">x</span> &lt;= <span class="id">z</span>) (<span class="id">x</span> &lt;= <span class="id">y</span>).<br/>
+<span class="kwd">Lemma</span> <span class="id">lez_abs2</span> (<span class="id">a</span> <span class="id">b</span> : <span class="id">int</span>) : 0 &lt;= <span class="id">a</span> -&gt; <span class="id">a</span> &lt;= <span class="id">b</span> -&gt; (`|<span class="id">a</span>| &lt;= `|<span class="id">b</span>|)%<span class="id">N</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof174')">Proof.</span></div>
 <div class="proofscript" id="proof174">
-<span class="id">apply</span>: (<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#equivP">equivP</a></span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#ler_addgt0Pr">ler_addgt0Pr</a></span> <span class="id">_</span> <span class="id">_</span>)); <span class="id">split</span>=&gt; [<span class="id">xy</span> <span class="id">z</span>|<span class="id">xz</span> <span class="id">e</span> <span class="id">e_gt0</span>].<br/>
-&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">subr_gt0</span> =&gt; /<span class="id">xy</span>; <span class="id">rewrite</span> <span class="id">addrC</span> <span class="id">addrNK</span>.<br/>
-<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">xz</span>; <span class="id">rewrite</span> -[<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#ltLHS">ltLHS</a></span>]<span class="id">addr0</span> <span class="id">ler_lt_add</span>.<br/>
-Qed.</div>
+ <span class="kwd">by</span> <span class="id">case</span>: <span class="id">a</span> =&gt; //= <span class="id">n</span> <span class="id">_</span>; <span class="id">case</span>: <span class="id">b</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="ler_ltP">ler_ltP</a></span> (<span class="id">R</span> : <span class="id">numFieldType</span>) (<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>) :<br/>
-&nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#reflect">reflect</a></span> (<span class="kwd">forall</span> <span class="id">z</span>, <span class="id">z</span> &lt; <span class="id">x</span> -&gt; <span class="id">z</span> &lt;= <span class="id">y</span>) (<span class="id">x</span> &lt;= <span class="id">y</span>).<br/>
+<span class="kwd">Lemma</span> <span class="id">ler_gtP</span> (<span class="id">R</span> : <span class="id">numFieldType</span>) (<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>) :<br/>
+&nbsp;&nbsp;<span class="id">reflect</span> (<span class="kwd">forall</span> <span class="id">z</span>, <span class="id">z</span> &gt; <span class="id">y</span> -&gt; <span class="id">x</span> &lt;= <span class="id">z</span>) (<span class="id">x</span> &lt;= <span class="id">y</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof175')">Proof.</span></div>
 <div class="proofscript" id="proof175">
-<span class="id">apply</span>: (<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#equivP">equivP</a></span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#ler_addgt0Pr">ler_addgt0Pr</a></span> <span class="id">_</span> <span class="id">_</span>)); <span class="id">split</span>=&gt; [<span class="id">xy</span> <span class="id">z</span>|<span class="id">xz</span> <span class="id">e</span> <span class="id">e_gt0</span>].<br/>
-&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">subr_gt0</span> =&gt; /<span class="id">xy</span>; <span class="id">rewrite</span> <span class="id">addrCA</span> -[<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#leLHS">leLHS</a></span>]<span class="id">addr0</span> <span class="id">ler_add2l</span> <span class="id">subr_ge0</span>.<br/>
-<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">ler_subl_addr</span> <span class="id">xz</span>// -[<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#ltRHS">ltRHS</a></span>]<span class="id">subr0</span> <span class="id">ler_lt_sub</span>.<br/>
+<span class="id">apply</span>: (<span class="id">equivP</span> (<span class="id">ler_addgt0Pr</span> <span class="id">_</span> <span class="id">_</span>)); <span class="id">split</span>=&gt; [<span class="id">xy</span> <span class="id">z</span>|<span class="id">xz</span> <span class="id">e</span> <span class="id">e_gt0</span>].<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">subr_gt0</span> =&gt; /<span class="id">xy</span>; <span class="id">rewrite</span> <span class="id">addrC</span> <span class="id">addrNK</span>.<br/>
+<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">xz</span>; <span class="id">rewrite</span> -[<span class="id">ltLHS</span>]<span class="id">addr0</span> <span class="id">ler_lt_add</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">Definition</span> <span class="id"><a name="inv_fun">inv_fun</a></span> <span class="id">T</span> (<span class="id">R</span> : <span class="id">unitRingType</span>) (<span class="id">f</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) <span class="id">x</span> := (<span class="id">f</span> <span class="id">x</span>)^-1%<span class="id">R</span>.<br/>
-<span class="kwd">Notation</span> "<span class="id">f</span> \^-1" := (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#inv_fun">inv_fun</a></span> <span class="id">f</span>) : <span class="id">ring_scope</span>.<br/>
-<span class="kwd">Arguments</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#inv_fun">inv_fun</a></span> {<span class="id">T</span> <span class="id">R</span>} <span class="id">_</span> <span class="id">_</span> /.<br/>
-<br/>
-<span class="kwd">Definition</span> <span class="id"><a name="bound_side">bound_side</a></span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">porderType</span> <span class="id">d</span>) (<span class="id">c</span> : <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Datatypes.html#bool">bool</a></span>) (<span class="id">x</span> : <span class="id">itv_bound</span> <span class="id">T</span>) :=<br/>
-&nbsp;&nbsp;<span class="kwd">if</span> <span class="id">x</span> <span class="id">is</span> <span class="id">BSide</span> <span class="id">c</span>' <span class="id">_</span> <span class="kwd">then</span> <span class="id">c</span> == <span class="id">c</span>' <span class="kwd">else</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Datatypes.html#false">false</a></span>.<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="real_ltr_distlC">real_ltr_distlC</a></span> [<span class="id">R</span> : <span class="id">numDomainType</span>] [<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>] (<span class="id">e</span> : <span class="id">R</span>) :<br/>
-&nbsp;&nbsp;<span class="id">x</span> - <span class="id">y</span> \<span class="id">is</span> <span class="id">Num.real</span> -&gt; (`|<span class="id">x</span> - <span class="id">y</span>| &lt; <span class="id">e</span>) = (<span class="id">x</span> - <span class="id">e</span> &lt; <span class="id">y</span> &lt; <span class="id">x</span> + <span class="id">e</span>).<br/>
+<span class="kwd">Lemma</span> <span class="id">ler_ltP</span> (<span class="id">R</span> : <span class="id">numFieldType</span>) (<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>) :<br/>
+&nbsp;&nbsp;<span class="id">reflect</span> (<span class="kwd">forall</span> <span class="id">z</span>, <span class="id">z</span> &lt; <span class="id">x</span> -&gt; <span class="id">z</span> &lt;= <span class="id">y</span>) (<span class="id">x</span> &lt;= <span class="id">y</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof176')">Proof.</span></div>
 <div class="proofscript" id="proof176">
- <span class="kwd">by</span> <span class="id">move</span>=&gt; ?; <span class="id">rewrite</span> <span class="id">distrC</span> <span class="id">real_ltr_distl</span>// -<span class="id">rpredN</span> <span class="id">opprB</span>. Qed.</div>
+<span class="id">apply</span>: (<span class="id">equivP</span> (<span class="id">ler_addgt0Pr</span> <span class="id">_</span> <span class="id">_</span>)); <span class="id">split</span>=&gt; [<span class="id">xy</span> <span class="id">z</span>|<span class="id">xz</span> <span class="id">e</span> <span class="id">e_gt0</span>].<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">subr_gt0</span> =&gt; /<span class="id">xy</span>; <span class="id">rewrite</span> <span class="id">addrCA</span> -[<span class="id">leLHS</span>]<span class="id">addr0</span> <span class="id">ler_add2l</span> <span class="id">subr_ge0</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">ler_subl_addr</span> <span class="id">xz</span>// -[<span class="id"><a name="bound_side">ltRHS</a></span>]<span class="id">subr0</span> <span class="id">ler_lt_sub</span>.<br/>
+Qed.</div>
 <br/>
-<span class="kwd">Definition</span> <span class="id"><a name="proj">proj</a></span> {<span class="id">I</span>} {<span class="id">T</span> : <span class="id">I</span> -&gt; <span class="kwd">Type</span>} <span class="id">i</span> (<span class="id">f</span> : <span class="kwd">forall</span> <span class="id">i</span>, <span class="id">T</span> <span class="id">i</span>) := <span class="id">f</span> <span class="id">i</span>.<br/>
+<span class="kwd">Definition</span> <span class="id">inv_fun</span> <span class="id">T</span> (<span class="id">R</span> : <span class="id">unitRingType</span>) (<span class="id">f</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) <span class="id">x</span> := (<span class="id">f</span> <span class="id">x</span>)^-1%<span class="id">R</span>.<br/>
+<span class="kwd">Notation</span> "<span class="id">f</span> \^-1" := (<span class="id">inv_fun</span> <span class="id">f</span>) : <span class="id">ring_scope</span>.<br/>
+<span class="kwd">Arguments</span> <span class="id">inv_fun</span> {<span class="id">T</span> <span class="id">R</span>} <span class="id">_</span> <span class="id">_</span> /.<br/>
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="DFunWith">DFunWith</a></span>.<br/>
-<span class="kwd">Variables</span> (<span class="id"><a name="DFunWith.I">I</a></span> : <span class="id">eqType</span>) (<span class="id"><a name="DFunWith.T">T</a></span> : <span class="id">I</span> -&gt; <span class="kwd">Type</span>) (<span class="id"><a name="DFunWith.f">f</a></span> : <span class="kwd">forall</span> <span class="id">i</span>, <span class="id">T</span> <span class="id">i</span>).<br/>
+<span class="kwd">Definition</span> <span class="id">bound_side</span> <span class="id">d</span> (<span class="id">T</span> : <span class="id">porderType</span> <span class="id">d</span>) (<span class="id">c</span> : <span class="id">bool</span>) (<span class="id">x</span> : <span class="id">itv_bound</span> <span class="id">T</span>) :=<br/>
+&nbsp;&nbsp;<span class="kwd">if</span> <span class="id">x</span> <span class="id">is</span> <span class="id">BSide</span> <span class="id">c</span>' <span class="id">_</span> <span class="kwd">then</span> <span class="id">c</span> == <span class="id">c</span>' <span class="kwd">else</span> <span class="id">false</span>.<br/>
 <br/>
-<span class="kwd">Definition</span> <span class="id"><a name="dfwith">dfwith</a></span> <span class="id">i</span> (<span class="id">x</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">T</a></span> <span class="id">i</span>) (<span class="id">j</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.I">I</a></span>) : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">T</a></span> <span class="id">j</span> :=<br/>
-&nbsp;&nbsp;<span class="kwd">if</span> (<span class="id">i</span> =<span class="id">P</span> <span class="id">j</span>) <span class="id">is</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#ReflectT">ReflectT</a></span> <span class="id">ij</span> <span class="kwd">then</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#ecast">ecast</a></span> <span class="id">j</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">T</a></span> <span class="id">j</span>) <span class="id">ij</span> <span class="id">x</span> <span class="kwd">else</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.f">f</a></span> <span class="id">j</span>.<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="dfwithin">dfwithin</a></span> <span class="id">i</span> <span class="id">x</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwith">dfwith</a></span> <span class="id">x</span> <span class="id">i</span> = <span class="id">x</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">real_ltr_distlC</span> [<span class="id">R</span> : <span class="id">numDomainType</span>] [<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>] (<span class="id">e</span> : <span class="id">R</span>) :<br/>
+&nbsp;&nbsp;<span class="id">x</span> - <span class="id">y</span> \<span class="id">is</span> <span class="id">Num.real</span> -&gt; (`|<span class="id">x</span> - <span class="id">y</span>| &lt; <span class="id">e</span>) = (<span class="id">x</span> - <span class="id">e</span> &lt; <span class="id">y</span> &lt; <span class="id"><a name="DFunWith.T">x</a></span> + <span class="id">e</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof177')">Proof.</span></div>
 <div class="proofscript" id="proof177">
- <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwith">dfwith</a></span>; <span class="id">case</span>: <span class="id">eqP</span> =&gt; // <span class="id">ii</span>; <span class="id">rewrite</span> <span class="id">eq_axiomK</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; ?; <span class="id">rewrite</span> <span class="id">distrC</span> <span class="id">real_ltr_distl</span>// -<span class="id">rpredN</span> <span class="id">opprB</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="dfwithout">dfwithout</a></span> <span class="id">i</span> (<span class="id">x</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">T</a></span> <span class="id">i</span>) <span class="id">j</span> : <span class="id">i</span> != <span class="id">j</span> -&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwith">dfwith</a></span> <span class="id">x</span> <span class="id">j</span> = <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.f">f</a></span> <span class="id">j</span>.<br/>
+<span class="kwd">Definition</span> <span class="id">proj</span> {<span class="id">I</span>} {<span class="id">T</span> : <span class="id">I</span> -&gt; <span class="kwd">Type</span>} <span class="id">i</span> (<span class="id">f</span> : <span class="kwd">forall</span> <span class="id">i</span>, <span class="id">T</span> <span class="id">i</span>) := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.f">f</a></span> <span class="id">i</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">DFunWith</span>.<br/>
+<span class="kwd">Variables</span> (<span class="id">I</span> : <span class="id">eqType</span>) (<span class="id">T</span> : <span class="id">I</span> -&gt; <span class="kwd">Type</span>) (<span class="id">f</span> : <span class="kwd">forall</span> <span class="id">i</span>, <span class="id">T</span> <span class="id">i</span>).<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">dfwith</span> <span class="id">i</span> (<span class="id">x</span> : <span class="id">T</span> <span class="id">i</span>) (<span class="id">j</span> : <span class="id">I</span>) : <span class="id">T</span> <span class="id">j</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">if</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">i</a></span> =<span class="id">P</span> <span class="id">j</span>) <span class="id">is</span> <span class="id">ReflectT</span> <span class="id">ij</span> <span class="kwd">then</span> <span class="id">ecast</span> <span class="id">j</span> (<span class="id">T</span> <span class="id">j</span>) <span class="id">ij</span> <span class="id">x</span> <span class="kwd">else</span> <span class="id">f</span> <span class="id">j</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">dfwithin</span> <span class="id">i</span> <span class="id">x</span> : <span class="id">dfwith</span> <span class="id">x</span> <span class="id">i</span> = <span class="id">x</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof178')">Proof.</span></div>
 <div class="proofscript" id="proof178">
- <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwith">dfwith</a></span>; <span class="id">case</span>: <span class="id">eqP</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">dfwith</span>; <span class="id">case</span>: <span class="id">eqP</span> =&gt; // <span class="id">ii</span>; <span class="id">rewrite</span> <span class="id">eq_axiomK</span>. Qed.</div>
 <br/>
-<span class="kwd">Variant</span> <span class="id"><a name="dfwith_spec">dfwith_spec</a></span> <span class="id">i</span> (<span class="id">x</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">T</a></span> <span class="id">i</span>) : <span class="kwd">forall</span> <span class="id">j</span>, <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">T</a></span> <span class="id">j</span> -&gt; <span class="kwd">Type</span> :=<br/>
-&nbsp;&nbsp;| <span class="id"><a name="DFunWithin">DFunWithin</a></span> : <span class="id">dfwith_spec</span> <span class="id">x</span> <span class="id">x</span><br/>
-&nbsp;&nbsp;| <span class="id"><a name="DFunWithout">DFunWithout</a></span> <span class="id">j</span> : <span class="id">i</span> != <span class="id">j</span> -&gt; <span class="id">dfwith_spec</span> <span class="id">x</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.f">f</a></span> <span class="id">j</span>).<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="dfwithP">dfwithP</a></span> <span class="id">i</span> (<span class="id">x</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">T</a></span> <span class="id">i</span>) (<span class="id">j</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.I">I</a></span>) : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwith_spec">dfwith_spec</a></span> <span class="id">x</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwith">dfwith</a></span> <span class="id">x</span> <span class="id">j</span>).<br/>
+<span class="kwd">Lemma</span> <span class="id">dfwithout</span> <span class="id">i</span> (<span class="id">x</span> : <span class="id">T</span> <span class="id">i</span>) <span class="id">j</span> : <span class="id">i</span> != <span class="id">j</span> -&gt; <span class="id">dfwith</span> <span class="id">x</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.f">j</a></span> = <span class="id">f</span> <span class="id">j</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof179')">Proof.</span></div>
 <div class="proofscript" id="proof179">
-<span class="kwd">by</span> <span class="id">case</span>: (<span class="id">eqVneq</span> <span class="id">i</span> <span class="id">j</span>) =&gt; [&lt;-|<span class="id">nij</span>];<br/>
-&nbsp;&nbsp;&nbsp;[<span class="id">rewrite</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwithin">dfwithin</a></span>|<span class="id">rewrite</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwithout">dfwithout</a></span>//]; <span class="id">constructor</span>.<br/>
-Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">dfwith</a></span>; <span class="id">case</span>: <span class="id">eqP</span>. Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="projK">projK</a></span> <span class="id">i</span> (<span class="id">x</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith.T">T</a></span> <span class="id">i</span>) : <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#cancel">cancel</a></span> (@<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwith">dfwith</a></span> <span class="id">i</span>) (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#proj">proj</a></span> <span class="id">i</span>).<br/>
+<span class="kwd">Variant</span> <span class="id">dfwith_spec</span> <span class="id">i</span> (<span class="id">x</span> : <span class="id">T</span> <span class="id">i</span>) : <span class="kwd">forall</span> <span class="id">j</span>, <span class="id">T</span> <span class="id">j</span> -&gt; <span class="kwd">Type</span> :=<br/>
+&nbsp;&nbsp;| <span class="id">DFunWithin</span> : <span class="id">dfwith_spec</span> <span class="id">x</span> <span class="id">x</span><br/>
+&nbsp;&nbsp;| <span class="id">DFunWithout</span> <span class="id">j</span> : <span class="id">i</span> != <span class="id">j</span> -&gt; <span class="id">dfwith_spec</span> <span class="id">x</span> (<span class="id">f</span> <span class="id">j</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">dfwithP</span> <span class="id">i</span> (<span class="id">x</span> : <span class="id">T</span> <span class="id">i</span>) (<span class="id">j</span> : <span class="id">I</span>) : <span class="id">dfwith_spec</span> <span class="id">x</span> (<span class="id">dfwith</span> <span class="id">x</span> <span class="id">j</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof180')">Proof.</span></div>
 <div class="proofscript" id="proof180">
- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">z</span>; <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#proj">proj</a></span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwithin">dfwithin</a></span>. Qed.</div>
-<br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#DFunWith">DFunWith</a></span>.<br/>
-<span class="kwd">Arguments</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dfwith">dfwith</a></span> {<span class="id">I</span> <span class="id">T</span>} <span class="id">f</span> <span class="id">i</span> <span class="id">x</span>.<br/>
-<br/>
-<span class="kwd">Definition</span> <span class="id"><a name="swap">swap</a></span> (<span class="id">T1</span> <span class="id">T2</span> : <span class="kwd">Type</span>) (<span class="id">x</span> : <span class="id">T1</span> * <span class="id">T2</span>) := (<span class="id">x</span>.2, <span class="id">x</span>.1).<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="ler_sqrt">ler_sqrt</a></span> {<span class="id">R</span> : <span class="id">rcfType</span>} (<span class="id">a</span> <span class="id">b</span> : <span class="id">R</span>) :<br/>
-&nbsp;&nbsp;(0 &lt;= <span class="id">b</span> -&gt; (<span class="id">Num.sqrt</span> <span class="id">a</span> &lt;= <span class="id">Num.sqrt</span> <span class="id">b</span>) = (<span class="id">a</span> &lt;= <span class="id">b</span>))%<span class="id">R</span>.<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof181')">Proof.</span></div>
-<div class="proofscript" id="proof181">
-<span class="id">have</span> [<span class="id">b_gt0</span> <span class="id">_</span>|//|&lt;- <span class="id">_</span>] := <span class="id">ltgtP</span>; <span class="id">last</span> <span class="id">first</span>.<br/>
-&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">sqrtr0</span> -<span class="id">sqrtr_eq0</span> <span class="id">le_eqVlt</span> <span class="id">ltNge</span> <span class="id">sqrtr_ge0</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#orbF">orbF</a></span>.<br/>
-<span class="id">have</span> [<span class="id">a_le0</span>|<span class="id">a_gt0</span>] := <span class="id">ler0P</span> <span class="id">a</span>; <span class="id">last</span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ler_psqrt</span>.<br/>
-<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ler0_sqrtr</span> // <span class="id">sqrtr_ge0</span> (<span class="id">le_trans</span> <span class="id">a_le0</span>) ?<span class="id">ltW</span>.<br/>
+<span class="kwd">by</span> <span class="id">case</span>: (<span class="id">eqVneq</span> <span class="id">i</span> <span class="id">j</span>) =&gt; [&lt;-|<span class="id">nij</span>];<br/>
+&nbsp;&nbsp;&nbsp;[<span class="id">rewrite</span> <span class="id">dfwithin</span>|<span class="id">rewrite</span> <span class="id">dfwithout</span>//]; <span class="id">constructor</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="order_min">order_min</a></span>.<br/>
-<span class="kwd">Variables</span> (<span class="id"><a name="order_min.d">d</a></span> : <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Datatypes.html#unit">unit</a></span>) (<span class="id"><a name="order_min.T">T</a></span> : <span class="id">orderType</span> <span class="id">d</span>).<br/>
+<span class="kwd">Lemma</span> <span class="id">projK</span> <span class="id">i</span> (<span class="id">x</span> : <span class="id">T</span> <span class="id">i</span>) : <span class="id">cancel</span> (@<span class="id">dfwith</span> <span class="id">i</span>) (<span class="id">proj</span> <span class="id">i</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof181')">Proof.</span></div>
+<div class="proofscript" id="proof181">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">z</span>; <span class="id">rewrite</span> /<span class="id">proj</span> <span class="id">dfwithin</span>. Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">DFunWith</span>.<br/>
+<span class="kwd">Arguments</span> <span class="id">dfwith</span> {<span class="id">I</span> <span class="id">T</span>} <span class="id">f</span> <span class="id">i</span> <span class="id">x</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">swap</span> (<span class="id">T1</span> <span class="id">T2</span> : <span class="kwd">Type</span>) (<span class="id">x</span> : <span class="id">T1</span> * <span class="id">T2</span>) := (<span class="id">x</span>.2, <span class="id">x</span>.1).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">ler_sqrt</span> {<span class="id">R</span> : <span class="id">rcfType</span>} (<span class="id">a</span> <span class="id">b</span> : <span class="id">R</span>) :<br/>
+&nbsp;&nbsp;(0 &lt;= <span class="id">b</span> -&gt; (<span class="id">Num.sqrt</span> <span class="id">a</span> &lt;= <span class="id">Num.sqrt</span> <span class="id">b</span>) = (<span class="id">a</span> &lt;= <span class="id">b</span>))%<span class="id">R</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof182')">Proof.</span></div>
+<div class="proofscript" id="proof182">
+<span class="id">have</span> [<span class="id">b_gt0</span> <span class="id">_</span>|//|&lt;- <span class="id">_</span>] := <span class="id">ltgtP</span>; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">sqrtr0</span> -<span class="id">sqrtr_eq0</span> <span class="id">le_eqVlt</span> <span class="id">ltNge</span> <span class="id">sqrtr_ge0</span> <span class="id">orbF</span>.<br/>
+<span class="id">have</span> [<span class="id">a_le0</span>|<span class="id">a_gt0</span>] := <span class="id">ler0P</span> <span class="id">a</span>; <span class="id">last</span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ler_psqrt</span>.<br/>
+<span class="kwd">by</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#order_min.T">rewrite</a></span> <span class="id">ler0_sqrtr</span> // <span class="id">sqrtr_ge0</span> (<span class="id">le_trans</span> <span class="id">a_le0</span>) ?<span class="id">ltW</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Section</span> <span class="id">order_min</span>.<br/>
+<span class="kwd">Variables</span> (<span class="id">d</span> : <span class="id">unit</span>) (<span class="id">T</span> : <span class="id">orderType</span> <span class="id">d</span>).<br/>
 <span class="kwd">Import</span> <span class="id">Order</span>.<br/>
 <span class="id">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">order_scope</span>.<br/>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="lt_min_lt">lt_min_lt</a></span> (<span class="id">x</span> <span class="id">y</span> <span class="id">z</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#order_min.T">T</a></span>) : (<span class="id">min</span> <span class="id">x</span> <span class="id">z</span> &lt; <span class="id">min</span> <span class="id">y</span> <span class="id">z</span>)%<span class="id">O</span> -&gt; (<span class="id">x</span> &lt; <span class="id">y</span>)%<span class="id">O</span>.<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof182')">Proof.</span></div>
-<div class="proofscript" id="proof182">
-<span class="id">rewrite</span> /<span class="id">Order.min</span>/=; <span class="id">case</span>: <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#ifPn">ifPn</a></span> =&gt; <span class="id">xz</span>; <span class="id">case</span>: <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#ifPn">ifPn</a></span> =&gt; <span class="id">yz</span>; <span class="id">rewrite</span> ?<span class="id">ltxx</span>//.<br/>
+<span class="kwd">Lemma</span> <span class="id">lt_min_lt</span> (<span class="id">x</span> <span class="id">y</span> <span class="id">z</span> : <span class="id">T</span>) : (<span class="id">min</span> <span class="id">x</span> <span class="id">z</span> &lt; <span class="id">min</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#order_min">y</a></span> <span class="id">z</span>)%<span class="id">O</span> -&gt; (<span class="id">x</span> &lt; <span class="id">y</span>)%<span class="id">O</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof183')">Proof.</span></div>
+<div class="proofscript" id="proof183">
+<span class="id">rewrite</span> /<span class="id">Order.min</span>/=; <span class="id">case</span>: <span class="id">ifPn</span> =&gt; <span class="id">xz</span>; <span class="id">case</span>: <span class="id">ifPn</span> =&gt; <span class="id">yz</span>; <span class="id">rewrite</span> ?<span class="id">ltxx</span>//.<br/>
 - <span class="kwd">by</span> <span class="id">move</span>=&gt; /<span class="id">lt_le_trans</span>; <span class="id">apply</span>; <span class="id">rewrite</span> <span class="id">leNgt</span>.<br/>
 - <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ltNge</span> (<span class="id">ltW</span> <span class="id">yz</span>).<br/>
 Qed.</div>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#order_min">order_min</a></span>.<br/>
+<span class="kwd">End</span> <span class="id">order_min</span>.<br/>
 <br/>
 <pre>
 (**************************)
@@ -1495,336 +1502,384 @@ Qed.</div>
 </pre>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">poly</span>.<br/>
 <br/>
-<span class="kwd">Definition</span> <span class="id"><a name="coefE">coefE</a></span> :=<br/>
+<span class="kwd">Definition</span> <span class="id">coefE</span> :=<br/>
 &nbsp;&nbsp;(<span class="id">coef0</span>, <span class="id">coef1</span>, <span class="id">coefC</span>, <span class="id">coefX</span>, <span class="id">coefXn</span>,<br/>
-&nbsp;&nbsp;&nbsp;<span class="id">coefZ</span>, <span class="id">coefMC</span>, <span class="id">coefCM</span>, <span class="id">coefXnM</span>, <span class="id">coefMXn</span>, <span class="id">coefXM</span>, <span class="id">coefMX</span>, <span class="id">coefMNn</span>, <span class="id">coefMn</span>,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id">coefZ</span>, <span class="id">coefMC</span>, <span class="id">coefCM</span>, <span class="id">coefXnM</span>, <span class="id">coefMXn</span>, <span class="id"><a name="Pdeg2">coefXM</a></span>, <span class="id">coefMX</span>, <span class="id">coefMNn</span>, <span class="id">coefMn</span>,<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">coefN</span>, <span class="id">coefB</span>, <span class="id">coefD</span>,<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">coef_cons</span>, <span class="id">coef_Poly</span>, <span class="id">coef_poly</span>,<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">coef_deriv</span>, <span class="id">coef_nderivn</span>, <span class="id">coef_derivn</span>, <span class="id">coef_map</span>, <span class="id">coef_sum</span>,<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">coef_comp_poly</span>).<br/>
 <br/>
-<span class="kwd">Module</span> <span class="kwd">Export</span> <span class="id"><a name="Pdeg2">Pdeg2</a></span>.<br/>
+<span class="kwd">Module</span> <span class="kwd">Export</span> <span class="id">Pdeg2</span>.<br/>
 <br/>
-<span class="kwd">Module</span> <span class="kwd">Export</span> <span class="id"><a name="Pdeg2.Field">Field</a></span>.<br/>
+<span class="kwd">Module</span> <span class="kwd">Export</span> <span class="id">Field</span>.<br/>
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field">Pdeg2Field</a></span>.<br/>
-<span class="kwd">Variable</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.F">F</a></span> : <span class="id">fieldType</span>.<br/>
-<span class="kwd">Hypothesis</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.nz2">nz2</a></span> : 2%:<span class="id">R</span> != 0 :&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.F">F</a></span>.<br/>
+<span class="kwd">Section</span> <span class="id">Pdeg2Field</span>.<br/>
+<span class="kwd">Variable</span> <span class="id">F</span> : <span class="id">fieldType</span>.<br/>
+<span class="kwd">Hypothesis</span> <span class="id">nz2</span> : 2%:<span class="id">R</span> != 0 :&gt; <span class="id">F</span>.<br/>
 <br/>
-<span class="kwd">Variable</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.p">p</a></span> : {<span class="id">poly</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.F">F</a></span>}.<br/>
-<span class="kwd">Hypothesis</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.degp">degp</a></span> : <span class="id">size</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span> = 3%<span class="id">N</span>.<br/>
+<span class="kwd">Variable</span> <span class="id">p</span> : {<span class="id">poly</span> <span class="id">F</span>}.<br/>
+<span class="kwd">Hypothesis</span> <span class="id">degp</span> : <span class="id">size</span> <span class="id">p</span> = 3%<span class="id">N</span>.<br/>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.a">a</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span>`<span class="id">_2</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.b">b</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span>`<span class="id">_1</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.c">c</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span>`<span class="id">_0</span>.<br/>
+<span class="kwd">Let</span> <span class="id">a</span> := <span class="id">p</span>`<span class="id">_2</span>.<br/>
+<span class="kwd">Let</span> <span class="id">b</span> := <span class="id">p</span>`<span class="id">_1</span>.<br/>
+<span class="kwd">Let</span> <span class="id">c</span> := <span class="id">p</span>`<span class="id">_0</span>.<br/>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.pneq0">pneq0</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span> != 0<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof183')">Proof.</span></div>
-<div class="proofscript" id="proof183">
- <span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">size_poly_gt0</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.degp">degp</a></span>. Qed.</div>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.aneq0">aneq0</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> != 0.<br/>
+<span class="kwd">Let</span> <span class="id">pneq0</span> : <span class="id">p</span> != 0<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof184')">Proof.</span></div>
 <div class="proofscript" id="proof184">
- <span class="kwd">by</span> <span class="id">move</span>: <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.pneq0">pneq0</a></span>; <span class="id">rewrite</span> -<span class="id">lead_coef_eq0</span> <span class="id">lead_coefE</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.degp">degp</a></span>. Qed.</div>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.a2neq0">a2neq0</a></span> : 2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> != 0<br/>
+ <span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">size_poly_gt0</span> <span class="id">degp</span>. Qed.</div>
+<span class="kwd">Let</span> <span class="id">aneq0</span> : <span class="id">a</span> != 0.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof185')">Proof.</span></div>
 <div class="proofscript" id="proof185">
- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulf_neq0</span>. Qed.</div>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.sqa2neq0">sqa2neq0</a></span> : (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span>) ^+ 2 != 0<br/>
+ <span class="kwd">by</span> <span class="id">move</span>: <span class="id">pneq0</span>; <span class="id">rewrite</span> -<span class="id">lead_coef_eq0</span> <span class="id">lead_coefE</span> <span class="id">degp</span>. Qed.</div>
+<span class="kwd">Let</span> <span class="id">a2neq0</span> : 2%:<span class="id">R</span> * <span class="id">a</span> != 0<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof186')">Proof.</span></div>
 <div class="proofscript" id="proof186">
- <span class="id">exact</span>: <span class="id">expf_neq0</span>. Qed.</div>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.aa4">aa4</a></span> : 4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> = (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span>)^+2.<br/>
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulf_neq0</span>. Qed.</div>
+<span class="kwd">Let</span> <span class="id">sqa2neq0</span> : (2%:<span class="id">R</span> * <span class="id">a</span>) ^+ 2 != 0<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof187')">Proof.</span></div>
 <div class="proofscript" id="proof187">
- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">expr2</span> <span class="id">mulrACA</span> <span class="id">mulrA</span> -<span class="id">natrM</span>. Qed.</div>
+ <span class="id">exact</span>: <span class="id">expf_neq0</span>. Qed.</div>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.splitr">splitr</a></span> (<span class="id">x</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.F">F</a></span>) : <span class="id">x</span> = <span class="id">x</span> / 2%:<span class="id">R</span> + <span class="id">x</span> / 2%:<span class="id">R</span>.<br/>
+<span class="kwd">Let</span> <span class="id">aa4</span> : 4%:<span class="id">R</span> * <span class="id">a</span> * <span class="id">a</span> = (2%:<span class="id">R</span> * <span class="id">a</span>)^+2.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof188')">Proof.</span></div>
 <div class="proofscript" id="proof188">
-<span class="id">apply</span>: (<span class="id">mulIf</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.nz2">nz2</a></span>); <span class="id">rewrite</span> -<span class="id">mulrDl</span> <span class="id">mulfVK</span>//.<br/>
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">expr2</span> <span class="id">mulrACA</span> <span class="id">mulrA</span> -<span class="id">natrM</span>. Qed.</div>
+<br/>
+<span class="kwd">Let</span> <span class="id">splitr</span> (<span class="id">x</span> : <span class="id">F</span>) : <span class="id">x</span> = <span class="id">x</span> / 2%:<span class="id">R</span> + <span class="id">x</span> / 2%:<span class="id">R</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof189')">Proof.</span></div>
+<div class="proofscript" id="proof189">
+<span class="id">apply</span>: (<span class="id">mulIf</span> <span class="id">nz2</span>); <span class="id">rewrite</span> -<span class="id">mulrDl</span> <span class="id">mulfVK</span>//.<br/>
 <span class="kwd">by</span> <span class="id">rewrite</span> -[2%:<span class="id">R</span>]/(1 + 1)%:<span class="id">R</span> <span class="id">natrD</span> <span class="id">mulrDr</span> <span class="id">mulr1</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.pE">pE</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span> = <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> *: '<span class="id">X</span>^2 + <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.b">b</a></span> *: '<span class="id">X</span> + <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.c">c</a></span>%:<span class="id">P</span>.<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof189')">Proof.</span></div>
-<div class="proofscript" id="proof189">
-<span class="id">apply</span>/<span class="id">polyP</span> =&gt; + /[!<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#coefE">coefE</a></span>] =&gt; -[|[|[|<span class="id">i</span>]]] /=; <span class="id">rewrite</span> !<span class="id">Monoid.simpm</span>//.<br/>
-<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">nth_default</span>// <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.degp">degp</a></span>.<br/>
-Qed.</div>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.delta">delta</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.b">b</a></span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.c">c</a></span>.<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="Pdeg2.Field.deg2_poly_canonical">deg2_poly_canonical</a></span> :<br/>
-&nbsp;&nbsp;<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span> = <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> *: (('<span class="id">X</span> + (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.b">b</a></span> / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span>))%:<span class="id">P</span>)^+2 - (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.delta">delta</a></span> / (4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> ^+ 2))%:<span class="id">P</span>).<br/>
+<span class="kwd">Let</span> <span class="id">pE</span> : <span class="id"><a name="Pdeg2.Field.deg2_poly_canonical">p</a></span> = <span class="id">a</span> *: '<span class="id">X</span>^2 + <span class="id">b</span> *: '<span class="id">X</span> + <span class="id">c</span>%:<span class="id">P</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof190')">Proof.</span></div>
 <div class="proofscript" id="proof190">
-<span class="id">rewrite</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.pE">pE</a></span> <span class="id">sqrrD</span> -!<span class="id">addrA</span> <span class="id">scalerDr</span>; <span class="id">congr</span> +%<span class="id">R</span>; <span class="id">rewrite</span> <span class="id">addrA</span> <span class="id">scalerDr</span>; <span class="id">congr</span> +%<span class="id">R</span>.<br/>
-- <span class="id">rewrite</span> -<span class="id">mulrDr</span> -<span class="id">polyCD</span> -!<span class="id">mul_polyC</span> <span class="id">mulrA</span> <span class="id">mulrAC</span> -<span class="id">polyCM</span>.<br/>
-&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> [<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> * <span class="id">_</span>]<span class="id">mulrC</span> <span class="id">mulrDl</span> <span class="id">invfM</span> -!<span class="id">mulrA</span> <span class="id">mulVf</span>// <span class="id">mulr1</span> -<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.splitr">splitr</a></span>.<br/>
-- <span class="id">rewrite</span> [<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> ^+ 2]<span class="id">expr2</span> <span class="id">mulrA</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.aa4">aa4</a></span> -<span class="id">polyC_exp</span> -<span class="id">polyCB</span> <span class="id">expr_div_n</span> -<span class="id">mulrBl</span> <span class="id">subKr</span>.<br/>
-&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">mul_polyC</span> -<span class="id">polyCM</span> <span class="id">mulrCA</span> <span class="id">mulrACA</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.aa4">aa4</a></span> <span class="id">mulrCA</span> <span class="id">mulfV</span>// <span class="id">mulr1</span>.<br/>
+<span class="id">apply</span>/<span class="id">polyP</span> =&gt; + /[!<span class="id">coefE</span>] =&gt; -[|[|[|<span class="id">i</span>]]] /=; <span class="id">rewrite</span> !<span class="id">Monoid.simpm</span>//.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">nth_default</span>// <span class="id">degp</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">Variable</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.r">r</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.F">F</a></span>.<br/>
-<span class="kwd">Hypothesis</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.r_sqrt_delta">r_sqrt_delta</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r">r</a></span> ^+ 2 = <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.delta">delta</a></span>.<br/>
+<span class="kwd">Let</span> <span class="id">delta</span> := <span class="id">b</span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id">a</span> * <span class="id">c</span>.<br/>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.r1">r1</a></span> := (- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.b">b</a></span> - <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r">r</a></span>) / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span>).<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.r2">r2</a></span> := (- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.b">b</a></span> + <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r">r</a></span>) / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span>).<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="Pdeg2.Field.deg2_poly_factor">deg2_poly_factor</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span> = <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> *: ('<span class="id">X</span> - <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r1">r1</a></span>%:<span class="id">P</span>) * ('<span class="id">X</span> - <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r2">r2</a></span>%:<span class="id">P</span>).<br/>
+<span class="kwd">Lemma</span> <span class="id">deg2_poly_canonical</span> :<br/>
+&nbsp;&nbsp;<span class="id">p</span> = <span class="id">a</span> *: (('<span class="id">X</span> + (<span class="id">b</span> / (2%:<span class="id">R</span> * <span class="id">a</span>))%:<span class="id">P</span>)^+2 - (<span class="id">delta</span> / (4%:<span class="id">R</span> * <span class="id">a</span> ^+ 2))%:<span class="id">P</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof191')">Proof.</span></div>
 <div class="proofscript" id="proof191">
-<span class="id">rewrite</span> [<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.p">p</a></span>]<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.deg2_poly_canonical">deg2_poly_canonical</a></span>//= -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.a">a</a></span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.b">b</a></span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.c">c</a></span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.delta">delta</a></span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r1">r1</a></span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r2">r2</a></span>.<br/>
-<span class="id">rewrite</span> ![(- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.b">b</a></span> + <span class="id">_</span>) * <span class="id">_</span>]<span class="id">mulrDl</span> 2!<span class="id">polyCD</span> 2!<span class="id">opprD</span> 2!<span class="id">addrA</span> !<span class="id">mulNr</span> !<span class="id">polyCN</span> !<span class="id">opprK</span>.<br/>
-<span class="id">rewrite</span> -<span class="id">scalerAl</span> [<span class="kwd">in</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssrmatching.ssrmatching.html#SsrMatchingSyntax.RHS">RHS</a></span>]<span class="id">mulrC</span> -<span class="id">subr_sqr</span> -<span class="id">polyC_exp</span> -[4%:<span class="id">R</span>]/(2 * 2)%:<span class="id">R</span> <span class="id">natrM</span>.<br/>
-<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">expr2</span> -<span class="id">exprMn</span> [<span class="kwd">in</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssrmatching.ssrmatching.html#SsrMatchingSyntax.RHS">RHS</a></span>]<span class="id">exprMn</span> <span class="id">exprVn</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r_sqrt_delta">r_sqrt_delta</a></span>.<br/>
+<span class="id">rewrite</span> <span class="id">pE</span> <span class="id">sqrrD</span> -!<span class="id">addrA</span> <span class="id">scalerDr</span>; <span class="id">congr</span> +%<span class="id">R</span>; <span class="id">rewrite</span> <span class="id">addrA</span> <span class="id">scalerDr</span>; <span class="id">congr</span> +%<span class="id">R</span>.<br/>
+- <span class="id">rewrite</span> -<span class="id">mulrDr</span> -<span class="id">polyCD</span> -!<span class="id">mul_polyC</span> <span class="id">mulrA</span> <span class="id">mulrAC</span> -<span class="id">polyCM</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> [<span class="id">a</span> * <span class="id">_</span>]<span class="id">mulrC</span> <span class="id">mulrDl</span> <span class="id">invfM</span> -!<span class="id">mulrA</span> <span class="id"><a name="Pdeg2.Field.Pdeg2Field.r">mulVf</a></span>// <span class="id">mulr1</span> -<span class="id">splitr</span>.<br/>
+- <span class="id">rewrite</span> [<span class="id">a</span> ^+ 2]<span class="id">expr2</span> <span class="id">mulrA</span> <span class="id">aa4</span> -<span class="id">polyC_exp</span> -<span class="id">polyCB</span> <span class="id">expr_div_n</span> -<span class="id"><a name="Pdeg2.Field.Pdeg2Field.r2">mulrBl</a></span> <span class="id">subKr</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">mul_polyC</span> -<span class="id">polyCM</span> <span class="id">mulrCA</span> <span class="id">mulrACA</span> <span class="id">aa4</span> <span class="id">mulrCA</span> <span class="id">mulfV</span>// <span class="id">mulr1</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field">Pdeg2Field</a></span>.<br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field">Field</a></span>.<br/>
+<span class="kwd">Variable</span> <span class="id">r</span> : <span class="id">F</span>.<br/>
+<span class="kwd">Hypothesis</span> <span class="id">r_sqrt_delta</span> : <span class="id">r</span> ^+ 2 = <span class="id">delta</span>.<br/>
 <br/>
-<span class="kwd">Module</span> <span class="id"><a name="Pdeg2.Real">Real</a></span>.<br/>
+<span class="kwd">Let</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.Pdeg2Field.r1">r1</a></span> := (- <span class="id">b</span> - <span class="id">r</span>) / (2%:<span class="id">R</span> * <span class="id">a</span>).<br/>
+<span class="kwd">Let</span> <span class="id">r2</span> := (- <span class="id">b</span> + <span class="id">r</span>) / (2%:<span class="id">R</span> * <span class="id">a</span>).<br/>
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real">Pdeg2Real</a></span>.<br/>
-<br/>
-<span class="kwd">Variable</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.F">F</a></span> : <span class="id">realFieldType</span>.<br/>
-<br/>
-<span class="kwd">Section</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex">Pdeg2RealConvex</a></span>.<br/>
-<br/>
-<span class="kwd">Variable</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span> : {<span class="id">poly</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.F">F</a></span>}.<br/>
-<span class="kwd">Hypothesis</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.degp">degp</a></span> : <span class="id">size</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span> = 3%<span class="id">N</span>.<br/>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>`<span class="id">_2</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.b">b</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>`<span class="id">_1</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.c">c</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>`<span class="id">_0</span>.<br/>
-<br/>
-<span class="kwd">Hypothesis</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.age0">age0</a></span> : 0 &lt;= <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span>.<br/>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.delta">delta</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.b">b</a></span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.c">c</a></span>.<br/>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.pneq0">pneq0</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span> != 0<br/>
+<span class="kwd">Lemma</span> <span class="id">deg2_poly_factor</span> : <span class="id">p</span> = <span class="id">a</span> *: ('<span class="id">X</span> - <span class="id">r1</span>%:<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssrmatching.ssrmatching.html#SsrMatchingSyntax.RHS">P</a></span>) * ('<span class="id">X</span> - <span class="id">r2</span>%:<span class="id">P</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof192')">Proof.</span></div>
 <div class="proofscript" id="proof192">
- <span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">size_poly_gt0</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.degp">degp</a></span>. Qed.</div>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.aneq0">aneq0</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span> != 0.<br/>
+<span class="id">rewrite</span> [<span class="id">p</span>]<span class="id">deg2_poly_canonical</span>//= -/<span class="id">a</span> -/<span class="id">b</span> -/<span class="id">c</span> -/<span class="id">delta</span> /<span class="id">r1</span> /<span class="id">r2</span>.<br/>
+<span class="id">rewrite</span> ![(- <span class="id">b</span> + <span class="id">_</span>) * <span class="id">_</span>]<span class="id">mulrDl</span> 2!<span class="id">polyCD</span> 2!<span class="id">opprD</span> 2!<span class="id">addrA</span> !<span class="id">mulNr</span> !<span class="id">polyCN</span> !<span class="id">opprK</span>.<br/>
+<span class="id">rewrite</span> -<span class="id">scalerAl</span> [<span class="kwd">in</span> <span class="id">RHS</span>]<span class="id">mulrC</span> -<span class="id">subr_sqr</span> -<span class="id">polyC_exp</span> -[4%:<span class="id">R</span>]/(2 * 2)%:<span class="id">R</span> <span class="id">natrM</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">expr2</span> -<span class="id">exprMn</span> [<span class="kwd">in</span> <span class="id">RHS</span>]<span class="id">exprMn</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">exprVn</a></span> <span class="id">r_sqrt_delta</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">Pdeg2Field</span>.<br/>
+<span class="kwd">End</span> <span class="id">Field</span>.<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id">Real</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">Pdeg2Real</span>.<br/>
+<br/>
+<span class="kwd">Variable</span> <span class="id">F</span> : <span class="id">realFieldType</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">Pdeg2RealConvex</span>.<br/>
+<br/>
+<span class="kwd">Variable</span> <span class="id">p</span> : {<span class="id">poly</span> <span class="id">F</span>}.<br/>
+<span class="kwd">Hypothesis</span> <span class="id">degp</span> : <span class="id">size</span> <span class="id">p</span> = 3%<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">N</a></span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">a</span> := <span class="id">p</span>`<span class="id">_2</span>.<br/>
+<span class="kwd">Let</span> <span class="id">b</span> := <span class="id">p</span>`<span class="id">_1</span>.<br/>
+<span class="kwd">Let</span> <span class="id">c</span> := <span class="id">p</span>`<span class="id">_0</span>.<br/>
+<br/>
+<span class="kwd">Hypothesis</span> <span class="id">age0</span> : 0 &lt;= <span class="id">a</span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">delta</span> := <span class="id">b</span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id">a</span> * <span class="id">c</span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">pneq0</span> : <span class="id">p</span> != 0<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof193')">Proof.</span></div>
 <div class="proofscript" id="proof193">
- <span class="kwd">by</span> <span class="id">move</span>: <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.pneq0">pneq0</a></span>; <span class="id">rewrite</span> -<span class="id">lead_coef_eq0</span> <span class="id">lead_coefE</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.degp">degp</a></span>. Qed.</div>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.agt0">agt0</a></span> : 0 &lt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span><br/>
+ <span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">size_poly_gt0</span> <span class="id">degp</span>. Qed.</div>
+<span class="kwd">Let</span> <span class="id">aneq0</span> : <span class="id">a</span> != 0.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof194')">Proof.</span></div>
 <div class="proofscript" id="proof194">
- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">lt_def</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.aneq0">aneq0</a></span>. Qed.</div>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a4gt0">a4gt0</a></span> : 0 &lt; 4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span><br/>
+ <span class="kwd">by</span> <span class="id">move</span>: <span class="id">pneq0</span>; <span class="id">rewrite</span> -<span class="id">lead_coef_eq0</span> <span class="id">lead_coefE</span> <span class="id">degp</span>. Qed.</div>
+<span class="kwd">Let</span> <span class="id">agt0</span> : 0 &lt; <span class="id">a</span><br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof195')">Proof.</span></div>
 <div class="proofscript" id="proof195">
- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulr_gt0</span> ?<span class="id">ltr0n</span>. Qed.</div>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="Pdeg2.Real.deg2_poly_min">deg2_poly_min</a></span> <span class="id">x</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>.[- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.b">b</a></span> / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span>)] &lt;= <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>.[<span class="id">x</span>].<br/>
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">lt_def</span> <span class="id">aneq0</span>. Qed.</div>
+<span class="kwd">Let</span> <span class="id">a4gt0</span> : 0 &lt; 4%:<span class="id">R</span> * <span class="id">a</span><br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof196')">Proof.</span></div>
 <div class="proofscript" id="proof196">
-<span class="id">rewrite</span> [<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>]<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.deg2_poly_canonical">deg2_poly_canonical</a></span> ?<span class="id">pnatr_eq0</span>// -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.b">b</a></span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.c">c</a></span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.delta">delta</a></span> !<span class="id">hornerE</span>/=.<br/>
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulr_gt0</span> ?<span class="id">ltr0n</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">deg2_poly_min</span> <span class="id">x</span> : <span class="id">p</span>.[- <span class="id">b</span> / (2%:<span class="id">R</span> * <span class="id">a</span>)] &lt;= <span class="id">p</span>.[<span class="id">x</span>].<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof197')">Proof.</span></div>
+<div class="proofscript" id="proof197">
+<span class="id">rewrite</span> [<span class="id">p</span>]<span class="id">deg2_poly_canonical</span> ?<span class="id">pnatr_eq0</span>// -/<span class="id">a</span> -/<span class="id">b</span> -/<span class="id">c</span> /<span class="id">delta</span> !<span class="id">hornerE</span>/=.<br/>
 <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">ler_pmul2l</span>// <span class="id">ler_add2r</span> <span class="id">addrC</span> <span class="id">mulNr</span> <span class="id">subrr</span> ?<span class="id">mulr0</span> ?<span class="id">expr0n</span> <span class="id">sqr_ge0</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="Pdeg2.Real.deg2_poly_minE">deg2_poly_minE</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>.[- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.b">b</a></span> / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span>)] = - <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.delta">delta</a></span> / (4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span>).<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof197')">Proof.</span></div>
-<div class="proofscript" id="proof197">
-<span class="id">rewrite</span> [<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>]<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.deg2_poly_canonical">deg2_poly_canonical</a></span> ?<span class="id">pnatr_eq0</span>// -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.b">b</a></span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.c">c</a></span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.delta">delta</a></span> !<span class="id">hornerE</span>/=.<br/>
-<span class="id">rewrite</span> -?<span class="id">expr2</span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id">X</span>^+2]<span class="id">addrC</span> [<span class="kwd">in</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssrmatching.ssrmatching.html#SsrMatchingSyntax.LHS">LHS</a></span>]<span class="id">mulNr</span> <span class="id">subrr</span> <span class="id">expr0n</span> <span class="id">add0r</span> <span class="id">mulNr</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">deg2_poly_minE</span> : <span class="id">p</span>.[- <span class="id">b</span> / (2%:<span class="id">R</span> * <span class="id">a</span>)] = - <span class="id">delta</span> / (4%:<span class="id">R</span> * <span class="id">a</span>).<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof198')">Proof.</span></div>
+<div class="proofscript" id="proof198">
+<span class="id">rewrite</span> [<span class="id">p</span>]<span class="id">deg2_poly_canonical</span> ?<span class="id">pnatr_eq0</span>// -/<span class="id">a</span> -/<span class="id">b</span> -/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">c</a></span> -/<span class="id">delta</span> !<span class="id">hornerE</span>/=.<br/>
+<span class="id">rewrite</span> -?<span class="id">expr2</span> [<span class="id">X</span> <span class="kwd">in</span> <span class="id">X</span>^+2]<span class="id">addrC</span> [<span class="kwd">in</span> <span class="id">LHS</span>]<span class="id">mulNr</span> <span class="id">subrr</span> <span class="id">expr0n</span> <span class="id">add0r</span> <span class="id">mulNr</span>.<br/>
 <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">mulrC</span> <span class="id">mulNr</span> <span class="id">invfM</span> <span class="id">mulrA</span> <span class="id">mulfVK</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="Pdeg2.Real.deg2_poly_ge0">deg2_poly_ge0</a></span> : <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#reflect">reflect</a></span> (<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.p">p</a></span>.[<span class="id">x</span>]) (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.delta">delta</a></span> &lt;= 0).<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof198')">Proof.</span></div>
-<div class="proofscript" id="proof198">
-<span class="id">apply</span>/(<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#iffP">iffP</a></span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#idP">idP</a></span>) =&gt; [<span class="id">dlt0</span> <span class="id">x</span> | /(<span class="id">_</span> (- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.b">b</a></span> / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex.a">a</a></span>)))]; <span class="id">last</span> <span class="id">first</span>.<br/>
-&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.deg2_poly_minE">deg2_poly_minE</a></span> <span class="id">ler_pdivl_mulr</span>// <span class="id">mul0r</span> <span class="id">oppr_ge0</span>.<br/>
-<span class="id">apply</span>: <span class="id">le_trans</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.deg2_poly_min">deg2_poly_min</a></span> <span class="id">_</span>).<br/>
-<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.deg2_poly_minE">deg2_poly_minE</a></span> <span class="id">ler_pdivl_mulr</span>// <span class="id">mul0r</span> <span class="id">oppr_ge0</span>.<br/>
-Qed.</div>
-<br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real.Pdeg2RealConvex">Pdeg2RealConvex</a></span>.<br/>
-<br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2Real">Pdeg2Real</a></span>.<br/>
-<br/>
-<span class="kwd">Section</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed">Pdeg2RealClosed</a></span>.<br/>
-<br/>
-<span class="kwd">Variable</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.F">F</a></span> : <span class="id">rcfType</span>.<br/>
-<br/>
-<span class="kwd">Section</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex">Pdeg2RealClosedConvex</a></span>.<br/>
-<br/>
-<span class="kwd">Variable</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.p">p</a></span> : {<span class="id">poly</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.F">F</a></span>}.<br/>
-<span class="kwd">Hypothesis</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.degp">degp</a></span> : <span class="id">size</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.p">p</a></span> = 3%<span class="id">N</span>.<br/>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.a">a</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.p">p</a></span>`<span class="id">_2</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.b">b</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.p">p</a></span>`<span class="id">_1</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.c">c</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.p">p</a></span>`<span class="id">_0</span>.<br/>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.nz2">nz2</a></span> : 2%:<span class="id">R</span> != 0 :&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.F">F</a></span><br/>
+<span class="kwd">Lemma</span> <span class="id">deg2_poly_ge0</span> : <span class="id">reflect</span> (<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id">p</span>.[<span class="id">x</span>]) (<span class="id">delta</span> &lt;= 0).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof199')">Proof.</span></div>
 <div class="proofscript" id="proof199">
- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">pnatr_eq0</span>. Qed.</div>
+<span class="id">apply</span>/(<span class="id">iffP</span> <span class="id">idP</span>) =&gt; [<span class="id">dlt0</span> <span class="id">x</span> | /(<span class="id">_</span> (- <span class="id">b</span> / (2%:<span class="id">R</span> * <span class="id">a</span>)))]; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">deg2_poly_minE</span> <span class="id">ler_pdivl_mulr</span>// <span class="id">mul0r</span> <span class="id">oppr_ge0</span>.<br/>
+<span class="id">apply</span>: <span class="id">le_trans</span> (<span class="id">deg2_poly_min</span> <span class="id">_</span>).<br/>
+<span class="kwd">by</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.p">rewrite</a></span> <span class="id">deg2_poly_minE</span> <span class="id">ler_pdivl_mulr</span>// <span class="id">mul0r</span> <span class="id">oppr_ge0</span>.<br/>
+Qed.</div>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.delta">delta</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.b">b</a></span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.a">a</a></span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.c">c</a></span>.<br/>
+<span class="kwd">End</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.b">Pdeg2RealConvex</a></span>.<br/>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.r1">r1</a></span> := (- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.b">b</a></span> - <span class="id">Num.sqrt</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.delta">delta</a></span>) / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.a">a</a></span>).<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.r2">r2</a></span> := (- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.b">b</a></span> + <span class="id">Num.sqrt</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.delta">delta</a></span>) / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.a">a</a></span>).<br/>
+<span class="kwd">End</span> <span class="id">Pdeg2Real</span>.<br/>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="Pdeg2.Real.deg2_poly_factor">deg2_poly_factor</a></span> : 0 &lt;= <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.delta">delta</a></span> -&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.p">p</a></span> = <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.a">a</a></span> *: ('<span class="id">X</span> - <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.r1">r1</a></span>%:<span class="id">P</span>) * ('<span class="id">X</span> - <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.r2">r2</a></span>%:<span class="id">P</span>).<br/>
+<span class="kwd">Section</span> <span class="id">Pdeg2RealClosed</span>.<br/>
+<br/>
+<span class="kwd">Variable</span> <span class="id">F</span> : <span class="id">rcfType</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">Pdeg2RealClosedConvex</span>.<br/>
+<br/>
+<span class="kwd">Variable</span> <span class="id">p</span> : {<span class="id"><a name="Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex.r1">poly</a></span> <span class="id">F</span>}.<br/>
+<span class="kwd">Hypothesis</span> <span class="id">degp</span> : <span class="id">size</span> <span class="id">p</span> = 3%<span class="id">N</span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">a</span> := <span class="id">p</span>`<span class="id">_2</span>.<br/>
+<span class="kwd">Let</span> <span class="id">b</span> := <span class="id">p</span>`<span class="id">_1</span>.<br/>
+<span class="kwd">Let</span> <span class="id">c</span> := <span class="id">p</span>`<span class="id">_0</span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">nz2</span> : 2%:<span class="id">R</span> != 0 :&gt; <span class="id">F</span><br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof200')">Proof.</span></div>
 <div class="proofscript" id="proof200">
- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">dge0</span>; <span class="id">apply</span>: <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Field.deg2_poly_factor">deg2_poly_factor</a></span>; <span class="id">rewrite</span> ?<span class="id">sqr_sqrtr</span>. Qed.</div>
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">pnatr_eq0</span>. Qed.</div>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex">Pdeg2RealClosedConvex</a></span>.<br/>
+<span class="kwd">Let</span> <span class="id">delta</span> := <span class="id">b</span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id">a</span> * <span class="id">c</span>.<br/>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed">Pdeg2RealClosed</a></span>.<br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real">Real</a></span>.<br/>
+<span class="kwd">Let</span> <span class="id">r1</span> := (- <span class="id">b</span> - <span class="id">Num.sqrt</span> <span class="id">delta</span>) / (2%:<span class="id">R</span> * <span class="id">a</span>).<br/>
+<span class="kwd">Let</span> <span class="id">r2</span> := (- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2.Real.Pdeg2RealClosed.Pdeg2RealClosedConvex">b</a></span> + <span class="id">Num.sqrt</span> <span class="id">delta</span>) / (2%:<span class="id">R</span> * <span class="id">a</span>).<br/>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Pdeg2">Pdeg2</a></span>.<br/>
-<br/>
-<span class="kwd">Section</span> <span class="id"><a name="Degle2PolyRealConvex">Degle2PolyRealConvex</a></span>.<br/>
-<br/>
-<span class="kwd">Variable</span> (<span class="id"><a name="Degle2PolyRealConvex.F">F</a></span> : <span class="id">realFieldType</span>) (<span class="id"><a name="Degle2PolyRealConvex.p">p</a></span> : {<span class="id">poly</span> <span class="id">F</span>}).<br/>
-<span class="kwd">Hypothesis</span> <span class="id"><a name="Degle2PolyRealConvex.degp">degp</a></span> : (<span class="id">size</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.p">p</a></span> &lt;= 3)%<span class="id">N</span>.<br/>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Degle2PolyRealConvex.a">a</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.p">p</a></span>`<span class="id">_2</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Degle2PolyRealConvex.b">b</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.p">p</a></span>`<span class="id">_1</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Degle2PolyRealConvex.c">c</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.p">p</a></span>`<span class="id">_0</span>.<br/>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Degle2PolyRealConvex.delta">delta</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.b">b</a></span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.a">a</a></span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.c">c</a></span>.<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="deg_le2_poly_delta_ge0">deg_le2_poly_delta_ge0</a></span> : 0 &lt;= <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.a">a</a></span> -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.p">p</a></span>.[<span class="id">x</span>]) -&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.delta">delta</a></span> &lt;= 0.<br/>
+<span class="kwd">Lemma</span> <span class="id">deg2_poly_factor</span> : 0 &lt;= <span class="id">delta</span> -&gt; <span class="id">p</span> = <span class="id">a</span> *: ('<span class="id">X</span> - <span class="id">r1</span>%:<span class="id">P</span>) * ('<span class="id">X</span> - <span class="id">r2</span>%:<span class="id">P</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof201')">Proof.</span></div>
 <div class="proofscript" id="proof201">
-<span class="id">move</span>=&gt; <span class="id">age0</span> <span class="id">pge0</span>; <span class="id">move</span>: <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.degp">degp</a></span>; <span class="id">rewrite</span> <span class="id">leq_eqVlt</span> =&gt; /<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#orP">orP</a></span>[/<span class="id">eqP</span>|] <span class="id">degp</span>'.<br/>
-&nbsp;&nbsp;<span class="id">exact</span>/(<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#deg2_poly_ge0">Real.deg2_poly_ge0</a></span> <span class="id">degp</span>' <span class="id">age0</span>).<br/>
-<span class="id">have</span> <span class="id">a0</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.a">a</a></span> = 0 <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.a">a</a></span> <span class="id">nth_default</span>.<br/>
-<span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.delta">delta</a></span> <span class="id">a0</span> <span class="id">mulr0</span> <span class="id">mul0r</span> <span class="id">subr0</span> <span class="id">exprn_even_le0</span>//=.<br/>
-<span class="id">have</span> [//|/<span class="id">eqP</span> <span class="id">nzb</span>] := <span class="id">eqP</span>; <span class="id">move</span>: (<span class="id">pge0</span> ((- 1 - <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.c">c</a></span>) / <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.b">b</a></span>)).<br/>
-<span class="id">have</span> -&gt; : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.p">p</a></span> = <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.b">b</a></span> *: '<span class="id">X</span> + <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.c">c</a></span>%:<span class="id">P</span>.<br/>
-&nbsp;&nbsp;<span class="id">apply</span>/<span class="id">polyP</span> =&gt; + /[!<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#coefE">coefE</a></span>] =&gt; -[|[|<span class="id">i</span>]] /=; <span class="id">rewrite</span> !<span class="id">Monoid.simpm</span>//.<br/>
-&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">nth_default</span>// -<span class="id">ltnS</span> (<span class="id">leq_trans</span> <span class="id">degp</span>').<br/>
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id"><a name="Degle2PolyRealConvex.p">dge0</a></span>; <span class="id">apply</span>: <span class="id">deg2_poly_factor</span>; <span class="id">rewrite</span> ?<span class="id">sqr_sqrtr</span>. Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">Pdeg2RealClosedConvex</span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id">Pdeg2RealClosed</span>.<br/>
+<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.b">Real</a></span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id">Pdeg2</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">Degle2PolyRealConvex</span>.<br/>
+<br/>
+<span class="kwd">Variable</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex.a">F</a></span> : <span class="id">realFieldType</span>) (<span class="id">p</span> : {<span class="id">poly</span> <span class="id">F</span>}).<br/>
+<span class="kwd">Hypothesis</span> <span class="id">degp</span> : (<span class="id">size</span> <span class="id">p</span> &lt;= 3)%<span class="id">N</span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">a</span> := <span class="id">p</span>`<span class="id">_2</span>.<br/>
+<span class="kwd">Let</span> <span class="id">b</span> := <span class="id">p</span>`<span class="id">_1</span>.<br/>
+<span class="kwd">Let</span> <span class="id">c</span> := <span class="id">p</span>`<span class="id">_0</span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">delta</span> := <span class="id">b</span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id">a</span> * <span class="id">c</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">deg_le2_poly_delta_ge0</span> : 0 &lt;= <span class="id">a</span> -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id">p</span>.[<span class="id">x</span>]) -&gt; <span class="id">delta</span> &lt;= 0.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof202')">Proof.</span></div>
+<div class="proofscript" id="proof202">
+<span class="id">move</span>=&gt; <span class="id">age0</span> <span class="id">pge0</span>; <span class="id">move</span>: <span class="id">degp</span>; <span class="id">rewrite</span> <span class="id">leq_eqVlt</span> =&gt; /<span class="id">orP</span>[/<span class="id">eqP</span>|] <span class="id">degp</span>'.<br/>
+&nbsp;&nbsp;<span class="id">exact</span>/(<span class="id">Real.deg2_poly_ge0</span> <span class="id">degp</span>' <span class="id">age0</span>).<br/>
+<span class="id">have</span> <span class="id">a0</span> : <span class="id">a</span> = 0 <span class="kwd">by</span> <span class="id">rewrite</span> /<span class="id">a</span> <span class="id">nth_default</span>.<br/>
+<span class="id">rewrite</span> /<span class="id">delta</span> <span class="id">a0</span> <span class="id">mulr0</span> <span class="id">mul0r</span> <span class="id">subr0</span> <span class="id">exprn_even_le0</span>//=.<br/>
+<span class="id">have</span> [//|/<span class="id">eqP</span> <span class="id">nzb</span>] := <span class="id">eqP</span>; <span class="id">move</span>: (<span class="id">pge0</span> ((- 1 - <span class="id">c</span>) / <span class="id">b</span>)).<br/>
+<span class="id">have</span> -&gt; : <span class="id">p</span> = <span class="id">b</span> *: '<span class="id">X</span> + <span class="id">c</span>%:<span class="id">P</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply</span>/<span class="id">polyP</span> =&gt; + /[!<span class="id">coefE</span>] =&gt; -[|[|<span class="id">i</span>]] /=; <span class="id">rewrite</span> !<span class="id">Monoid.simpm</span>//.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id"><a name="Degle2PolyRealClosedConvex.p">nth_default</a></span>// -<span class="id">ltnS</span> (<span class="id">leq_trans</span> <span class="id">degp</span>').<br/>
 <span class="kwd">by</span> <span class="id">rewrite</span> !<span class="id">hornerE</span>/= <span class="id">mulrAC</span> <span class="id">mulfV</span>// <span class="id">mul1r</span> <span class="id">subrK</span> <span class="id">ler0N1</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealConvex">Degle2PolyRealConvex</a></span>.<br/>
+<span class="kwd">End</span> <span class="id">Degle2PolyRealConvex</span>.<br/>
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="Degle2PolyRealClosedConvex">Degle2PolyRealClosedConvex</a></span>.<br/>
+<span class="kwd">Section</span> <span class="id">Degle2PolyRealClosedConvex</span>.<br/>
 <br/>
-<span class="kwd">Variable</span> (<span class="id"><a name="Degle2PolyRealClosedConvex.F">F</a></span> : <span class="id">rcfType</span>) (<span class="id"><a name="Degle2PolyRealClosedConvex.p">p</a></span> : {<span class="id">poly</span> <span class="id">F</span>}).<br/>
-<span class="kwd">Hypothesis</span> <span class="id"><a name="Degle2PolyRealClosedConvex.degp">degp</a></span> : (<span class="id">size</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.p">p</a></span> &lt;= 3)%<span class="id">N</span>.<br/>
+<span class="kwd">Variable</span> (<span class="id">F</span> : <span class="id">rcfType</span>) (<span class="id">p</span> : {<span class="id">poly</span> <span class="id">F</span>}).<br/>
+<span class="kwd">Hypothesis</span> <span class="id">degp</span> : (<span class="id">size</span> <span class="id">p</span> &lt;= 3)%<span class="id">N</span>.<br/>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Degle2PolyRealClosedConvex.a">a</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.p">p</a></span>`<span class="id">_2</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Degle2PolyRealClosedConvex.b">b</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.p">p</a></span>`<span class="id">_1</span>.<br/>
-<span class="kwd">Let</span> <span class="id"><a name="Degle2PolyRealClosedConvex.c">c</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.p">p</a></span>`<span class="id">_0</span>.<br/>
+<span class="kwd">Let</span> <span class="id">a</span> := <span class="id">p</span>`<span class="id">_2</span>.<br/>
+<span class="kwd">Let</span> <span class="id">b</span> := <span class="id">p</span>`<span class="id">_1</span>.<br/>
+<span class="kwd">Let</span> <span class="id">c</span> := <span class="id">p</span>`<span class="id">_0</span>.<br/>
 <br/>
-<span class="kwd">Let</span> <span class="id"><a name="Degle2PolyRealClosedConvex.delta">delta</a></span> := <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.b">b</a></span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.a">a</a></span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.c">c</a></span>.<br/>
+<span class="kwd">Let</span> <span class="id">delta</span> := <span class="id">b</span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id">a</span> * <span class="id">c</span>.<br/>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="deg_le2_poly_ge0">deg_le2_poly_ge0</a></span> : (<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.p">p</a></span>.[<span class="id">x</span>]) -&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.delta">delta</a></span> &lt;= 0.<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof202')">Proof.</span></div>
-<div class="proofscript" id="proof202">
-<span class="id">have</span> [<span class="id">age0</span>|<span class="id">alt0</span>] := <span class="id">leP</span> 0 <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.a">a</a></span>; <span class="id">first</span> <span class="id">exact</span>: <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#deg_le2_poly_delta_ge0">deg_le2_poly_delta_ge0</a></span>.<br/>
-<span class="id">move</span>=&gt; <span class="id">pge0</span>; <span class="id">move</span>: <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.degp">degp</a></span>; <span class="id">rewrite</span> <span class="id">leq_eqVlt</span> =&gt; /<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#orP">orP</a></span>[/<span class="id">eqP</span>|] <span class="id">degp</span>'; <span class="id">last</span> <span class="id">first</span>.<br/>
-&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">move</span>: <span class="id">alt0</span>; <span class="id">rewrite</span> /<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.a">a</a></span> <span class="id">nth_default</span> ?<span class="id">ltxx</span>.<br/>
-<span class="id">have</span> [//|<span class="id">dge0</span>] := <span class="id">leP</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.delta">delta</a></span> 0.<br/>
-<span class="id">pose</span> <span class="id">r1</span> := (- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.b">b</a></span> - <span class="id">Num.sqrt</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.delta">delta</a></span>) / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.a">a</a></span>).<br/>
-<span class="id">pose</span> <span class="id">r2</span> := (- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.b">b</a></span> + <span class="id">Num.sqrt</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.delta">delta</a></span>) / (2%:<span class="id">R</span> * <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex.a">a</a></span>).<br/>
-<span class="id">pose</span> <span class="id">x0</span> := <span class="id">Num.max</span> (<span class="id">r1</span> + 1) (<span class="id">r2</span> + 1).<br/>
-<span class="id">move</span>: (<span class="id">pge0</span> <span class="id">x0</span>); <span class="id">rewrite</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#deg2_poly_factor">Real.deg2_poly_factor</a></span> <span class="id">degp</span>' (<span class="id">ltW</span> <span class="id">dge0</span>)).<br/>
-<span class="id">rewrite</span> !<span class="id">hornerE</span>/= -<span class="id">mulrA</span> <span class="id">nmulr_rge0</span>// <span class="id">leNgt</span> =&gt; /<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#negbTE">negbTE</a></span>&lt;-.<br/>
-<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">mulr_gt0</span>; <span class="id">rewrite</span> <span class="id">subr_gt0</span> <span class="id">lt_maxr</span> <span class="id">ltr_addl</span> <span class="id">ltr01</span> ?<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#orbT">orbT</a></span>.<br/>
-Qed.</div>
-<br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#Degle2PolyRealClosedConvex">Degle2PolyRealClosedConvex</a></span>.<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="deg_le2_ge0">deg_le2_ge0</a></span> (<span class="id">F</span> : <span class="id">rcfType</span>) (<span class="id">a</span> <span class="id">b</span> <span class="id">c</span> : <span class="id">F</span>) :<br/>
-&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id">a</span> * <span class="id">x</span> ^+ 2 + <span class="id">b</span> * <span class="id">x</span> + <span class="id">c</span>)%<span class="id">R</span> -&gt; (<span class="id">b</span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id">a</span> * <span class="id">c</span> &lt;= 0)%<span class="id">R</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">deg_le2_poly_ge0</span> : (<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id">p</span>.[<span class="id">x</span>]) -&gt; <span class="id">delta</span> &lt;= 0.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof203')">Proof.</span></div>
 <div class="proofscript" id="proof203">
+<span class="id">have</span> [<span class="id">age0</span>|<span class="id">alt0</span>] := <span class="id">leP</span> 0 <span class="id">a</span>; <span class="id">first</span> <span class="id">exact</span>: <span class="id">deg_le2_poly_delta_ge0</span>.<br/>
+<span class="id">move</span>=&gt; <span class="id">pge0</span>; <span class="id">move</span>: <span class="id">degp</span>; <span class="id">rewrite</span> <span class="id">leq_eqVlt</span> =&gt; /<span class="id">orP</span>[/<span class="id">eqP</span>|] <span class="id">degp</span>'; <span class="id">last</span> <span class="id">first</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="id">move</span>: <span class="id">alt0</span>; <span class="id">rewrite</span> /<span class="id">a</span> <span class="id">nth_default</span> ?<span class="id">ltxx</span>.<br/>
+<span class="id">have</span> [//|<span class="id">dge0</span>] := <span class="id">leP</span> <span class="id">delta</span> 0.<br/>
+<span class="id">pose</span> <span class="id">r1</span> := (- <span class="id">b</span> - <span class="id">Num.sqrt</span> <span class="id">delta</span>) / (2%:<span class="id">R</span> * <span class="id">a</span>).<br/>
+<span class="id">pose</span> <span class="id">r2</span> := (- <span class="id">b</span> + <span class="id">Num.sqrt</span> <span class="id">delta</span>) / (2%:<span class="id">R</span> * <span class="id">a</span>).<br/>
+<span class="id">pose</span> <span class="id">x0</span> := <span class="id">Num.max</span> (<span class="id">r1</span> + 1) (<span class="id">r2</span> + 1).<br/>
+<span class="id">move</span>: (<span class="id">pge0</span> <span class="id">x0</span>); <span class="id">rewrite</span> (<span class="id">Real.deg2_poly_factor</span> <span class="id">degp</span>' (<span class="id">ltW</span> <span class="id">dge0</span>)).<br/>
+<span class="id">rewrite</span> !<span class="id">hornerE</span>/= -<span class="id">mulrA</span> <span class="id">nmulr_rge0</span>// <span class="id">leNgt</span> =&gt; /<span class="id">negbTE</span>&lt;-.<br/>
+<span class="kwd">by</span> <span class="id">apply</span>: <span class="id">mulr_gt0</span>; <span class="id">rewrite</span> <span class="id">subr_gt0</span> <span class="id">lt_maxr</span> <span class="id">ltr_addl</span> <span class="id">ltr01</span> ?<span class="id">orbT</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">Degle2PolyRealClosedConvex</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">deg_le2_ge0</span> (<span class="id">F</span> : <span class="id">rcfType</span>) (<span class="id">a</span> <span class="id">b</span> <span class="id">c</span> : <span class="id">F</span>) :<br/>
+&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span>, 0 &lt;= <span class="id">a</span> * <span class="id">x</span> ^+ 2 + <span class="id">b</span> * <span class="id">x</span> + <span class="id">c</span>)%<span class="id">R</span> -&gt; (<span class="id">b</span> ^+ 2 - 4%:<span class="id">R</span> * <span class="id">a</span> * <span class="id">c</span> &lt;= 0)%<span class="id">R</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof204')">Proof.</span></div>
+<div class="proofscript" id="proof204">
 <span class="id">move</span>=&gt; <span class="id">pge0</span>; <span class="id">pose</span> <span class="id">p</span> := \<span class="id">poly_</span>(<span class="id">i</span> &lt; 3) [:: <span class="id">c</span>; <span class="id">b</span>; <span class="id">a</span>]`<span class="id">_i</span>.<br/>
-<span class="id">have</span> := @<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#deg_le2_poly_ge0">deg_le2_poly_ge0</a></span> <span class="id">_</span> <span class="id">p</span> (<span class="id">size_poly</span> <span class="id">_</span> <span class="id">_</span>); <span class="id">rewrite</span> !<span class="id">coef_poly</span>/=; <span class="id">apply</span>=&gt; <span class="id">r</span>.<br/>
+<span class="id">have</span> := @<span class="id">deg_le2_poly_ge0</span> <span class="id">_</span> <span class="id">p</span> (<span class="id">size_poly</span> <span class="id">_</span> <span class="id">_</span>); <span class="id">rewrite</span> !<span class="id">coef_poly</span>/=; <span class="id">apply</span>=&gt; <span class="id">r</span>.<br/>
 <span class="id">rewrite</span> <span class="id">horner_poly</span> !<span class="id">big_ord_recr</span> !<span class="id">big_ord0</span>/= !<span class="id">Monoid.simpm</span>/= <span class="id">expr1</span>.<br/>
 <span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">mulrA</span> -<span class="id">expr2</span> <span class="id">addrC</span> <span class="id">addrA</span> <span class="id">addrAC</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "<span class="id">f</span> \<span class="id">min</span> <span class="id">g</span>" (<span class="kwd">at</span> <span class="id">level</span> 50, <span class="id">left</span> <span class="id">associativity</span>).<br/>
 <br/>
-<span class="kwd">Definition</span> <span class="id"><a name="min_fun">min_fun</a></span> <span class="id">T</span> (<span class="id">R</span> : <span class="id">numDomainType</span>) (<span class="id">f</span> <span class="id">g</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) <span class="id">x</span> := <span class="id">Num.min</span> (<span class="id">f</span> <span class="id">x</span>) (<span class="id">g</span> <span class="id">x</span>).<br/>
-<span class="kwd">Notation</span> "<span class="id">f</span> \<span class="id">min</span> <span class="id">g</span>" := (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#min_fun">min_fun</a></span> <span class="id">f</span> <span class="id">g</span>) : <span class="id">ring_scope</span>.<br/>
-<span class="kwd">Arguments</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#min_fun">min_fun</a></span> {<span class="id">T</span> <span class="id">R</span>} <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> /.<br/>
+<span class="kwd">Definition</span> <span class="id">min_fun</span> <span class="id">T</span> (<span class="id">R</span> : <span class="id">numDomainType</span>) (<span class="id">f</span> <span class="id">g</span> : <span class="id">T</span> -&gt; <span class="id">R</span>) <span class="id">x</span> := <span class="id">Num.min</span> (<span class="id">f</span> <span class="id">x</span>) (<span class="id">g</span> <span class="id">x</span>).<br/>
+<span class="kwd">Notation</span> "<span class="id"><a name="dependent_choice_Type">f</a></span> \<span class="id">min</span> <span class="id">g</span>" := (<span class="id">min_fun</span> <span class="id">f</span> <span class="id">g</span>) : <span class="id">ring_scope</span>.<br/>
+<span class="kwd">Arguments</span> <span class="id">min_fun</span> {<span class="id">T</span> <span class="id"><a name="dependent_choice_Type">R</a></span>} <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> /.<br/>
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="dependent_choice_Type">dependent_choice_Type</a></span>.<br/>
+<span class="kwd">Section</span> <span class="id">dependent_choice_Type</span>.<br/>
 <span class="kwd">Context</span> <span class="id">X</span> (<span class="id">R</span> : <span class="id">X</span> -&gt; <span class="id">X</span> -&gt; <span class="kwd">Prop</span>).<br/>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="dependent_choice_Type">dependent_choice_Type</a></span> : (<span class="kwd">forall</span> <span class="id">x</span>, {<span class="id">y</span> | <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dependent_choice_Type.R">R</a></span> <span class="id">x</span> <span class="id">y</span>}) -&gt;<br/>
-&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x0</span>, {<span class="id">f</span> | <span class="id">f</span> 0%<span class="id">N</span> = <span class="id">x0</span> /\ <span class="kwd">forall</span> <span class="id">n</span>, <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dependent_choice_Type.R">R</a></span> (<span class="id">f</span> <span class="id">n</span>) (<span class="id">f</span> <span class="id">n</span>.+1)}.<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof204')">Proof.</span></div>
-<div class="proofscript" id="proof204">
-<span class="id">move</span>=&gt; <span class="id">h</span> <span class="id">x0</span>.<br/>
-<span class="id">set</span> (<span class="id">f</span> := <span class="kwd">fix</span> <span class="id">f</span> <span class="id">n</span> := <span class="kwd">if</span> <span class="id">n</span> <span class="id">is</span> <span class="id">n</span>'.+1 <span class="kwd">then</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> (<span class="id">h</span> (<span class="id">f</span> <span class="id">n</span>')) <span class="kwd">else</span> <span class="id">x0</span>).<br/>
-<span class="kwd">exists</span> <span class="id">f</span>; <span class="id">split</span> =&gt; //.<br/>
-<span class="id">intro</span> <span class="id">n</span>; <span class="id">induction</span> <span class="id">n</span>; <span class="id">simpl</span>; <span class="id">apply</span>: <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Specif.html#proj2_sig">proj2_sig</a></span>.<br/>
-Qed.</div>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#dependent_choice_Type">dependent_choice_Type</a></span>.<br/>
-<br/>
-<span class="kwd">Section</span> <span class="id"><a name="max_min">max_min</a></span>.<br/>
-<span class="kwd">Variable</span> <span class="id"><a name="max_min.R">R</a></span> : <span class="id">realFieldType</span>.<br/>
-<span class="kwd">Import</span> <span class="id">Num.Theory</span>.<br/>
-<br/>
-<span class="kwd">Let</span> <span class="id"><a name="max_min.nz2">nz2</a></span> : 2%:<span class="id">R</span> != 0 :&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#max_min.R">R</a></span><br/>
+<span class="kwd">Lemma</span> <span class="id">dependent_choice_Type</span> : (<span class="kwd">forall</span> <span class="id">x</span>, {<span class="id">y</span> | <span class="id">R</span> <span class="id">x</span> <span class="id">y</span>}) -&gt;<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x0</span>, {<span class="id">f</span> | <span class="id">f</span> 0%<span class="id">N</span> = <span class="id">x0</span> /\ <span class="kwd">forall</span> <span class="id">n</span>, <span class="id">R</span> (<span class="id">f</span> <span class="id">n</span>) (<span class="id">f</span> <span class="id">n</span>.+1)}.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof205')">Proof.</span></div>
 <div class="proofscript" id="proof205">
- <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">pnatr_eq0</span>. Qed.</div>
+<span class="id">move</span>=&gt; <span class="id">h</span> <span class="id">x0</span>.<br/>
+<span class="id">set</span> (<span class="id">f</span> := <span class="kwd">fix</span> <span class="id">f</span> <span class="id">n</span> := <span class="kwd">if</span> <span class="id">n</span> <span class="id">is</span> <span class="id">n</span>'.+1 <span class="kwd">then</span> <span class="id">proj1_sig</span> (<span class="id">h</span> (<span class="id">f</span> <span class="id">n</span>')) <span class="kwd">else</span> <span class="id">x0</span>).<br/>
+<span class="kwd">exists</span> <span class="id">f</span>; <span class="id">split</span> =&gt; //.<br/>
+<span class="id">intro</span> <span class="id">n</span>; <span class="id">induction</span> <span class="id">n</span>; <span class="id"><a name="maxr_absE">simpl</a></span>; <span class="id">apply</span>: <span class="id">proj2_sig</span>.<br/>
+Qed.</div>
+<span class="kwd">End</span> <span class="id">dependent_choice_Type</span>.<br/>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="maxr_absE">maxr_absE</a></span> (<span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#max_min.R">R</a></span>) : <span class="id">Num.max</span> <span class="id">x</span> <span class="id">y</span> = (<span class="id">x</span> + <span class="id">y</span> + `|<span class="id">x</span> - <span class="id">y</span>|) / 2%:<span class="id">R</span>.<br/>
+<span class="kwd">Section</span> <span class="id">max_min</span>.<br/>
+<span class="kwd">Variable</span> <span class="id">R</span> : <span class="id">realFieldType</span>.<br/>
+<span class="kwd">Import</span> <span class="id">Num.Theory</span>.<br/>
+<br/>
+<span class="kwd">Let</span> <span class="id">nz2</span> : 2%:<span class="id">R</span> != 0 :&gt; <span class="id">R</span><br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof206')">Proof.</span></div>
 <div class="proofscript" id="proof206">
-<span class="id">apply</span>: <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#canRL">canRL</a></span> (<span class="id">mulfK</span> <span class="id">_</span>) <span class="id">_</span> =&gt; //; <span class="id">rewrite</span> ?<span class="id">pnatr_eq0</span>//.<br/>
+ <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">pnatr_eq0</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">maxr_absE</span> (<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>) : <span class="id">Num.max</span> <span class="id">x</span> <span class="id">y</span> = (<span class="id">x</span> + <span class="id">y</span> + `|<span class="id">x</span> - <span class="id">y</span>|) / 2%:<span class="id">R</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof207')">Proof.</span></div>
+<div class="proofscript" id="proof207">
+<span class="id">apply</span>: <span class="id">canRL</span> (<span class="id">mulfK</span> <span class="id">_</span>) <span class="id">_</span> =&gt; //; <span class="id">rewrite</span> ?<span class="id">pnatr_eq0</span>//.<br/>
 <span class="id">case</span>: <span class="id">lerP</span> =&gt; <span class="id">_</span>; <span class="comment">(*&nbsp;TODO:&nbsp;ring&nbsp;*)</span> <span class="id">rewrite</span> [2%:<span class="id">R</span>]<span class="id">mulr2n</span> <span class="id">mulrDr</span> <span class="id">mulr1</span>.<br/>
 &nbsp;&nbsp;<span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">addrACA</span> <span class="id">subrr</span> <span class="id">addr0</span>.<br/>
 <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">addrCA</span> <span class="id">addrAC</span> <span class="id">subrr</span> <span class="id">add0r</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="minr_absE">minr_absE</a></span> (<span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#max_min.R">R</a></span>) : <span class="id">Num.min</span> <span class="id">x</span> <span class="id">y</span> = (<span class="id">x</span> + <span class="id">y</span> - `|<span class="id">x</span> - <span class="id">y</span>|) / 2%:<span class="id">R</span>.<br/>
-<div><span class="toggleproof" onclick="toggleDisplay('proof207')">Proof.</span></div>
-<div class="proofscript" id="proof207">
-<span class="id">apply</span>: (<span class="id">addrI</span> (<span class="id">Num.max</span> <span class="id">x</span> <span class="id">y</span>)); <span class="id">rewrite</span> <span class="id">addr_max_min</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#maxr_absE">maxr_absE</a></span>. <span class="comment">(*&nbsp;TODO:&nbsp;ring&nbsp;*)</span><br/>
-<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">mulrDl</span> <span class="id">addrACA</span> <span class="id">subrr</span> <span class="id">addr0</span> <span class="id">mulrDl</span> -<span class="id">splitr</span>.<br/>
-Qed.</div>
-<br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#max_min">max_min</a></span>.<br/>
-<br/>
-<span class="kwd">Notation</span> <span class="id"><a name="trivial">trivial</a></span> := (<span class="id">ltac</span>:(<span class="id">done</span>)).<br/>
-<br/>
-<span class="kwd">Section</span> <span class="id"><a name="bigmax_seq">bigmax_seq</a></span>.<br/>
-<span class="kwd">Context</span> <span class="id">d</span> {<span class="id">T</span> : <span class="id">orderType</span> <span class="id">d</span>} {<span class="id">x</span> : <span class="id">T</span>} {<span class="id">I</span> : <span class="id">eqType</span>}.<br/>
-<span class="kwd">Variables</span> (<span class="id"><a name="bigmax_seq.r">r</a></span> : <span class="id">seq</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.I">I</a></span>) (<span class="id"><a name="bigmax_seq.i0">i0</a></span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.I">I</a></span>) (<span class="id"><a name="bigmax_seq.P">P</a></span> : <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#pred">pred</a></span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.I">I</a></span>).<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="le_bigmax_seq">le_bigmax_seq</a></span> <span class="id">F</span> :<br/>
-&nbsp;&nbsp;<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.i0">i0</a></span> \<span class="kwd">in</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.r">r</a></span> -&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.P">P</a></span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.i0">i0</a></span> -&gt; (<span class="id">F</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.i0">i0</a></span> &lt;= \<span class="id">big</span>[<span class="id">Order.max</span>/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.x">x</a></span>]<span class="id">_</span>(<span class="id">i</span> &lt;- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.r">r</a></span> | <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.P">P</a></span> <span class="id">i</span>) <span class="id">F</span> <span class="id">i</span>)%<span class="id">O</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">minr_absE</span> (<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>) : <span class="id">Num.min</span> <span class="id">x</span> <span class="id">y</span> = (<span class="id">x</span> + <span class="id">y</span> - `|<span class="id">x</span> - <span class="id">y</span>|) / 2%:<span class="id">R</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof208')">Proof.</span></div>
 <div class="proofscript" id="proof208">
-<span class="id">move</span>=&gt; + <span class="id">Pi0</span>; <span class="id">elim</span>: <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.r">r</a></span> =&gt; // <span class="id">h</span> <span class="id">t</span> <span class="id">ih</span>; <span class="id">rewrite</span> <span class="id">inE</span> <span class="id">big_cons</span>.<br/>
-<span class="id">move</span>=&gt; /<span class="id">predU1P</span>[&lt;-|<span class="id">i0t</span>]; <span class="id">first</span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">Pi0</span> <span class="id">le_maxr</span>// <span class="id">lexx</span>.<br/>
-<span class="kwd">by</span> <span class="id">case</span>: <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#ifPn">ifPn</a></span> =&gt; <span class="id">Ph</span>; [<span class="id">rewrite</span> <span class="id">le_maxr</span> <span class="id">ih</span>// <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#orbT">orbT</a></span>|<span class="id">rewrite</span> <span class="id">ih</span>].<br/>
+<span class="id">apply</span>: (<span class="id"><a name="bigmax_seq">addrI</a></span> (<span class="id">Num.max</span> <span class="id">x</span> <span class="id">y</span>)); <span class="id">rewrite</span> <span class="id">addr_max_min</span> <span class="id">maxr_absE</span>. <span class="comment">(*&nbsp;TODO:&nbsp;ring&nbsp;*)</span><br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> -<span class="id">mulrDl</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.I">addrACA</a></span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#pred">subrr</a></span> <span class="id">addr0</span> <span class="id">mulrDl</span> -<span class="id">splitr</span>.<br/>
 Qed.</div>
 <br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="bigmax_sup_seq">bigmax_sup_seq</a></span> (<span class="id">m</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.T">T</a></span>) (<span class="id">F</span> : <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.I">I</a></span> -&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.T">T</a></span>) :<br/>
-&nbsp;&nbsp;<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.i0">i0</a></span> \<span class="kwd">in</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.r">r</a></span> -&gt; <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.P">P</a></span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.i0">i0</a></span> -&gt; (<span class="id">m</span> &lt;= <span class="id">F</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.i0">i0</a></span>)%<span class="id">O</span> -&gt;<br/>
-&nbsp;&nbsp;(<span class="id">m</span> &lt;= \<span class="id">big</span>[<span class="id">Order.max</span>/<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.x">x</a></span>]<span class="id">_</span>(<span class="id">i</span> &lt;- <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.r">r</a></span> | <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.P">P</a></span> <span class="id">i</span>) <span class="id">F</span> <span class="id">i</span>)%<span class="id">O</span>.<br/>
+<span class="kwd">End</span> <span class="id">max_min</span>.<br/>
+<br/>
+<span class="kwd">Notation</span> <span class="id">trivial</span> := (<span class="id">ltac</span>:(<span class="id">done</span>)).<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id">bigmax_seq</span>.<br/>
+<span class="kwd">Context</span> <span class="id">d</span> {<span class="id">T</span> : <span class="id">orderType</span> <span class="id">d</span>} {<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.i0">x</a></span> : <span class="id">T</span>} {<span class="id">I</span> : <span class="id">eqType</span>}.<br/>
+<span class="kwd">Variables</span> (<span class="id">r</span> : <span class="id">seq</span> <span class="id">I</span>) (<span class="id">i0</span> : <span class="id">I</span>) (<span class="id">P</span> : <span class="id">pred</span> <span class="id">I</span>).<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">le_bigmax_seq</span> <span class="id">F</span> :<br/>
+&nbsp;&nbsp;<span class="id">i0</span> \<span class="kwd">in</span> <span class="id">r</span> -&gt; <span class="id">P</span> <span class="id">i0</span> -&gt; (<span class="id">F</span> <span class="id">i0</span> &lt;= \<span class="id">big</span>[<span class="id">Order.max</span>/<span class="id">x</span>]<span class="id">_</span>(<span class="id">i</span> &lt;- <span class="id">r</span> | <span class="id">P</span> <span class="id">i</span>) <span class="id">F</span> <span class="id">i</span>)%<span class="id">O</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof209')">Proof.</span></div>
 <div class="proofscript" id="proof209">
- <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">i0r</span> <span class="id">Pi0</span> ?; <span class="id">apply</span>: <span class="id">le_trans</span> (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#le_bigmax_seq">le_bigmax_seq</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>). Qed.</div>
+<span class="id">move</span>=&gt; + <span class="id">Pi0</span>; <span class="id">elim</span>: <span class="id">r</span> =&gt; // <span class="id">h</span> <span class="id">t</span> <span class="id">ih</span>; <span class="id">rewrite</span> <span class="id">inE</span> <span class="id">big_cons</span>.<br/>
+<span class="id">move</span>=&gt; /<span class="id">predU1P</span>[&lt;-|<span class="id"><a name="bigmax_sup_seq">i0t</a></span>]; <span class="id">first</span> <span class="kwd">by</span> <span class="id">rewrite</span> <span class="id">Pi0</span> <span class="id">le_maxr</span>// <span class="id">lexx</span>.<br/>
+<span class="kwd">by</span> <span class="id">case</span>: <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq.P">ifPn</a></span> =&gt; <span class="id">Ph</span>; [<span class="id">rewrite</span> <span class="id">le_maxr</span> <span class="id">ih</span>// <span class="id">orbT</span>|<span class="id">rewrite</span> <span class="id">ih</span>].<br/>
+Qed.</div>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmax_seq">bigmax_seq</a></span>.<br/>
-<span class="kwd">Arguments</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#le_bigmax_seq">le_bigmax_seq</a></span> {<span class="id">d</span> <span class="id">T</span>} <span class="id">x</span> {<span class="id">I</span> <span class="id">r</span>} <span class="id">i0</span> <span class="id">P</span>.<br/>
-<br/>
-<span class="kwd">Lemma</span> <span class="id"><a name="gerBl">gerBl</a></span> {<span class="id">R</span> : <span class="id">numDomainType</span>} (<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>) : 0 &lt;= <span class="id">y</span> -&gt; <span class="id">x</span> - <span class="id">y</span> &lt;= <span class="id">x</span>.<br/>
+<span class="kwd">Lemma</span> <span class="id">bigmax_sup_seq</span> (<span class="id">m</span> : <span class="id">T</span>) (<span class="id">F</span> : <span class="id">I</span> -&gt; <span class="id">T</span>) :<br/>
+&nbsp;&nbsp;<span class="id">i0</span> \<span class="kwd">in</span> <span class="id">r</span> -&gt; <span class="id">P</span> <span class="id">i0</span> -&gt; (<span class="id">m</span> &lt;= <span class="id">F</span> <span class="id">i0</span>)%<span class="id">O</span> -&gt;<br/>
+&nbsp;&nbsp;(<span class="id">m</span> &lt;= \<span class="id">big</span>[<span class="id">Order.max</span>/<span class="id">x</span>]<span class="id">_</span>(<span class="id">i</span> &lt;- <span class="id">r</span> | <span class="id">P</span> <span class="id">i</span>) <span class="id"><a name="gerBl">F</a></span> <span class="id">i</span>)%<span class="id">O</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof210')">Proof.</span></div>
 <div class="proofscript" id="proof210">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">i0r</span> <span class="id">Pi0</span> ?; <span class="id">apply</span>: <span class="id">le_trans</span> (<span class="id">le_bigmax_seq</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>). Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">bigmax_seq</span>.<br/>
+<span class="kwd">Arguments</span> <span class="id">le_bigmax_seq</span> {<span class="id">d</span> <span class="id">T</span>} <span class="id">x</span> {<span class="id">I</span> <span class="id">r</span>} <span class="id">i0</span> <span class="id">P</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">gerBl</span> {<span class="id">R</span> : <span class="id">numDomainType</span>} (<span class="id">x</span> <span class="id">y</span> : <span class="id">R</span>) : 0 &lt;= <span class="id">y</span> -&gt; <span class="id">x</span> - <span class="id">y</span> &lt;= <span class="id">x</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof211')">Proof.</span></div>
+<div class="proofscript" id="proof211">
  <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">y0</span>; <span class="id">rewrite</span> <span class="id">ler_subl_addl</span> <span class="id">ler_addr</span>. Qed.</div>
+<br/>
+<span class="kwd">Section</span> <span class="id">normr</span>.<br/>
+<span class="kwd">Variable</span> <span class="id">R</span> : <span class="id">realDomainType</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id">Rnpos</span> : <span class="id">qualifier</span> 0 <span class="id">R</span> := [<span class="id">qualify</span> <span class="id">x</span> : <span class="id">R</span> | <span class="id">x</span> &lt;= 0].<br/>
+<span class="kwd">Lemma</span> <span class="id">nposrE</span> <span class="id">x</span> : (<span class="id">x</span> \<span class="id">is</span> <span class="id">Rnpos</span>) = (<span class="id">x</span> &lt;= 0)<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof212')">Proof.</span></div>
+<div class="proofscript" id="proof212">
+ <span class="kwd">by</span> []. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">ger0_le_norm</span> :<br/>
+&nbsp;&nbsp;{<span class="kwd">in</span> <span class="id">Num.nneg</span> &amp;, {<span class="id">mono</span> (@<span class="id">Num.Def.normr</span> <span class="id">_</span> <span class="id">R</span>) : <span class="id">x</span> <span class="id">y</span> / <span class="id">x</span> &lt;= <span class="id">y</span>}}.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof213')">Proof.</span></div>
+<div class="proofscript" id="proof213">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">x</span> <span class="id">y</span>; <span class="id">rewrite</span> !<span class="id">nnegrE</span> =&gt; <span class="id">x0</span> <span class="id">y0</span>; <span class="id">rewrite</span> !<span class="id">ger0_norm</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">gtr0_le_norm</span> :<br/>
+&nbsp;&nbsp;{<span class="kwd">in</span> <span class="id">Num.pos</span> &amp;, {<span class="id">mono</span> (@<span class="id">Num.Def.normr</span> <span class="id">_</span> <span class="id">R</span>) : <span class="id">x</span> <span class="id">y</span> / <span class="id">x</span> &lt;= <span class="id">y</span>}}.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof214')">Proof.</span></div>
+<div class="proofscript" id="proof214">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">x</span> <span class="id">y</span>; <span class="id">rewrite</span> !<span class="id">posrE</span> =&gt; /<span class="id">ltW</span> <span class="id">x0</span> /<span class="id">ltW</span> <span class="id">y0</span>; <span class="id">exact</span>: <span class="id">ger0_le_norm</span>. Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">ler0_ge_norm</span> :<br/>
+&nbsp;&nbsp;{<span class="kwd">in</span> <span class="id">Rnpos</span> &amp;, {<span class="id">mono</span> (@<span class="id">Num.Def.normr</span> <span class="id">_</span> <span class="id">R</span>) : <span class="id">x</span> <span class="id">y</span> / <span class="id">x</span> &lt;= <span class="id">y</span> &gt;-&gt; <span class="id">x</span> &gt;= <span class="id">y</span>}}.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof215')">Proof.</span></div>
+<div class="proofscript" id="proof215">
+<span class="id">move</span>=&gt; <span class="id">x</span> <span class="id">y</span>; <span class="id">rewrite</span> !<span class="id">nposrE</span> =&gt; <span class="id">x0</span> <span class="id">y0</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> !<span class="id">ler0_norm</span>// -<span class="id">subr_ge0</span> <span class="id">opprK</span> <span class="id">addrC</span> <span class="id">subr_ge0</span>.<br/>
+Qed.</div>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">ltr0_ge_norm</span> :<br/>
+&nbsp;&nbsp;{<span class="kwd">in</span> <span class="id">Num.neg</span> &amp;, {<span class="id">mono</span> (@<span class="id">Num.Def.normr</span> <span class="id">_</span> <span class="id">R</span>) : <span class="id">x</span> <span class="id">y</span> / <span class="id">x</span> &lt;= <span class="id">y</span> &gt;-&gt; <span class="id">x</span> &gt;= <span class="id">y</span>}}.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof216')">Proof.</span></div>
+<div class="proofscript" id="proof216">
+ <span class="kwd">by</span> <span class="id">move</span>=&gt; <span class="id">x</span> <span class="id">y</span>; <span class="id">rewrite</span> !<span class="id">negrE</span> =&gt; /<span class="id">ltW</span> <span class="id">x0</span> /<span class="id">ltW</span> <span class="id">y0</span>; <span class="id">exact</span>: <span class="id">ler0_ge_norm</span>. Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id">normr</span>.<br/>
+<br/>
+<span class="kwd">Lemma</span> <span class="id">leq_ltn_expn</span> <span class="id">m</span> : <span class="kwd">exists</span> <span class="id">n</span>, (2 ^ <span class="id">n</span> &lt;= <span class="id">m</span>.+1 &lt; 2 ^ <span class="id">n</span>.+1)%<span class="id">N</span>.<br/>
+<div><span class="toggleproof" onclick="toggleDisplay('proof217')">Proof.</span></div>
+<div class="proofscript" id="proof217">
+<span class="id">elim</span>: <span class="id">m</span> =&gt; [|<span class="id">m</span> [<span class="id">n</span> /<span class="id">andP</span>[<span class="id">h1</span> <span class="id">h2</span>]]]; <span class="id">first</span> <span class="kwd">by</span> <span class="kwd">exists</span> <span class="id">O</span>.<br/>
+<span class="id">have</span> [<span class="id">m2n</span>|<span class="id">nm2</span>] := <span class="id">ltnP</span> <span class="id">m</span>.+2 (2 ^ <span class="id">n</span>.+1)%<span class="id">N</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">by</span> <span class="kwd">exists</span> <span class="id">n</span>; <span class="id">rewrite</span> <span class="id">m2n</span> <span class="id">andbT</span> (<span class="id">leq_trans</span> <span class="id">h1</span>).<br/>
+<span class="kwd">exists</span> <span class="id">n</span>.+1; <span class="id">rewrite</span> <span class="id">nm2</span>/= -<span class="id">addn1</span>.<br/>
+<span class="id">rewrite</span> -[<span class="id">X</span> <span class="kwd">in</span> (<span class="id">_</span> &lt;= <span class="id">X</span>)%<span class="id">N</span>]<span class="id">prednK</span> ?<span class="id">expn_gt0</span>// -[<span class="id">X</span> <span class="kwd">in</span> (<span class="id">_</span> &lt;= <span class="id">X</span>)%<span class="id">N</span>]<span class="id">addn1</span> <span class="id">leq_add2r</span>.<br/>
+<span class="kwd">by</span> <span class="id">rewrite</span> (<span class="id">leq_trans</span> <span class="id">h2</span>)// -<span class="id">subn1</span> <span class="id">leq_subRL</span> ?<span class="id">expn_gt0</span>// <span class="id">add1n</span> <span class="id">ltn_exp2l</span>.<br/>
+Qed.</div>
 
 </div>
 <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/tree/yoshihiro503%40generate_index">a fork of coq2html</a></div>
