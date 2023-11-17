@@ -24,6 +24,7 @@ let kinds = [Global;
              EntryKind "def";
              EntryKind "prf";
              EntryKind "abbrev";
+             EntryKind "file";
             ]
 
 let skind = function Global -> "Global"
@@ -39,17 +40,16 @@ let is_kind = function
 let linkname_of_kind = function Global -> "global"
                               | EntryKind s -> s
 
-let table xrefs =
+type item = {kind: kind; name: string; linkname: string; module_: string}
+
+let table citems =
   let mkrow kind =
     (!%"<td>%s Index</td>" (skind kind))
-    ^ (List.map (fun (c, xrefs) ->
-           if List.exists
-                (function (_key, (_name,_pos,_path, typ)) when is_kind kind typ -> true
-                         |_ -> false) xrefs
-           then
+    ^ (List.map (fun (c, items) ->
+           if List.exists (fun item -> kind = Global || item.kind = kind) items then
              !%{|<td><a href="index_%s_%c.html">%c</a></td>|} (linkname_of_kind kind) c c
            else
-             !%{|<td>%c</td>|} c) xrefs
+             !%{|<td>%c</td>|} c) citems
     |> String.concat "")
     |> fun s -> "<tr>" ^ s ^ "</tr>"
   in
@@ -58,13 +58,13 @@ let table xrefs =
   ^ "</tbody></table>"
 
 (* generate an html file e.g. mathcomp.classical.functions.html *)
-let generate_with_capital output_dir table kind (c, xrefs) =
-  if xrefs = [] then () else
+let generate_with_capital output_dir table kind (c, items) =
+  if items = [] then () else
     let body =
       let h2 = if kind = Global then !%"%c" c else !%"%c (%s)" c (skind kind) in
-      List.filter (fun (_, (_, _, _, typ)) -> is_kind kind typ) xrefs
-      |> List.map (fun (key, (name, pos, path, typ)) ->
-             !%{|<a href="%s.html#%s">%s</a> [%s, in %s:%d]|} name path path typ name pos)
+      List.filter (fun item -> kind = Global || item.kind = kind) items
+      |> List.map (fun item ->
+             !%{|<a href="%s">%s</a> [%s, in %s]|} item.linkname item.name (skind item.kind) item.module_)
       |> String.concat "<br>"
       |> (^) (!%"%s<h2>%s</h2>" table h2)
     in
@@ -75,23 +75,35 @@ let generate_topfile output_dir xrefs =
   let body = table xrefs in
   write_html_file body (Filename.concat output_dir "index.html")
 
-let generate output_dir xref_table =
-  let xrefs = 
+let is_initial c s =
+  if s = "" then false else Char.uppercase_ascii (String.get s 0) = c
+
+let generate output_dir xref_table xref_modules =
+  let indexed_items =
     List.map (fun c ->
-        Hashtbl.fold (fun (name, pos) xref store ->
+        let items =
+          Hashtbl.fold (fun (name, pos) xref store ->
             match xref with
-            | Def (path, typ) when
-                   String.get path 0 = c
-                   || String.get path 0 = Char.lowercase_ascii c ->
-               (String.lowercase_ascii path, (name, pos, path, typ)) :: store
-            | _ -> store)
-          xref_table []
-        |> List.sort compare
-        |> fun xrefs -> (c, xrefs))
+            | Def (path, typ) when is_initial c path ->
+               let linkname = !%"%s.html#%s" name path in
+               let module_ = name in
+               {kind=EntryKind typ; name=path; linkname; module_} :: store
+            | _ -> store) xref_table []
+        in
+        
+        Hashtbl.fold (fun filename _ store ->
+            let basename = Str.(split (regexp_string ".") filename) |> List.rev |> List.hd in
+            if is_initial c basename then
+              let linkname = !%"%s.html" filename in
+              {kind=EntryKind "file"; name=basename; linkname; module_=filename} :: store
+            else store) xref_modules items
+        |> List.sort (fun x y -> compare (String.lowercase_ascii x.name)
+                                   (String.lowercase_ascii y.name))
+        |> fun items -> (c, items))
       alphabets
   in
   List.iter (fun kind ->
-      List.iter (generate_with_capital output_dir (table xrefs) kind) xrefs)
+      List.iter (generate_with_capital output_dir (table indexed_items) kind) indexed_items)
     kinds;
-  generate_topfile output_dir xrefs
+  generate_topfile output_dir indexed_items
 
