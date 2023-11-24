@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.sequences</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.sequences" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.sequences</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrint</span> <span class="id">ssrnum</span> <span class="id">matrix</span>.<br/>
@@ -25,76 +24,75 @@
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.set_interval.html">set_interval</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.landau.html">landau</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                Definitions and lemmas about sequences                      *)
-(*                                                                            *)
-(* The purpose of this file is to gather generic definitions and lemmas about *)
-(* sequences.                                                                 *)
-(*                                                                            *)
-(* * About sequences of real numbers:                                         *)
-(*        [sequence u_n]_n == the sequence of general element u_n             *)
-(*                  R ^nat == notation for the type of sequences, i.e.,       *)
-(*                            functions of type nat -&gt; R                      *)
-(*                 seqDU F == sequence F_0, F_1 \ F_0, F_2 \ (F_0 U F_1),...  *)
-(*                  seqD F == the sequence F_0, F_1 \ F_0, F_2 \ F_1,...      *)
-(*               series u_ == the sequence of partial sums of u_              *)
-(*            telescope u_ := [sequence u_ n.+1 - u_ n]_n                     *)
-(*                harmonic == harmonic sequence                               *)
-(*              arithmetic == arithmetic sequence                             *)
-(*               geometric == geometric sequence                              *)
-(*                            also arithmetic_mean, harmonic_mean,            *)
-(*                            root_mean_square                                *)
-(*          [series u_n]_n == the series of general element u_n               *)
-(*              [normed S] == transforms a series S = [series u_n]_n in its   *)
-(*                            normed series [series `|u_n|]_n] (useful to     *)
-(*                            represent absolute and normed convergence:      *)
-(*                            cvg [norm S_n])                                 *)
-(*             exp_coeff n == the sequence of coefficients of the real        *)
-(*                            exponential                                     *)
-(*                  expR x == the exponential function defined on a realType  *)
-(* is_cvg_series_exp_coeff == convergence of \sum_n^+oo x^n / n!              *)
-(*                                                                            *)
-(*        \sum_&lt;range&gt; F i == lim (fun n =&gt; (\sum_&lt;range&gt;) F i)) where        *)
-(*                            &lt;range&gt; can be (i &lt;oo), (i &lt;oo | P i),          *)
-(*                            (m &lt;= i &lt;oo), or (m &lt;= i &lt;oo | P i)             *)
-(*                                                                            *)
-(* Sections sequences_R_* contain properties of sequences of real numbers.    *)
-(* For example:                                                               *)
-(* nonincreasing_cvgn_ge u_ == if u_ is nonincreasing and convergent then     *)
-(*                             forall n, lim u_ &lt;= u_ n                       *)
-(* nondecreasing_cvgn_le u_ == if u_ is nondecreasing and convergent then     *)
-(*                             forall n, lim u_ &gt;= u_ n                       *)
-(*    nondecreasing_cvgn u_ == if u_ is nondecreasing and bounded then u_     *)
-(*                             is convergent and its limit is sup u_n         *)
-(*    nonincreasing_cvgn u_ == if u_ is nonincreasing u_ and bound by below   *)
-(*                             then u_ is convergent                          *)
-(*                 adjacent == adjacent sequences lemma                       *)
-(*                   cesaro == Cesaro's lemma                                 *)
-(*                                                                            *)
-(* * About sequences of natural numbers:                                      *)
-(*   nseries                                                                  *)
-(*                                                                            *)
-(* * About sequences of extended real numbers:                                *)
-(*   eseries, etelescope, etc.                                                *)
-(*                                                                            *)
-(* Section sequences_ereal contain properties of sequences of extended real   *)
-(* numbers.                                                                   *)
-(*                                                                            *)
-(*   Naming convention: lemmas about series of non-negative (resp. non-       *)
-(*   positive) extended numbers use the string "nneseries" (resp. "npeseries")*)
-(*   as part of their identifier                                              *)
-(*                                                                            *)
-(* * Limit superior and inferior:                                             *)
-(*             sdrop u n := {u_k | k &gt;= n}                                    *)
-(*                sups u := [sequence sup (sdrop u n)]_n                      *)
-(*                infs u := [sequence inf (sdrop u n)]_n                      *)
-(*         limn_{inf,sup} == limit inferior/superior for realType             *)
-(*               esups u := [sequence ereal_sup (sdrop u n)]_n                *)
-(*               einfs u := [sequence ereal_inf (sdrop u n)]_n                *)
-(*        limn_e{inf,sup} == limit inferior/superior for \bar R               *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+               Definitions and lemmas about sequences                      
+                                                                           
+The purpose of this file is to gather generic definitions and lemmas about 
+sequences.                                                                 
+                                                                           
+* About sequences of real numbers:                                         
+       [sequence u_n]_n == the sequence of general element u_n             
+                 R ^nat == notation for the type of sequences, i.e.,       
+                           functions of type nat -&gt; R                      
+                seqDU F == sequence F_0, F_1 \ F_0, F_2 \ (F_0 U F_1),...  
+                 seqD F == the sequence F_0, F_1 \ F_0, F_2 \ F_1,...      
+              series u_ == the sequence of partial sums of u_              
+           telescope u_ := [sequence u_ n.+1 - u_ n]_n                     
+               harmonic == harmonic sequence                               
+             arithmetic == arithmetic sequence                             
+              geometric == geometric sequence                              
+                           also arithmetic_mean, harmonic_mean,            
+                           root_mean_square                                
+         [series u_n]_n == the series of general element u_n               
+             [normed S] == transforms a series S = [series u_n]_n in its   
+                           normed series [series `|u_n|]_n] (useful to     
+                           represent absolute and normed convergence:      
+                           cvg [norm S_n])                                 
+            exp_coeff n == the sequence of coefficients of the real        
+                           exponential                                     
+                 expR x == the exponential function defined on a realType  
+is_cvg_series_exp_coeff == convergence of \sum_n^+oo x^n / n!              
+                                                                           
+       \sum_&lt;range&gt; F i == lim (fun n =&gt; (\sum_&lt;range&gt;) F i)) where        
+                           &lt;range&gt; can be (i &lt;oo), (i &lt;oo | P i),          
+                           (m &lt;= i &lt;oo), or (m &lt;= i &lt;oo | P i)             
+                                                                           
+Sections sequences_R_* contain properties of sequences of real numbers.    
+For example:                                                               
+nonincreasing_cvgn_ge u_ == if u_ is nonincreasing and convergent then     
+                            forall n, lim u_ &lt;= u_ n                       
+nondecreasing_cvgn_le u_ == if u_ is nondecreasing and convergent then     
+                            forall n, lim u_ &gt;= u_ n                       
+   nondecreasing_cvgn u_ == if u_ is nondecreasing and bounded then u_     
+                            is convergent and its limit is sup u_n         
+   nonincreasing_cvgn u_ == if u_ is nonincreasing u_ and bound by below   
+                            then u_ is convergent                          
+                adjacent == adjacent sequences lemma                       
+                  cesaro == Cesaro's lemma                                 
+                                                                           
+* About sequences of natural numbers:                                      
+  nseries                                                                  
+                                                                           
+* About sequences of extended real numbers:                                
+  eseries, etelescope, etc.                                                
+                                                                           
+Section sequences_ereal contain properties of sequences of extended real   
+numbers.                                                                   
+                                                                           
+  Naming convention: lemmas about series of non-negative (resp. non-       
+  positive) extended numbers use the string "nneseries" (resp. "npeseries")
+  as part of their identifier                                              
+                                                                           
+* Limit superior and inferior:                                             
+            sdrop u n := {u_k | k &gt;= n}                                    
+               sups u := [sequence sup (sdrop u n)]_n                      
+               infs u := [sequence inf (sdrop u n)]_n                      
+        limn_{inf,sup} == limit inferior/superior for realType             
+              esups u := [sequence ereal_sup (sdrop u n)]_n                
+              einfs u := [sequence ereal_inf (sdrop u n)]_n                
+       limn_e{inf,sup} == limit inferior/superior for \bar R               
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>
@@ -232,10 +230,9 @@ Qed.</div>
 <span class="id">Local</span> <span class="kwd">Notation</span> <span class="id"><a name="eqolimn">eqolimn</a></span> := (@<span class="id"><a href="mathcomp.analysis.landau.html#eqolim">eqolim</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="mathcomp.analysis.topology.html#eventually_filter">eventually_filter</a></span>).<br/>
 <span class="id">Local</span> <span class="kwd">Notation</span> <span class="id"><a name="eqolimPn">eqolimPn</a></span> := (@<span class="id"><a href="mathcomp.analysis.landau.html#eqolimP">eqolimP</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="mathcomp.analysis.topology.html#eventually_filter">eventually_filter</a></span>).<br/>
 <br/>
-<pre>
-(*********************)
-(* Sequences of sets *)
-(*********************)</pre>
+<pre class="ssrdoc">
+Sequences of sets 
+</pre>
 <br/>
 <span class="kwd">Section</span> <span class="id"><a name="seqDU">seqDU</a></span>.<br/>
 <span class="kwd">Variables</span> (<span class="id"><a name="seqDU.T">T</a></span> : <span class="kwd">Type</span>).<br/>
@@ -371,10 +368,9 @@ Qed.</div>
 <br/>
 <span class="kwd">End</span> <span class="id"><a href="mathcomp.analysis.sequences.html#seqD">seqD</a></span>.<br/>
 <br/>
-<pre>
-(************************************)
-(* Convergence of patched sequences *)
-(************************************)</pre>
+<pre class="ssrdoc">
+Convergence of patched sequences 
+</pre>
 <br/>
 <span class="kwd">Section</span> <span class="id"><a name="sequences_patched">sequences_patched</a></span>.<br/>
 <br/>
@@ -1477,10 +1473,9 @@ Qed.</div>
 <br/>
 <span class="kwd">Definition</span> <span class="id">expR</span> {<span class="id">R</span> : <span class="id">realType</span>} (<span class="id">x</span> : <span class="id">R</span>) : <span class="id">R</span> := <span class="id">lim</span> (<span class="id">series</span> (<span class="id">exp_coeff</span> <span class="id">x</span>)).<br/>
 <br/>
-<pre>
-(********************************)
-(* Sequences of natural numbers *)
-(********************************)</pre>
+<pre class="ssrdoc">
+Sequences of natural numbers 
+</pre>
 <br/>
 <span class="kwd">Lemma</span> <span class="id">__deprecated__nat_dvg_real</span> (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">u_</span> : <span class="id">nat</span> ^<span class="id">nat</span>) : <span class="id">u_</span> --&gt; \<span class="id">oo</span> -&gt;<br/>
 &nbsp;&nbsp;([<span class="id">sequence</span> (<span class="id">u_</span> <span class="id">n</span>)%:<span class="id">R</span> : <span class="id">R</span>^<span class="id">o</span>]<span class="id">_n</span> --&gt; +<span class="id">oo</span>)%<span class="id">R</span>.<br/>
@@ -1557,10 +1552,9 @@ Qed.</div>
 <span class="kwd">by</span> <span class="id"><a href="mathcomp.analysis.sequences.html#eseries">near</a></span> <span class="id">do</span> <span class="id">rewrite</span> (<span class="id">leq_trans</span> <span class="id">lun</span>) ?<span class="id">le_nseries</span>//; <span class="id">apply</span>: <span class="id">nbhs_infty_ge</span>.<br/>
 <span class="id">Unshelve</span>. <span class="id">all</span>: <span class="kwd">by</span> <span class="id">end_near</span>. Qed.</div>
 <br/>
-<pre>
-(**************************************)
-(* Sequences of extended real numbers *)
-(**************************************)</pre>
+<pre class="ssrdoc">
+Sequences of extended real numbers 
+</pre>
 <br/>
 <span class="kwd">Notation</span> "\<span class="id">big</span> [ <span class="id">op</span> / <span class="id">idx</span> ]<span class="id">_</span> ( <span class="id">m</span> &lt;= <span class="id">i</span> &lt;<span class="id">oo</span> | <span class="id">P</span> ) <span class="id">F</span>" :=<br/>
 &nbsp;&nbsp;(<span class="id">lim</span> (<span class="kwd">fun</span> <span class="id">n</span> =&gt; (\<span class="id">big</span>[ <span class="id">op</span> / <span class="id">idx</span> ]<span class="id">_</span>(<span class="id">m</span> &lt;= <span class="id">i</span> &lt; <span class="id">n</span> | <span class="id">P</span>) <span class="id">F</span>))) : <span class="id">big_scope</span>.<br/>

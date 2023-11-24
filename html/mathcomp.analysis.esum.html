@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.esum</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.esum" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.esum</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrnum</span> <span class="id">finmap</span>.<br/>
@@ -24,22 +23,21 @@
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.cardinality.html">cardinality</a></span> <span class="id"><a href="mathcomp.classical.fsbigop.html">fsbigop</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.sequences.html">sequences</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.numfun.html">numfun</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                      Summation over classical sets                         *)
-(*                                                                            *)
-(* This file provides a definition of sum over classical sets and a few       *)
-(* lemmas in particular for the case of sums of non-negative terms.           *)
-(*                                                                            *)
-(*            fsets S == the set of finite sets (fset) included in S          *)
-(* \esum_(i in I) f i == summation of non-negative extended real numbers over *)
-(*                       classical sets; I is a classical set and f is a      *)
-(*                       function whose codomain is included in the extended  *)
-(*                       reals; it is 0 if I = set0 and sup(\sum_A a) where A *)
-(*                       is a finite set included in I o.w.                   *)
-(*       summable D f := \esum_(x in D) `| f x | &lt; +oo                        *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                     Summation over classical sets                         
+                                                                           
+This file provides a definition of sum over classical sets and a few       
+lemmas in particular for the case of sums of non-negative terms.           
+                                                                           
+           fsets S == the set of finite sets (fset) included in S          
+\esum_(i in I) f i == summation of non-negative extended real numbers over 
+                      classical sets; I is a classical set and f is a      
+                      function whose codomain is included in the extended  
+                      reals; it is 0 if I = set0 and sup(\sum_A a) where A 
+                      is a finite set included in I o.w.                   
+      summable D f := \esum_(x in D) `| f x | &lt; +oo                        
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "\<span class="id">esum_</span> ( <span class="id">i</span> '<span class="kwd">in</span>' <span class="id">P</span> ) <span class="id">F</span>"<br/>
 &nbsp;&nbsp;(<span class="kwd">at</span> <span class="id">level</span> 41, <span class="id">F</span> <span class="kwd">at</span> <span class="id">level</span> 41, <span class="id">format</span> "\<span class="id">esum_</span> ( <span class="id">i</span>  '<span class="kwd">in</span>'  <span class="id">P</span> )  <span class="id">F</span>").<br/>

@@ -26,3 +26,24 @@ function hideAll(cls)
     }
   }
 }
+
+function renderMarkdowns()
+{
+    const md = markdownit({html:true})
+          .use(texmath, { engine: katex,
+                          delimiters: 'dollars'} );
+    const elements = document.querySelectorAll('.markdown');
+    console.log(elements);
+    for (let elem of elements) {
+	console.log(elem.textContent);
+	const result = md.render(elem.textContent);
+	console.log(result);
+	elem.innerHTML = result;
+    }
+}
+
+function init(cls)
+{
+    hideAll(cls);
+    renderMarkdowns();
+}

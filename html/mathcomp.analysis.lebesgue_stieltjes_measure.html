@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.lebesgue_stieltjes_measure</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.lebesgue_stieltjes_measure" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.lebesgue_stieltjes_measure</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrnum</span> <span class="id">ssrint</span> <span class="id">interval</span>.<br/>
@@ -27,32 +26,31 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.numfun.html">numfun</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.sequences.html">sequences</a></span> <span class="id"><a href="mathcomp.analysis.esum.html">esum</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.real_interval.html">real_interval</a></span> <span class="id"><a href="mathcomp.analysis.measure.html">measure</a></span> <span class="id"><a href="mathcomp.analysis.realfun.html">realfun</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                       Lebesgue Stieltjes Measure                           *)
-(*                                                                            *)
-(* This file contains a formalization of the Lebesgue-Stieltjes measure using *)
-(* the Measure Extension theorem from measure.v.                              *)
-(*                                                                            *)
-(* Reference:                                                                 *)
-(* - Achim Klenke, Probability Theory 2nd edition, 2014                       *)
-(*                                                                            *)
-(*    right_continuous f == the function f is right-continuous                *)
-(*          cumulative R == type of non-decreasing, right-continuous          *)
-(*                          functions (with R : numFieldType)                 *)
-(*                          The HB class is Cumulative.                       *)
-(*                          instance: idfun                                   *)
-(*          ocitv_type R == alias for R : realType                            *)
-(*                 ocitv == set of open-closed intervals ]x, y] where         *)
-(*                          x and y are real numbers                          *)
-(*              R.-ocitv == display for ocitv_type R                          *)
-(*  R.-ocitv.-measurable == semiring of sets of open-closed intervals         *)
-(*           wlength f A := f b - f a with the hull of the set of real        *)
-(*                          numbers A being delimited by a and b              *)
-(* lebesgue_stieltjes_measure f == Lebesgue-Stieltjes measure for f           *)
-(*                          f is a cumulative function.                       *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                      Lebesgue Stieltjes Measure                           
+                                                                           
+This file contains a formalization of the Lebesgue-Stieltjes measure using 
+the Measure Extension theorem from measure.v.                              
+                                                                           
+Reference:                                                                 
+- Achim Klenke, Probability Theory 2nd edition, 2014                       
+                                                                           
+   right_continuous f == the function f is right-continuous                
+         cumulative R == type of non-decreasing, right-continuous          
+                         functions (with R : numFieldType)                 
+                         The HB class is Cumulative.                       
+                         instance: idfun                                   
+         ocitv_type R == alias for R : realType                            
+                ocitv == set of open-closed intervals ]x, y] where         
+                         x and y are real numbers                          
+             R.-ocitv == display for ocitv_type R                          
+ R.-ocitv.-measurable == semiring of sets of open-closed intervals         
+          wlength f A := f b - f a with the hull of the set of real        
+                         numbers A being delimited by a and b              
+lebesgue_stieltjes_measure f == Lebesgue-Stieltjes measure for f           
+                         f is a cumulative function.                       
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

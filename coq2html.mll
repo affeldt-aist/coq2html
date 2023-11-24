@@ -309,8 +309,8 @@ rule coq_bol = parse
         if !in_proof then coq lexbuf else skip_newline lexbuf }
   (* Enter verbatim mode *)
   | space* ("(***" "*"+ "***)" "\n" as s)
-      { fprintf !oc "<pre>\n%s" s;
-        ssr_doc lexbuf;
+      { fprintf !oc "<pre class=\"ssrdoc\">\n";
+        ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</pre>\n";
 	skip_newline lexbuf
       }
@@ -434,16 +434,19 @@ and doc = parse
 
 (* beginning of line *)
 and ssr_doc_bol = parse
+  (* Leave verbatim mode *)
+  | space* ("(***" "*"+ "***)" as s)
+      { () }
+  | "(* "
+      { ssr_doc_bol lexbuf }
   | "\n"
       { ssr_doc_bol lexbuf }
   | ""
       { ssr_doc lexbuf }
 
 and ssr_doc = parse
-  (* Leave verbatim mode *)
-  | space* ("(***" "*"+ "***)" as s)
-      { fprintf !oc "%s" s;
-        () }
+  | "*)"
+      { ssr_doc lexbuf }
   | "\n"
       { character '\n'; ssr_doc_bol lexbuf }
   | eof

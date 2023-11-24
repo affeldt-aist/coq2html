@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.nsatz_realtype</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.nsatz_realtype" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.nsatz_realtype</h1>
 <div class="coq">
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.nsatz.Nsatz.html">Nsatz</a></span>.<br/>
@@ -24,17 +23,16 @@
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.boolp.html">boolp</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                           nsatz for realType                               *)
-(*                                                                            *)
-(* This file registers the ring corresponding to the MathComp-Analysis type   *)
-(* realType to the tactic nsatz of Coq. This enables some automation used for *)
-(* example in the file trigo.v.                                               *)
-(*                                                                            *)
-(* ref: https://coq.inria.fr/refman/addendum/nsatz.html                       *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                          nsatz for realType                               
+                                                                           
+This file registers the ring corresponding to the MathComp-Analysis type   
+realType to the tactic nsatz of Coq. This enables some automation used for 
+example in the file trigo.v.                                               
+                                                                           
+ref: https://coq.inria.fr/refman/addendum/nsatz.html                       
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Import</span> <span class="id">GRing.Theory</span> <span class="id">Num.Theory</span>.<br/>
 <br/>

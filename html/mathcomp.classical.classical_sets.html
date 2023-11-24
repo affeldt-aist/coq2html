@@ -6,185 +6,183 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.classical.classical_sets</title>
 <meta name="description" content="Documentation of Coq module mathcomp.classical.classical_sets" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.classical.classical_sets</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">matrix</span> <span class="id">finmap</span> <span class="id">order</span> <span class="id">ssrnum</span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">ssrint</span> <span class="id">interval</span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html">mathcomp_extra</a></span> <span class="id"><a href="mathcomp.classical.boolp.html">boolp</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(* This file develops a basic theory of sets and types equipped with a        *)
-(* canonical inhabitant (pointed types).                                      *)
-(*                                                                            *)
-(* --&gt; A decidable equality is defined for any type. It is thus possible to   *)
-(*     define an eqType structure for any type using the mixin gen_eqMixin.   *)
-(* --&gt; This file adds the possibility to define a choiceType structure for    *)
-(*     any type thanks to an axiom gen_choiceMixin giving a choice mixin.     *)
-(* --&gt; We chose to have generic mixins and no global instances of the eqType  *)
-(*     and choiceType structures to let the user choose which definition of   *)
-(*     equality to use and to avoid conflict with already declared instances. *)
-(*                                                                            *)
-(* * Sets:                                                                    *)
-(*                       set T == type of sets on T.                          *)
-(*                   (x \in P) == boolean membership predicate from ssrbool   *)
-(*                                for set P, available thanks to a canonical  *)
-(*                                predType T structure on sets on T.          *)
-(*             [set x : T | P] == set of points x : T such that P holds.      *)
-(*                 [set x | P] == same as before with T left implicit.        *)
-(*            [set E | x in A] == set defined by the expression E for x in    *)
-(*                                set A.                                      *)
-(*   [set E | x in A &amp; y in B] == same as before for E depending on 2         *)
-(*                                variables x and y in sets A and B.          *)
-(*                        setT == full set.                                   *)
-(*                        set0 == empty set.                                  *)
-(*                     range f == the range of f, i.e. [set f x | x in setT]  *)
-(*                     [set a] == set containing only a.                      *)
-(*                 [set a : T] == same as before with the type of a made      *)
-(*                                explicit.                                   *)
-(*                     A `|` B == union of A and B.                           *)
-(*                      a |` A == A extended with a.                          *)
-(*        [set a1; a2; ..; an] == set containing only the n elements ai.      *)
-(*                     A `&amp;` B == intersection of A and B.                    *)
-(*                     A `*` B == product of A and B, i.e. set of pairs (a,b) *)
-(*                                such that A a and B b.                      *)
-(*                        A.`1 == set of points a such that there exists b so *)
-(*                                that A (a, b).                              *)
-(*                        A.`2 == set of points a such that there exists b so *)
-(*                                that A (b, a).                              *)
-(*                        ~` A == complement of A.                            *)
-(*                    [set~ a] == complement of [set a].                      *)
-(*                     A `\` B == complement of B in A.                       *)
-(*                      A `\ a == A deprived of a.                            *)
-(*                        `I_n := [set k | k &lt; n]                             *)
-(*          \bigcup_(i in P) F == union of the elements of the family F whose *)
-(*                                index satisfies P.                          *)
-(*           \bigcup_(i : T) F == union of the family F indexed on T.         *)
-(*           \bigcup_(i &lt; n) F := \bigcup_(i in `I_n) F                       *)
-(*                 \bigcup_i F == same as before with T left implicit.        *)
-(*          \bigcap_(i in P) F == intersection of the elements of the family  *)
-(*                                F whose index satisfies P.                  *)
-(*           \bigcap_(i : T) F == union of the family F indexed on T.         *)
-(*           \bigcap_(i &lt; n) F := \bigcap_(i in `I_n) F                       *)
-(*                 \bigcap_i F == same as before with T left implicit.        *)
-(*                smallest C G := \bigcap_(A in [set M | C M /\ G `&lt;=` M]) A  *)
-(*                   A `&lt;=` B &lt;-&gt; A is included in B.                         *)
-(*                    A `&lt;` B := A `&lt;=` B /\ ~ (B `&lt;=` A)                     *)
-(*                  A `&lt;=&gt;` B &lt;-&gt; double inclusion A `&lt;=` B and B `&lt;=` A.     *)
-(*                   f @^-1` A == preimage of A by f.                         *)
-(*                      f @` A == image of A by f. Notation for `image A f`.  *)
-(*                    A !=set0 := exists x, A x.                              *)
-(*                    [set` p] == a classical set corresponding to the        *)
-(*                                predType p                                  *)
-(*                     `[a, b] := [set` `[a, b]], i.e., a classical set       *)
-(*                                corresponding to the interval `[a, b].      *)
-(*                     `]a, b] := [set` `]a, b]]                              *)
-(*                     `[a, b[ := [set` `[a, b[]                              *)
-(*                     `]a, b[ := [set` `]a, b[]                              *)
-(*                   `]-oo, b] := [set` `]-oo, b]]                            *)
-(*                   `]-oo, b[ := [set` `]-oo, b[]                            *)
-(*                   `[a, +oo[ := [set` `[a, +oo[]                            *)
-(*                   `]a, +oo[ := [set` `]a, +oo[]                            *)
-(*                 `]-oo, +oo[ := [set` `]-oo, +oo[]                          *)
-(*               is_subset1 A &lt;-&gt; A contains only 1 element.                  *)
-(*                   is_fun f &lt;-&gt; for each a, f a contains only 1 element.    *)
-(*                 is_total f &lt;-&gt; for each a, f a is non empty.               *)
-(*              is_totalfun f &lt;-&gt; conjunction of is_fun and is_total.         *)
-(*                   xget x0 P == point x in P if it exists, x0 otherwise;    *)
-(*                                P must be a set on a choiceType.            *)
-(*             fun_of_rel f0 f == function that maps x to an element of f x   *)
-(*                                if there is one, to f0 x otherwise.         *)
-(*                    F `#` G &lt;-&gt; intersections beween elements of F an G are *)
-(*                                all non empty.                              *)
-(*                                                                            *)
-(* * Pointed types:                                                           *)
-(*                 pointedType == interface type for types equipped with a    *)
-(*                                canonical inhabitant.                       *)
-(*             PointedType T m == packs the term m : T to build a             *)
-(*                                pointedType; T must have a choiceType       *)
-(*                                structure.                                  *)
-(*   [pointedType of T for cT] == T-clone of the pointedType structure cT.    *)
-(*          [pointedType of T] == clone of a canonical pointedType structure  *)
-(*                                on T.                                       *)
-(*                       point == canonical inhabitant of a pointedType.      *)
-(*                       get P == point x in P if it exists, point otherwise; *)
-(*                                P must be a set on a pointedType.           *)
-(*                                                                            *)
-(* --&gt; Thanks to this basic set theory, we proved Zorn's Lemma, which states  *)
-(*     that any ordered set such that every totally ordered subset admits an  *)
-(*     upper bound has a maximal element. We also proved an analogous version *)
-(*     for preorders, where maximal is replaced with premaximal: t is         *)
-(*     premaximal if whenever t &lt; s we also have s &lt; t.                       *)
-(*                                                                            *)
-(*                      $| T | == T : Type is inhabited                       *)
-(*                    squash x == proof of $| T | (with x : T)                *)
-(*                  unsquash s == extract a witness from s : $| T |           *)
-(* --&gt; Tactic:                                                                *)
-(*   - squash x:                                                              *)
-(*     solves a goal $| T | by instantiating with x or [the T of x]           *)
-(*                                                                            *)
-(*                trivIset D F == the sets F i, where i ranges over D : set I,*)
-(*                                are pairwise-disjoint                       *)
-(*                   cover D F := \bigcup_(i in D) F i                        *)
-(*             partition D F A == the non-empty sets F i,where i ranges over  *)
-(*                                D : set I, form a partition of A            *)
-(*          pblock_index D F x == index i such that i \in D and x \in F i     *)
-(*                pblock D F x := F (pblock_index D F x)                      *)
-(*                                                                            *)
-(*   maximal_disjoint_subcollection F A B == A is a maximal (for inclusion)   *)
-(*                                   disjoint subcollection of the collection *)
-(*                                   B of elements in F : I -&gt; set T          *)
-(*                                                                            *)
-(* * Upper and lower bounds:                                                  *)
-(*              ubound A == the set of upper bounds of the set A              *)
-(*              lbound A == the set of lower bounds of the set A              *)
-(*   Predicates to express existence conditions of supremum and infimum of    *)
-(*   sets of real numbers:                                                    *)
-(*          has_ubound A := ubound A != set0                                  *)
-(*             has_sup A := A != set0 /\ has_ubound A                         *)
-(*          has_lbound A := lbound A != set0                                  *)
-(*             has_inf A := A != set0 /\ has_lbound A                         *)
-(*                                                                            *)
-(*             isLub A m := m is a least upper bound of the set A             *)
-(*           supremums A := set of supremums of the set A                     *)
-(*         supremum x0 A == supremum of A or x0 if A is empty                 *)
-(*            infimums A := set of infimums of the set A                      *)
-(*          infimum x0 A == infimum of A or x0 if A is empty                  *)
-(*                                                                            *)
-(*               F `#` G := the classes of sets F and G intersect             *)
-(*                                                                            *)
-(* * sections:                                                                *)
-(*           xsection A x == with A : set (T1 * T2) and x : T1 is the         *)
-(*                           x-section of A                                   *)
-(*           ysection A y == with A : set (T1 * T2) and y : T2 is the         *)
-(*                           y-section of A                                   *)
-(*                                                                            *)
-(* * About the naming conventions in this file:                               *)
-(* - use T, T', T1, T2, etc., aT (domain type), rT (return type) for names of *)
-(*   variables in Type (or choiceType/pointedType/porderType)                 *)
-(*   + use the same suffix or prefix for the sets as their containing type    *)
-(*     (e.g., A1 in T1, etc.)                                                 *)
-(*   + as a consequence functions are rather of type aT -&gt; rT                 *)
-(* - use I, J when the type corresponds to an index                           *)
-(* - sets are named A, B, C, D, etc., or Y when it is ostensibly an image set *)
-(*   (i.e., of type set rT)                                                   *)
-(* - indexed sets are rather named F                                          *)
-(*                                                                            *)
-(* * Composition of relations:                                                *)
-(*                A \; B == [set x | exists z, A (x.1, z) &amp; B (z, x.2)]       *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+This file develops a basic theory of sets and types equipped with a        
+canonical inhabitant (pointed types).                                      
+                                                                           
+--&gt; A decidable equality is defined for any type. It is thus possible to   
+    define an eqType structure for any type using the mixin gen_eqMixin.   
+--&gt; This file adds the possibility to define a choiceType structure for    
+    any type thanks to an axiom gen_choiceMixin giving a choice mixin.     
+--&gt; We chose to have generic mixins and no global instances of the eqType  
+    and choiceType structures to let the user choose which definition of   
+    equality to use and to avoid conflict with already declared instances. 
+                                                                           
+* Sets:                                                                    
+                      set T == type of sets on T.                          
+                  (x \in P) == boolean membership predicate from ssrbool   
+                               for set P, available thanks to a canonical  
+                               predType T structure on sets on T.          
+            [set x : T | P] == set of points x : T such that P holds.      
+                [set x | P] == same as before with T left implicit.        
+           [set E | x in A] == set defined by the expression E for x in    
+                               set A.                                      
+  [set E | x in A &amp; y in B] == same as before for E depending on 2         
+                               variables x and y in sets A and B.          
+                       setT == full set.                                   
+                       set0 == empty set.                                  
+                    range f == the range of f, i.e. [set f x | x in setT]  
+                    [set a] == set containing only a.                      
+                [set a : T] == same as before with the type of a made      
+                               explicit.                                   
+                    A `|` B == union of A and B.                           
+                     a |` A == A extended with a.                          
+       [set a1; a2; ..; an] == set containing only the n elements ai.      
+                    A `&amp;` B == intersection of A and B.                    
+                    A `*` B == product of A and B, i.e. set of pairs (a,b) 
+                               such that A a and B b.                      
+                       A.`1 == set of points a such that there exists b so 
+                               that A (a, b).                              
+                       A.`2 == set of points a such that there exists b so 
+                               that A (b, a).                              
+                       ~` A == complement of A.                            
+                   [set~ a] == complement of [set a].                      
+                    A `\` B == complement of B in A.                       
+                     A `\ a == A deprived of a.                            
+                       `I_n := [set k | k &lt; n]                             
+         \bigcup_(i in P) F == union of the elements of the family F whose 
+                               index satisfies P.                          
+          \bigcup_(i : T) F == union of the family F indexed on T.         
+          \bigcup_(i &lt; n) F := \bigcup_(i in `I_n) F                       
+                \bigcup_i F == same as before with T left implicit.        
+         \bigcap_(i in P) F == intersection of the elements of the family  
+                               F whose index satisfies P.                  
+          \bigcap_(i : T) F == union of the family F indexed on T.         
+          \bigcap_(i &lt; n) F := \bigcap_(i in `I_n) F                       
+                \bigcap_i F == same as before with T left implicit.        
+               smallest C G := \bigcap_(A in [set M | C M /\ G `&lt;=` M]) A  
+                  A `&lt;=` B &lt;-&gt; A is included in B.                         
+                   A `&lt;` B := A `&lt;=` B /\ ~ (B `&lt;=` A)                     
+                 A `&lt;=&gt;` B &lt;-&gt; double inclusion A `&lt;=` B and B `&lt;=` A.     
+                  f @^-1` A == preimage of A by f.                         
+                     f @` A == image of A by f. Notation for `image A f`.  
+                   A !=set0 := exists x, A x.                              
+                   [set` p] == a classical set corresponding to the        
+                               predType p                                  
+                    `[a, b] := [set` `[a, b]], i.e., a classical set       
+                               corresponding to the interval `[a, b].      
+                    `]a, b] := [set` `]a, b]]                              
+                    `[a, b[ := [set` `[a, b[]                              
+                    `]a, b[ := [set` `]a, b[]                              
+                  `]-oo, b] := [set` `]-oo, b]]                            
+                  `]-oo, b[ := [set` `]-oo, b[]                            
+                  `[a, +oo[ := [set` `[a, +oo[]                            
+                  `]a, +oo[ := [set` `]a, +oo[]                            
+                `]-oo, +oo[ := [set` `]-oo, +oo[]                          
+              is_subset1 A &lt;-&gt; A contains only 1 element.                  
+                  is_fun f &lt;-&gt; for each a, f a contains only 1 element.    
+                is_total f &lt;-&gt; for each a, f a is non empty.               
+             is_totalfun f &lt;-&gt; conjunction of is_fun and is_total.         
+                  xget x0 P == point x in P if it exists, x0 otherwise;    
+                               P must be a set on a choiceType.            
+            fun_of_rel f0 f == function that maps x to an element of f x   
+                               if there is one, to f0 x otherwise.         
+                   F `#` G &lt;-&gt; intersections beween elements of F an G are 
+                               all non empty.                              
+                                                                           
+* Pointed types:                                                           
+                pointedType == interface type for types equipped with a    
+                               canonical inhabitant.                       
+            PointedType T m == packs the term m : T to build a             
+                               pointedType; T must have a choiceType       
+                               structure.                                  
+  [pointedType of T for cT] == T-clone of the pointedType structure cT.    
+         [pointedType of T] == clone of a canonical pointedType structure  
+                               on T.                                       
+                      point == canonical inhabitant of a pointedType.      
+                      get P == point x in P if it exists, point otherwise; 
+                               P must be a set on a pointedType.           
+                                                                           
+--&gt; Thanks to this basic set theory, we proved Zorn's Lemma, which states  
+    that any ordered set such that every totally ordered subset admits an  
+    upper bound has a maximal element. We also proved an analogous version 
+    for preorders, where maximal is replaced with premaximal: t is         
+    premaximal if whenever t &lt; s we also have s &lt; t.                       
+                                                                           
+                     $| T | == T : Type is inhabited                       
+                   squash x == proof of $| T | (with x : T)                
+                 unsquash s == extract a witness from s : $| T |           
+--&gt; Tactic:                                                                
+  - squash x:                                                              
+    solves a goal $| T | by instantiating with x or [the T of x]           
+                                                                           
+               trivIset D F == the sets F i, where i ranges over D : set I,
+                               are pairwise-disjoint                       
+                  cover D F := \bigcup_(i in D) F i                        
+            partition D F A == the non-empty sets F i,where i ranges over  
+                               D : set I, form a partition of A            
+         pblock_index D F x == index i such that i \in D and x \in F i     
+               pblock D F x := F (pblock_index D F x)                      
+                                                                           
+  maximal_disjoint_subcollection F A B == A is a maximal (for inclusion)   
+                                  disjoint subcollection of the collection 
+                                  B of elements in F : I -&gt; set T          
+                                                                           
+* Upper and lower bounds:                                                  
+             ubound A == the set of upper bounds of the set A              
+             lbound A == the set of lower bounds of the set A              
+  Predicates to express existence conditions of supremum and infimum of    
+  sets of real numbers:                                                    
+         has_ubound A := ubound A != set0                                  
+            has_sup A := A != set0 /\ has_ubound A                         
+         has_lbound A := lbound A != set0                                  
+            has_inf A := A != set0 /\ has_lbound A                         
+                                                                           
+            isLub A m := m is a least upper bound of the set A             
+          supremums A := set of supremums of the set A                     
+        supremum x0 A == supremum of A or x0 if A is empty                 
+           infimums A := set of infimums of the set A                      
+         infimum x0 A == infimum of A or x0 if A is empty                  
+                                                                           
+              F `#` G := the classes of sets F and G intersect             
+                                                                           
+* sections:                                                                
+          xsection A x == with A : set (T1 * T2) and x : T1 is the         
+                          x-section of A                                   
+          ysection A y == with A : set (T1 * T2) and y : T2 is the         
+                          y-section of A                                   
+                                                                           
+* About the naming conventions in this file:                               
+- use T, T', T1, T2, etc., aT (domain type), rT (return type) for names of 
+  variables in Type (or choiceType/pointedType/porderType)                 
+  + use the same suffix or prefix for the sets as their containing type    
+    (e.g., A1 in T1, etc.)                                                 
+  + as a consequence functions are rather of type aT -&gt; rT                 
+- use I, J when the type corresponds to an index                           
+- sets are named A, B, C, D, etc., or Y when it is ostensibly an image set 
+  (i.e., of type set rT)                                                   
+- indexed sets are rather named F                                          
+                                                                           
+* Composition of relations:                                                
+               A \; B == [set x | exists z, A (x.1, z) &amp; B (z, x.2)]       
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

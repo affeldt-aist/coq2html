@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.itv</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.itv" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.itv</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">Coq</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssreflect.html">ssreflect</a></span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html">ssrfun</a></span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html">ssrbool</a></span>.<br/>
@@ -25,53 +24,52 @@
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html">mathcomp_extra</a></span> <span class="id"><a href="mathcomp.classical.boolp.html">boolp</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(* This file develops tools to make the manipulation of numbers within        *)
-(* a known interval easier, thanks to canonical structures. This adds types   *)
-(* like {itv R &amp; `[a, b]}, a notation e%:itv that infers an enclosing         *)
-(* interval for expression e according to existing canonical instances and    *)
-(* %:inum to cast back from type {itv R &amp; i} to R.                            *)
-(* For instance, x : {i01 R}, we have (1 - x%:inum)%:itv : {i01 R}            *)
-(* automatically inferred.                                                    *)
-(*                                                                            *)
-(* * types for values within known interval                                   *)
-(*       {i01 R} == interface type for elements in R that live in `[0, 1];    *)
-(*                  R must have a numDomainType structure.                    *)
-(*                  Allows to solve automatically goals of the form x &gt;= 0    *)
-(*                  and x &lt;= 1 if x is canonically a {i01 R}. {i01 R} is      *)
-(*                  canonically stable by common operations.                  *)
-(*   {itv R &amp; i} == more generic type of values in interval i : interval int  *)
-(*                  R must have a numDomainType structure. This type is shown *)
-(*                  to be a porderType.                                       *)
-(*                                                                            *)
-(* * casts from/to values within known interval                               *)
-(*        x%:itv == explicitly casts x to the most precise known {itv R &amp; i}  *)
-(*                  according to existing canonical instances.                *)
-(*        x%:i01 == explicitly casts x to {i01 R} according to existing       *)
-(*                  canonical instances.                                      *)
-(*       x%:inum == explicit cast from {itv R &amp; i} to R.                      *)
-(*                                                                            *)
-(* * sign proofs                                                              *)
-(*    [itv of x] == proof that x is in interval inferred by x%:itv            *)
-(*     [lb of x] == proof that lb &lt; x or lb &lt;= x with lb the lower bound      *)
-(*                  inferred by x%:itv                                        *)
-(*     [ub of x] == proof that x &lt; ub or x &lt;= ub with ub the upper bound      *)
-(*                  inferred by x%:itv                                        *)
-(*    [lbe of x] == proof that lb &lt;= x                                        *)
-(*    [ube of x] == proof that x &lt;= ub                                        *)
-(*                                                                            *)
-(* * constructors                                                             *)
-(*    ItvNum xin == builds a {itv R &amp; i} from a proof xin : x \in i           *)
-(*                  where x : R                                               *)
-(*                                                                            *)
-(* --&gt; A number of canonical instances are provided for common operations, if *)
-(* your favorite operator is missing, look below for examples on how to add   *)
-(* the appropriate Canonical.                                                 *)
-(* --&gt; Canonical instances are also provided according to types, as a         *)
-(* fallback when no known operator appears in the expression. Look to         *)
-(* itv_top_typ below for an example on how to add your favorite type.         *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+This file develops tools to make the manipulation of numbers within        
+a known interval easier, thanks to canonical structures. This adds types   
+like {itv R &amp; `[a, b]}, a notation e%:itv that infers an enclosing         
+interval for expression e according to existing canonical instances and    
+%:inum to cast back from type {itv R &amp; i} to R.                            
+For instance, x : {i01 R}, we have (1 - x%:inum)%:itv : {i01 R}            
+automatically inferred.                                                    
+                                                                           
+* types for values within known interval                                   
+      {i01 R} == interface type for elements in R that live in `[0, 1];    
+                 R must have a numDomainType structure.                    
+                 Allows to solve automatically goals of the form x &gt;= 0    
+                 and x &lt;= 1 if x is canonically a {i01 R}. {i01 R} is      
+                 canonically stable by common operations.                  
+  {itv R &amp; i} == more generic type of values in interval i : interval int  
+                 R must have a numDomainType structure. This type is shown 
+                 to be a porderType.                                       
+                                                                           
+* casts from/to values within known interval                               
+       x%:itv == explicitly casts x to the most precise known {itv R &amp; i}  
+                 according to existing canonical instances.                
+       x%:i01 == explicitly casts x to {i01 R} according to existing       
+                 canonical instances.                                      
+      x%:inum == explicit cast from {itv R &amp; i} to R.                      
+                                                                           
+* sign proofs                                                              
+   [itv of x] == proof that x is in interval inferred by x%:itv            
+    [lb of x] == proof that lb &lt; x or lb &lt;= x with lb the lower bound      
+                 inferred by x%:itv                                        
+    [ub of x] == proof that x &lt; ub or x &lt;= ub with ub the upper bound      
+                 inferred by x%:itv                                        
+   [lbe of x] == proof that lb &lt;= x                                        
+   [ube of x] == proof that x &lt;= ub                                        
+                                                                           
+* constructors                                                             
+   ItvNum xin == builds a {itv R &amp; i} from a proof xin : x \in i           
+                 where x : R                                               
+                                                                           
+--&gt; A number of canonical instances are provided for common operations, if 
+your favorite operator is missing, look below for examples on how to add   
+the appropriate Canonical.                                                 
+--&gt; Canonical instances are also provided according to types, as a         
+fallback when no known operator appears in the expression. Look to         
+itv_top_typ below for an example on how to add your favorite type.         
+</pre>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "{ '<span class="id">itv</span>' <span class="id">R</span> &amp; <span class="id">i</span> }"<br/>
 &nbsp;&nbsp;(<span class="kwd">at</span> <span class="id">level</span> 0, <span class="id">R</span> <span class="kwd">at</span> <span class="id">level</span> 200, <span class="id">i</span> <span class="kwd">at</span> <span class="id">level</span> 200, <span class="id">format</span> "{ '<span class="id">itv</span>'  <span class="id">R</span>  &amp;  <span class="id">i</span> }").<br/>

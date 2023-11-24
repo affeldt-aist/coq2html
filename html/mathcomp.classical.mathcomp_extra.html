@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.classical.mathcomp_extra</title>
 <meta name="description" content="Documentation of Coq module mathcomp.classical.mathcomp_extra" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.classical.mathcomp_extra</h1>
 <div class="coq">
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.PArith.BinPos.html">BinPos</a></span>.<br/>
@@ -26,31 +25,29 @@
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">finmap</span> <span class="id">ssralg</span> <span class="id">ssrnum</span> <span class="id">ssrint</span> <span class="id">rat</span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">finset</span> <span class="id">interval</span>.<br/>
 <br/>
-<pre>
-(***************************)
-(* MathComp 1.15 additions *)
-(***************************)</pre>
+<pre class="ssrdoc">
+MathComp 1.15 additions 
+</pre>
 <br/>
-<pre>
-(******************************************************************************)
-(* This files contains lemmas and definitions missing from MathComp.          *)
-(*                                                                            *)
-(*               f \max g := fun x =&gt; Num.max (f x) (g x)                     *)
-(*               f \min g := fun x =&gt; Num.min (f x) (g x)                     *)
-(*                oflit f := Some \o f                                        *)
-(*          pred_oapp T D := [pred x | oapp (mem D) false x]                  *)
-(*                 f \* g := fun x =&gt; f x * g x                               *)
-(*                   \- f := fun x =&gt; - f x                                   *)
-(*     lteBSide, bnd_simp == multirule to simplify inequalities between       *)
-(*                           interval bounds                                  *)
-(*               miditv i == middle point of interval i                       *)
-(*                                                                            *)
-(*               proj i f == f i, where f : forall i, T i                     *)
-(*             dfwith f x == fun j =&gt; x if j = i, and f j otherwise           *)
-(*                           given x : T i                                    *)
-(*                 swap x := (x.2, x.1)                                       *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+This files contains lemmas and definitions missing from MathComp.          
+                                                                           
+              f \max g := fun x =&gt; Num.max (f x) (g x)                     
+              f \min g := fun x =&gt; Num.min (f x) (g x)                     
+               oflit f := Some \o f                                        
+         pred_oapp T D := [pred x | oapp (mem D) false x]                  
+                f \* g := fun x =&gt; f x * g x                               
+                  \- f := fun x =&gt; - f x                                   
+    lteBSide, bnd_simp == multirule to simplify inequalities between       
+                          interval bounds                                  
+              miditv i == middle point of interval i                       
+                                                                           
+              proj i f == f i, where f : forall i, T i                     
+            dfwith f x == fun j =&gt; x if j = i, and f j otherwise           
+                          given x : T i                                    
+                swap x := (x.2, x.1)                                       
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>
@@ -556,10 +553,9 @@ Qed.</div>
 <div class="proofscript" id="proof67">
  <span class="kwd">by</span> <span class="id">apply</span>: <span class="id">subitvP</span>; <span class="id">rewrite</span> <span class="id">subitvE</span> !<span class="id">bound_lexx</span>. Qed.</div>
 <br/>
-<pre>
-(**********************************)
-(* End of MathComp 1.15 additions *)
-(**********************************)</pre>
+<pre class="ssrdoc">
+End of MathComp 1.15 additions 
+</pre>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "`1- <span class="id">r</span>" (<span class="id">format</span> "`1- <span class="id">r</span>", <span class="kwd">at</span> <span class="id">level</span> 2).<br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "<span class="id">f</span> \^-1" (<span class="kwd">at</span> <span class="id">level</span> 3, <span class="id">format</span> "<span class="id">f</span> \^-1", <span class="id">left</span> <span class="id">associativity</span>).<br/>
@@ -603,10 +599,9 @@ Qed.</div>
 <span class="kwd">Arguments</span> <span class="id">big_rmcond</span> {<span class="id">R</span> <span class="id">idx</span> <span class="id">op</span> <span class="id">I</span> <span class="id">r</span>} <span class="id">P</span>.<br/>
 <span class="kwd">Arguments</span> <span class="id">big_rmcond_in</span> {<span class="id">R</span> <span class="id">idx</span> <span class="id">op</span> <span class="id">I</span> <span class="id">r</span>} <span class="id">P</span>.<br/>
 <br/>
-<pre>
-(*****************************)
-(* MathComp 1.16.0 additions *)
-(*****************************)</pre>
+<pre class="ssrdoc">
+MathComp 1.16.0 additions 
+</pre>
 <br/>
 <span class="kwd">Section</span> <span class="id"><a name="bigminr_maxr">bigminr_maxr</a></span>.<br/>
 <span class="kwd">Import</span> <span class="id">Num.Def</span>.<br/>
@@ -1296,15 +1291,13 @@ Qed.</div>
 <span class="kwd">Arguments</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#bigmin_eq_arg">bigmin_eq_arg</a></span> {<span class="id">d</span> <span class="id">T</span> <span class="id">I</span>} <span class="id">x</span> <span class="id">j</span>.<br/>
 <span class="kwd">Arguments</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#eq_bigmin">eq_bigmin</a></span> {<span class="id">d</span> <span class="id">T</span> <span class="id">I</span> <span class="id">x</span>} <span class="id">j</span>.<br/>
 <br/>
-<pre>
-(************************************)
-(* End of MathComp 1.16.0 additions *)
-(************************************)</pre>
+<pre class="ssrdoc">
+End of MathComp 1.16.0 additions 
+</pre>
 <br/>
-<pre>
-(*****************************)
-(* MathComp &gt; 1.16 additions *)
-(*****************************)</pre>
+<pre class="ssrdoc">
+MathComp &gt; 1.16 additions 
+</pre>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "<span class="id">f</span> \<span class="id">max</span> <span class="id">g</span>" (<span class="kwd">at</span> <span class="id">level</span> 50, <span class="id">left</span> <span class="id">associativity</span>).<br/>
 <br/>
@@ -1312,10 +1305,9 @@ Qed.</div>
 <span class="kwd">Notation</span> "<span class="id">f</span> \<span class="id">max</span> <span class="id">g</span>" := (<span class="id"><a href="mathcomp.classical.mathcomp_extra.html#max_fun">max_fun</a></span> <span class="id">f</span> <span class="id">g</span>) : <span class="id">ring_scope</span>.<br/>
 <span class="kwd">Arguments</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html#max_fun">max_fun</a></span> {<span class="id">T</span> <span class="id">R</span>} <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> /.<br/>
 <br/>
-<pre>
-(************************************)
-(* End of mathComp &gt; 1.16 additions *)
-(************************************)</pre>
+<pre class="ssrdoc">
+End of mathComp &gt; 1.16 additions 
+</pre>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "`1- <span class="id"><a name="onem.R">x</a></span>" (<span class="id">format</span> "`1- <span class="id">x</span>", <span class="kwd">at</span> <span class="id">level</span> 2).<br/>
 <br/>
@@ -1501,10 +1493,9 @@ Qed.</div>
 <br/>
 <span class="kwd">End</span> <span class="id">order_min</span>.<br/>
 <br/>
-<pre>
-(**************************)
-(* MathComp 2.1 additions *)
-(**************************)</pre>
+<pre class="ssrdoc">
+MathComp 2.1 additions 
+</pre>
 <br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">poly</span>.<br/>
 <br/>

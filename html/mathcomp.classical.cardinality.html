@@ -6,55 +6,53 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.classical.cardinality</title>
 <meta name="description" content="Documentation of Coq module mathcomp.classical.cardinality" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.classical.cardinality</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">HB</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">structures</span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">finmap</span> <span class="id">ssralg</span> <span class="id">ssrnum</span> <span class="id">ssrint</span> <span class="id">rat</span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html">mathcomp_extra</a></span> <span class="id"><a href="mathcomp.classical.boolp.html">boolp</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html">classical_sets</a></span> <span class="id"><a href="mathcomp.classical.functions.html">functions</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                              Cardinality                                   *)
-(*                                                                            *)
-(* This file provides an account of cardinality properties of classical sets. *)
-(* This includes standard results of set theory such as the Pigeon Hole       *)
-(* principle, the Cantor-Bernstein Theorem, or lemmas about the cardinal of   *)
-(* nat, nat * nat, and rat.                                                   *)
-(*                                                                            *)
-(* Since universe polymorphism is not yet available in our framework, we      *)
-(* develop a relational theory of cardinals: there is no type for cardinals   *)
-(* only relations A #&lt;= B and A #= B to compare the cardinals of two sets     *)
-(* (on two possibly different types).                                         *)
-(*                                                                            *)
-(*           A #&lt;= B == the cardinal of A is smaller or equal to the one of B *)
-(*           A #&gt;= B := B #&lt;= A                                               *)
-(*            A #= B == the cardinal of A is equal to the cardinal of B       *)
-(*           A #!= B := ~~ (A #= B)                                           *)
-(*      finite_set A == the set A is finite                                   *)
-(*                   := exists n, A #= `I_n                                   *)
-(*                   &lt;-&gt; exists X : {fset T}, A = [set` X]                    *)
-(*                   &lt;-&gt; ~ ([set: nat] #&lt;= A)                                 *)
-(*    infinite_set A := ~ finite_set A                                        *)
-(*       countable A &lt;-&gt; A is countable                                       *)
-(*                   := A #&lt;= [set: nat]                                      *)
-(*        fset_set A == the finite set corresponding if A : set T is finite,  *)
-(*                      set0 otherwise (T : choiceType)                       *)
-(*              A.`1 := [fset x.1 | x in A]                                   *)
-(*              A.`2 := [fset x.2 | x in A]                                   *)
-(* {fimfun aT &gt;-&gt; T} == type of functions with a finite image                 *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                             Cardinality                                   
+                                                                           
+This file provides an account of cardinality properties of classical sets. 
+This includes standard results of set theory such as the Pigeon Hole       
+principle, the Cantor-Bernstein Theorem, or lemmas about the cardinal of   
+nat, nat * nat, and rat.                                                   
+                                                                           
+Since universe polymorphism is not yet available in our framework, we      
+develop a relational theory of cardinals: there is no type for cardinals   
+only relations A #&lt;= B and A #= B to compare the cardinals of two sets     
+(on two possibly different types).                                         
+                                                                           
+          A #&lt;= B == the cardinal of A is smaller or equal to the one of B 
+          A #&gt;= B := B #&lt;= A                                               
+           A #= B == the cardinal of A is equal to the cardinal of B       
+          A #!= B := ~~ (A #= B)                                           
+     finite_set A == the set A is finite                                   
+                  := exists n, A #= `I_n                                   
+                  &lt;-&gt; exists X : {fset T}, A = [set` X]                    
+                  &lt;-&gt; ~ ([set: nat] #&lt;= A)                                 
+   infinite_set A := ~ finite_set A                                        
+      countable A &lt;-&gt; A is countable                                       
+                  := A #&lt;= [set: nat]                                      
+       fset_set A == the finite set corresponding if A : set T is finite,  
+                     set0 otherwise (T : choiceType)                       
+             A.`1 := [fset x.1 | x in A]                                   
+             A.`2 := [fset x.2 | x in A]                                   
+{fimfun aT &gt;-&gt; T} == type of functions with a finite image                 
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

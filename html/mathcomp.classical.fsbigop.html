@@ -6,33 +6,31 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.classical.fsbigop</title>
 <meta name="description" content="Documentation of Coq module mathcomp.classical.fsbigop" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.classical.fsbigop</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrnum</span> <span class="id">ssrint</span> <span class="id">interval</span> <span class="id">finmap</span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html">mathcomp_extra</a></span> <span class="id"><a href="mathcomp.classical.boolp.html">boolp</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html">classical_sets</a></span> <span class="id"><a href="mathcomp.classical.functions.html">functions</a></span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.cardinality.html">cardinality</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                     Finitely-supported big operators                       *)
-(*                                                                            *)
-(*     finite_support idx D F := D `&amp;` F @^-1` [set~ idx]                     *)
-(* \big[op/idx]_(i \in A) F i == iterated application of the operator op      *)
-(*                               with neutral idx over finite_support idx A F *)
-(*         \sum_(i \in A) F i == iterated addition, in ring_scope             *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                    Finitely-supported big operators                       
+                                                                           
+    finite_support idx D F := D `&amp;` F @^-1` [set~ idx]                     
+\big[op/idx]_(i \in A) F i == iterated application of the operator op      
+                              with neutral idx over finite_support idx A F 
+        \sum_(i \in A) F i == iterated addition, in ring_scope             
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "\<span class="id">big</span> [ <span class="id">op</span> / <span class="id">idx</span> ]<span class="id">_</span> ( <span class="id">i</span> '\<span class="kwd">in</span>' <span class="id">A</span> ) <span class="id">F</span>"<br/>
 &nbsp;&nbsp;(<span class="kwd">at</span> <span class="id">level</span> 36, <span class="id">F</span> <span class="kwd">at</span> <span class="id">level</span> 36, <span class="id">op</span>, <span class="id">idx</span> <span class="kwd">at</span> <span class="id">level</span> 10, <span class="id">i</span>, <span class="id">A</span> <span class="kwd">at</span> <span class="id">level</span> 50,<br/>

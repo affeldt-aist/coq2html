@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.hoelder</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.hoelder" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.hoelder</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">HB</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">structures</span>.<br/>
@@ -27,16 +26,15 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.esum.html">esum</a></span> <span class="id"><a href="mathcomp.analysis.measure.html">measure</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_measure.html">lebesgue_measure</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html">lebesgue_integral</a></span> <span class="id"><a href="mathcomp.analysis.numfun.html">numfun</a></span> <span class="id"><a href="mathcomp.analysis.exp.html">exp</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.convex.html">convex</a></span> <span class="id"><a href="mathcomp.analysis.itv.html">itv</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                         Hoelder's Inequality                               *)
-(*                                                                            *)
-(* This file provides Hoelder's inequality.                                   *)
-(*                                                                            *)
-(*           'N[mu]_p[f] := (\int[mu]_x (`|f x| `^ p)%:E) `^ p^-1             *)
-(*                          The corresponding definition is Lnorm.            *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                        Hoelder's Inequality                               
+                                                                           
+This file provides Hoelder's inequality.                                   
+                                                                           
+          'N[mu]_p[f] := (\int[mu]_x (`|f x| `^ p)%:E) `^ p^-1             
+                         The corresponding definition is Lnorm.            
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

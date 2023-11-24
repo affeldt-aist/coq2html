@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.ereal</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.ereal" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.ereal</h1>
 <div class="coq">
 <br/>
@@ -26,39 +25,38 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Export</span> <span class="id"><a href="mathcomp.analysis.constructive_ereal.html">constructive_ereal</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                   Extended real numbers, classical part                    *)
-(*                                                                            *)
-(* This is an addition to the file constructive_ereal.v with classical logic  *)
-(* elements.                                                                  *)
-(*                                                                            *)
-(*  (\sum_(i \in A) f i)%E == finitely supported sum, see fsbigop.v           *)
-(*                                                                            *)
-(*             ereal_sup E == supremum of E                                   *)
-(*             ereal_inf E == infimum of E                                    *)
-(*  ereal_supremums_neq0 S == S has a supremum                                *)
-(*                                                                            *)
-(* Topology of extended real numbers:                                         *)
-(*        ereal_topologicalType R == topology for extended real numbers over  *)
-(*                                   R, a realFieldType                       *)
-(*       ereal_pseudoMetricType R == pseudometric space for extended reals    *)
-(*                                   over R where is a realFieldType; the     *)
-(*                                   distance between x and y is defined by   *)
-(*                                   `|contract x - contract y|               *)
-(*                                                                            *)
-(* Filters:                                                                   *)
-(*                  ereal_dnbhs x == filter on extended real numbers that     *)
-(*                                   corresponds to the deleted neighborhood  *)
-(*                                   x^' if x is a real number and to         *)
-(*                                   predicates that are eventually true if x *)
-(*                                   is +oo/-oo.                              *)
-(*                   ereal_nbhs x == same as ereal_dnbhs where dnbhs is       *)
-(*                                   replaced with nbhs.                      *)
-(*                ereal_loc_seq x == sequence that converges to x in the set  *)
-(*                                   of extended real numbers.                *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                  Extended real numbers, classical part                    
+                                                                           
+This is an addition to the file constructive_ereal.v with classical logic  
+elements.                                                                  
+                                                                           
+ (\sum_(i \in A) f i)%E == finitely supported sum, see fsbigop.v           
+                                                                           
+            ereal_sup E == supremum of E                                   
+            ereal_inf E == infimum of E                                    
+ ereal_supremums_neq0 S == S has a supremum                                
+                                                                           
+Topology of extended real numbers:                                         
+       ereal_topologicalType R == topology for extended real numbers over  
+                                  R, a realFieldType                       
+      ereal_pseudoMetricType R == pseudometric space for extended reals    
+                                  over R where is a realFieldType; the     
+                                  distance between x and y is defined by   
+                                  `|contract x - contract y|               
+                                                                           
+Filters:                                                                   
+                 ereal_dnbhs x == filter on extended real numbers that     
+                                  corresponds to the deleted neighborhood  
+                                  x^' if x is a real number and to         
+                                  predicates that are eventually true if x 
+                                  is +oo/-oo.                              
+                  ereal_nbhs x == same as ereal_dnbhs where dnbhs is       
+                                  replaced with nbhs.                      
+               ereal_loc_seq x == sequence that converges to x in the set  
+                                  of extended real numbers.                
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

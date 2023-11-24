@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.convex</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.convex" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.convex</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrint</span> <span class="id">ssrnum</span> <span class="id">finmap</span>.<br/>
@@ -27,20 +26,19 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.realfun.html">realfun</a></span> <span class="id"><a href="mathcomp.analysis.itv.html">itv</a></span>.<br/>
 <span class="kwd">From</span> <span class="id">HB</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">structures</span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                                Convexity                                   *)
-(*                                                                            *)
-(* This file provides a small account of convexity using convex spaces, to be *)
-(* completed with material from infotheo.                                     *)
-(*                                                                            *)
-(*   isConvexSpace R T == interface for convex spaces                         *)
-(*       ConvexSpace R == structure of convex space                           *)
-(*         a &lt;| t |&gt; b == convexity operator                                  *)
-(* E : lmodType R with R : realDomainType and R : realDomainType are shown to *)
-(* be convex spaces                                                           *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                               Convexity                                   
+                                                                           
+This file provides a small account of convexity using convex spaces, to be 
+completed with material from infotheo.                                     
+                                                                           
+  isConvexSpace R T == interface for convex spaces                         
+      ConvexSpace R == structure of convex space                           
+        a &lt;| t |&gt; b == convexity operator                                  
+E : lmodType R with R : realDomainType and R : realDomainType are shown to 
+be convex spaces                                                           
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "<span class="id">x</span> &lt;| <span class="id">p</span> |&gt; <span class="id">y</span>" (<span class="id">format</span> "<span class="id">x</span>  &lt;| <span class="id">p</span> |&gt;  <span class="id">y</span>", <span class="kwd">at</span> <span class="id">level</span> 49).<br/>
 <br/>

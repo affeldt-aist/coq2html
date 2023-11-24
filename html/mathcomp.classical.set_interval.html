@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.classical.set_interval</title>
 <meta name="description" content="Documentation of Coq module mathcomp.classical.set_interval" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.classical.set_interval</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrnum</span> <span class="id">interval</span>.<br/>
@@ -24,22 +23,21 @@
 <span class="kwd">From</span> <span class="id">HB</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">structures</span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.functions.html">functions</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(* This files contains lemmas about sets and intervals.                       *)
-(*                                                                            *)
-(*              neitv i == the interval i is non-empty                        *)
-(*                         when the support type is a numFieldType, this      *)
-(*                         is equivalent to (i.1 &lt; i.2)%O (lemma neitvE)      *)
-(*   set_itv_infty_set0 == multirule to simplify empty intervals              *)
-(*      line_path a b t := (1 - t) * a + t * b, convexity operator over a     *)
-(*                         numDomainType                                      *)
-(*          ndline_path == line_path a b with the constraint that a &lt; b       *)
-(*         factor a b x := (x - a) / (b - a)                                  *)
-(*             set_itvE == multirule to turn intervals into inequalities      *)
-(*     disjoint_itv i j == intervals i and j are disjoint                     *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+This files contains lemmas about sets and intervals.                       
+                                                                           
+             neitv i == the interval i is non-empty                        
+                        when the support type is a numFieldType, this      
+                        is equivalent to (i.1 &lt; i.2)%O (lemma neitvE)      
+  set_itv_infty_set0 == multirule to simplify empty intervals              
+     line_path a b t := (1 - t) * a + t * b, convexity operator over a     
+                        numDomainType                                      
+         ndline_path == line_path a b with the constraint that a &lt; b       
+        factor a b x := (x - a) / (b - a)                                  
+            set_itvE == multirule to turn intervals into inequalities      
+    disjoint_itv i j == intervals i and j are disjoint                     
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

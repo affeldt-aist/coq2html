@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.trigo</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.trigo" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.trigo</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrint</span> <span class="id">ssrnum</span> <span class="id">matrix</span>.<br/>
@@ -25,32 +24,31 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.nsatz_realtype.html">nsatz_realtype</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.landau.html">landau</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.sequences.html">sequences</a></span> <span class="id"><a href="mathcomp.analysis.derive.html">derive</a></span> <span class="id"><a href="mathcomp.analysis.realfun.html">realfun</a></span> <span class="id"><a href="mathcomp.analysis.exp.html">exp</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                     Theory of trigonometric functions                      *)
-(*                                                                            *)
-(* This file provides the definitions of basic trigonometric functions and    *)
-(* develops their theories.                                                   *)
-(*                                                                            *)
-(*    periodic f T == f is a periodic function of period T                    *)
-(* alternating f T == f is an alternating function of period T                *)
-(*     sin_coeff x == the sequence of coefficients of sin x                   *)
-(*           sin x == the sine function, i.e., lim (series (sin_coeff x))     *)
-(*    sin_coeff' x == the sequence of odd coefficients of sin x               *)
-(*     cos_coeff x == the sequence of coefficients of cos x                   *)
-(*           cos x == the cosine function, i.e., lim (series (cos_coeff x))   *)
-(*    cos_coeff' x == the sequence of even coefficients of cos x              *)
-(*              pi == pi                                                      *)
-(*           tan x == the tangent function                                    *)
-(*          acos x == the arccos function                                     *)
-(*          asin x == the arcsin function                                     *)
-(*          atan x == the arctangent function                                 *)
-(*                                                                            *)
-(* Acknowledgments: the proof of cos 2 &lt; 0 is inspired from HOL-light, some   *)
-(* proofs of trigonometric relations are taken from                           *)
-(* https://github.com/affeldt-aist/coq-robot.                                 *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                    Theory of trigonometric functions                      
+                                                                           
+This file provides the definitions of basic trigonometric functions and    
+develops their theories.                                                   
+                                                                           
+   periodic f T == f is a periodic function of period T                    
+alternating f T == f is an alternating function of period T                
+    sin_coeff x == the sequence of coefficients of sin x                   
+          sin x == the sine function, i.e., lim (series (sin_coeff x))     
+   sin_coeff' x == the sequence of odd coefficients of sin x               
+    cos_coeff x == the sequence of coefficients of cos x                   
+          cos x == the cosine function, i.e., lim (series (cos_coeff x))   
+   cos_coeff' x == the sequence of even coefficients of cos x              
+             pi == pi                                                      
+          tan x == the tangent function                                    
+         acos x == the arccos function                                     
+         asin x == the arcsin function                                     
+         atan x == the arctangent function                                 
+                                                                           
+Acknowledgments: the proof of cos 2 &lt; 0 is inspired from HOL-light, some   
+proofs of trigonometric relations are taken from                           
+https://github.com/affeldt-aist/coq-robot.                                 
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

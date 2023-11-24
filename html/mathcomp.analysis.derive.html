@@ -6,42 +6,40 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.derive</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.derive" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.derive</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrnum</span> <span class="id">matrix</span> <span class="id">interval</span>.<br/>
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.mathcomp_extra.html">mathcomp_extra</a></span> <span class="id"><a href="mathcomp.classical.boolp.html">boolp</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html">classical_sets</a></span> <span class="id"><a href="mathcomp.classical.functions.html">functions</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.prodnormedzmodule.html">prodnormedzmodule</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.landau.html">landau</a></span> <span class="id"><a href="mathcomp.analysis.forms.html">forms</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(* This file provides a theory of differentiation. It includes the standard   *)
-(* rules of differentiation (differential of a sum, of a product, of          *)
-(* exponentiation, of the inverse, etc.) as well as standard theorems (the    *)
-(* Extreme Value Theorem, Rolle's theorem, the Mean Value Theorem).           *)
-(*                                                                            *)
-(* Parsable notations (in all of the following, f is not supposed to be       *)
-(* differentiable):                                                           *)
-(*               'd f x == the differential of a function f at a point x      *)
-(*   differentiable f x == the function f is differentiable at a point x      *)
-(*               'J f x == the Jacobian of f at a point x                     *)
-(*               'D_v f == the directional derivative of f along v            *)
-(*      derivable f a v == the function f is derivable at a with direction v  *)
-(*                         The type of f is V -&gt; W with V W : normedModType R *)
-(*                         and R : numFieldType                               *)
-(*               f^`()  == the derivative of f of domain R                    *)
-(*               f^`(n) == the nth derivative of f of domain R                *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+This file provides a theory of differentiation. It includes the standard   
+rules of differentiation (differential of a sum, of a product, of          
+exponentiation, of the inverse, etc.) as well as standard theorems (the    
+Extreme Value Theorem, Rolle's theorem, the Mean Value Theorem).           
+                                                                           
+Parsable notations (in all of the following, f is not supposed to be       
+differentiable):                                                           
+              'd f x == the differential of a function f at a point x      
+  differentiable f x == the function f is differentiable at a point x      
+              'J f x == the Jacobian of f at a point x                     
+              'D_v f == the directional derivative of f along v            
+     derivable f a v == the function f is derivable at a with direction v  
+                        The type of f is V -&gt; W with V W : normedModType R 
+                        and R : numFieldType                               
+              f^`()  == the derivative of f of domain R                    
+              f^`(n) == the nth derivative of f of domain R                
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

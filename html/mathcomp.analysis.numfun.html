@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.numfun</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.numfun" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.numfun</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">HB</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">structures</span>.<br/>
@@ -25,21 +24,20 @@
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.classical.functions.html">functions</a></span> <span class="id"><a href="mathcomp.classical.cardinality.html">cardinality</a></span> <span class="id"><a href="mathcomp.classical.set_interval.html">set_interval</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.sequences.html">sequences</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(* This file provides definitions and lemmas about numerical functions.       *)
-(*                                                                            *)
-(*    {nnfun T &gt;-&gt; R} == type of non-negative functions                       *)
-(*              f ^\+ == the function formed by the non-negative outputs      *)
-(*                       of f (from a type to the type of extended real       *)
-(*                       numbers) and 0 otherwise                             *)
-(*                       rendered as f ⁺ with company-coq (U+207A)            *)
-(*              f ^\- == the function formed by the non-positive outputs      *)
-(*                       of f and 0 o.w.                                      *)
-(*                       rendered as f ⁻ with company-coq (U+207B)            *)
-(*              \1_ A == indicator function 1_A                               *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+This file provides definitions and lemmas about numerical functions.       
+                                                                           
+   {nnfun T &gt;-&gt; R} == type of non-negative functions                       
+             f ^\+ == the function formed by the non-negative outputs      
+                      of f (from a type to the type of extended real       
+                      numbers) and 0 otherwise                             
+                      rendered as f ⁺ with company-coq (U+207A)            
+             f ^\- == the function formed by the non-positive outputs      
+                      of f and 0 o.w.                                      
+                      rendered as f ⁻ with company-coq (U+207B)            
+             \1_ A == indicator function 1_A                               
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>

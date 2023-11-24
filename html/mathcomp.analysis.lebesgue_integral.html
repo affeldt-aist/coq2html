@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.lebesgue_integral</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.lebesgue_integral" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.lebesgue_integral</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">HB</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">structures</span>.<br/>
@@ -26,48 +25,47 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.sequences.html">sequences</a></span> <span class="id"><a href="mathcomp.analysis.real_interval.html">real_interval</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.esum.html">esum</a></span> <span class="id"><a href="mathcomp.analysis.measure.html">measure</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_measure.html">lebesgue_measure</a></span> <span class="id"><a href="mathcomp.analysis.numfun.html">numfun</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                            Lebesgue Integral                               *)
-(*                                                                            *)
-(* This file contains a formalization of the Lebesgue integral. It starts     *)
-(* with simple functions and their integral, provides basic operations        *)
-(* (addition, etc.), and proves the properties of their integral              *)
-(* (semi-linearity, non-decreasingness). It then defines the integral of      *)
-(* measurable functions, proves the approximation theorem, the properties of  *)
-(* their integral (semi-linearity, non-decreasingness), the monotone          *)
-(* convergence theorem, and Fatou's lemma. Finally, it proves the linearity   *)
-(* properties of the integral, the dominated convergence theorem and Fubini's *)
-(* theorem.                                                                   *)
-(*                                                                            *)
-(* Main reference:                                                            *)
-(* - Daniel Li, Intégration et applications, 2016                             *)
-(*                                                                            *)
-(*         {mfun T &gt;-&gt; R} == type of real-valued measurable functions         *)
-(*         {sfun T &gt;-&gt; R} == type of simple functions                         *)
-(*       {nnsfun T &gt;-&gt; R} == type of non-negative simple functions            *)
-(*           cst_nnsfun r == constant simple function                         *)
-(*                nnsfun0 := cst_nnsfun 0                                     *)
-(*         sintegral mu f == integral of the function f with the measure mu   *)
-(*  \int[mu]_(x in D) f x == integral of the measurable function f over the   *)
-(*                           domain D with measure mu                         *)
-(*         \int[mu]_x f x := \int[mu]_(x in setT) f x                         *)
-(*         dyadic_itv n k == the interval                                     *)
-(*                           `[(k%:R * 2 ^- n), (k.+1%:R * 2 ^- n)[           *)
-(*             approx D f == nondecreasing sequence of functions that         *)
-(*                           approximates f over D using dyadic intervals     *)
-(*       Rintegral mu D f := fine (\int[mu]_(x in D) f x).                    *)
-(*     mu.-integrable D f == f is measurable over D and the integral of f     *)
-(*                           w.r.t. D is &lt; +oo                                *)
-(*            ae_eq D f g == f is equal to g almost everywhere                *)
-(*               m1 \x m2 == product measure over T1 * T2, m1 is a measure    *)
-(*                           measure over T1, and m2 is a sigma finite        *)
-(*                           measure over T2                                  *)
-(*              m1 \x^ m2 == product measure over T1 * T2, m2 is a measure    *)
-(*                           measure over T1, and m1 is a sigma finite        *)
-(*                           measure over T2                                  *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                           Lebesgue Integral                               
+                                                                           
+This file contains a formalization of the Lebesgue integral. It starts     
+with simple functions and their integral, provides basic operations        
+(addition, etc.), and proves the properties of their integral              
+(semi-linearity, non-decreasingness). It then defines the integral of      
+measurable functions, proves the approximation theorem, the properties of  
+their integral (semi-linearity, non-decreasingness), the monotone          
+convergence theorem, and Fatou's lemma. Finally, it proves the linearity   
+properties of the integral, the dominated convergence theorem and Fubini's 
+theorem.                                                                   
+                                                                           
+Main reference:                                                            
+- Daniel Li, Intégration et applications, 2016                             
+                                                                           
+        {mfun T &gt;-&gt; R} == type of real-valued measurable functions         
+        {sfun T &gt;-&gt; R} == type of simple functions                         
+      {nnsfun T &gt;-&gt; R} == type of non-negative simple functions            
+          cst_nnsfun r == constant simple function                         
+               nnsfun0 := cst_nnsfun 0                                     
+        sintegral mu f == integral of the function f with the measure mu   
+ \int[mu]_(x in D) f x == integral of the measurable function f over the   
+                          domain D with measure mu                         
+        \int[mu]_x f x := \int[mu]_(x in setT) f x                         
+        dyadic_itv n k == the interval                                     
+                          `[(k%:R * 2 ^- n), (k.+1%:R * 2 ^- n)[           
+            approx D f == nondecreasing sequence of functions that         
+                          approximates f over D using dyadic intervals     
+      Rintegral mu D f := fine (\int[mu]_(x in D) f x).                    
+    mu.-integrable D f == f is measurable over D and the integral of f     
+                          w.r.t. D is &lt; +oo                                
+           ae_eq D f g == f is equal to g almost everywhere                
+              m1 \x m2 == product measure over T1 * T2, m1 is a measure    
+                          measure over T1, and m2 is a sigma finite        
+                          measure over T2                                  
+             m1 \x^ m2 == product measure over T1 * T2, m2 is a measure    
+                          measure over T1, and m1 is a sigma finite        
+                          measure over T2                                  
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>
@@ -746,9 +744,7 @@ Qed.</div>
 Qed.</div>
 <span class="kwd">End</span> <span class="id">mulem_ge0</span>.<br/>
 <br/>
-<pre>
-(**********************************)
-
+<pre class="ssrdoc">
 Section simple_fun_raw_integral.
 Local Open Scope ereal_scope.
 Variables (T : Type) (R : numDomainType) (mu : set T -&gt; \bar R) (f : T -&gt; R).
@@ -786,7 +782,7 @@ rewrite fsbigU//=; last by move=&gt; t [-&gt;]//.
 rewrite !fsbig_set1 mul0e add0e mul1e.
 by rewrite preimage_indic ifT ?inE// ifN ?notin_set.
 Qed.
-(* NB: not used *)
+NB: not used 
 Lemma sintegralEnnsfun (f : {nnsfun T &gt;-&gt; R}) : sintegral mu f =
   (\sum_(x \in [set r | r &gt; 0]%R) (x%:E * mu (f @^-1` [set x])))%E.
 Proof.
@@ -1268,7 +1264,7 @@ Let A n k := if (k &lt; n * 2 ^ n)%N then
 Let B n := D `&amp;` [set x | n%:R%:E &lt;= f x]%E.
 Definition approx : (T -&gt; R)^nat := fun n x =&gt;
   \sum_(k &lt; n * 2 ^ n) k%:R * 2 ^- n * \1_(A n k) x + n%:R * \1_(B n) x.
-(* technical properties of the sets A and B *)
+technical properties of the sets A and B 
 Let mA n k : measurable (A n k).
 Proof.
 rewrite /A; case: ifPn =&gt; [kn|_]//; rewrite -preimage_comp.
@@ -2144,8 +2140,8 @@ rewrite monotone_convergence //.
 - by move=&gt; x Dx m n mn; apply: lee_sum_nneg_natr =&gt; // k _ _; exact: f0.
 Qed.
 End integral_nneseries.
-(* generalization of ge0_integralZl_EFin to a constant potentially +oo
-   using the monotone convergence theorem *)
+generalization of ge0_integralZl_EFin to a constant potentially +oo
+   using the monotone convergence theorem 
 Section ge0_integralZl.
 Local Open Scope ereal_scope.
 Context d (T : measurableType d) (R : realType).
@@ -4168,10 +4164,8 @@ rewrite h set_neq_lt setIUr measureU//.
   by move=&gt; /lt_trans =&gt; /[apply]; rewrite ltxx.
 Qed.
 End integral_ae_eq.
-(******************************************************************************)</pre>
-<pre>
-(******************************************************************************)
-
+</pre>
+<pre class="ssrdoc">
 Section measurable_section.
 Context d1 d2 (T1 : measurableType d1) (T2 : measurableType d2) (R : realType).
 Implicit Types (A : set (T1 * T2)).
@@ -4191,10 +4185,10 @@ Context d1 d2 (T1 : measurableType d1) (T2 : measurableType d2) (R : realType).
 Implicit Types A : set (T1 * T2).
 Section xsection.
 Variables (pt2 : T2) (m2 : T1 -&gt; {measure set T2 -&gt; \bar R}).
-(* the generalization from m2 : {measure set T2 -&gt; \bar R}t to
+the generalization from m2 : {measure set T2 -&gt; \bar R}t to
    T1 -&gt; {measure set T2 -&gt; \bar R} is needed to develop the theory
    of kernels; the original type was sufficient for the development
-   of the theory of integration  *)
+   of the theory of integration  
 Let phi A x := m2 x (xsection A x).
 Let B := [set A | measurable A /\ measurable_fun setT (phi A)].
 Lemma xsection_ndseq_closed : ndseq_closed B.
@@ -5004,7 +4998,7 @@ Variable m2 : {sigma_finite_measure set T2 -&gt; \bar R}.
 Variable f : T1 * T2 -&gt; \bar R.
 Hypothesis imf : (m1 \x m2).-integrable setT f.
 Let mf : measurable_fun setT f. Proof. exact: measurable_int imf. Qed.
-(* NB: only relies on mf *)
+NB: only relies on mf 
 Lemma fubini1a :
   (m1 \x m2).-integrable setT f &lt;-&gt; \int[m1]_x \int[m2]_y `|f (x, y)| &lt; +oo.
 Proof.
@@ -5029,7 +5023,7 @@ Proof.
 apply: (measurable_fun_fubini_tonelli_G (abse \o f)) =&gt; //=.
 exact: measurableT_comp.
 Qed.
-(* /NB: only relies on mf *)
+/NB: only relies on mf 
 Lemma ae_integrable1 :
   {ae m1, forall x, m2.-integrable setT (fun y =&gt; f (x, y))}.
 Proof.

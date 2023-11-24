@@ -6,17 +6,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module mathcomp.analysis.charge</title>
 <meta name="description" content="Documentation of Coq module mathcomp.analysis.charge" />
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-  <link rel="stylesheet" href="../css/texmath.css">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="../texmath.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
 
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="coq2html.js"> </script>
 </head>
 
-<body onload="hideAll('proofscript')">
+<body onload="init('proofscript')">
 <h1 class="title">Module mathcomp.analysis.charge</h1>
 <div class="coq">
 <span class="kwd">From</span> <span class="id">mathcomp</span> <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id">all_ssreflect</span> <span class="id">ssralg</span> <span class="id">ssrnum</span> <span class="id">ssrint</span> <span class="id">interval</span>.<br/>
@@ -27,52 +26,51 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.reals.html">reals</a></span> <span class="id"><a href="mathcomp.analysis.ereal.html">ereal</a></span> <span class="id"><a href="mathcomp.analysis.signed.html">signed</a></span> <span class="id"><a href="mathcomp.analysis.topology.html">topology</a></span> <span class="id"><a href="mathcomp.analysis.numfun.html">numfun</a></span> <span class="id"><a href="mathcomp.analysis.normedtype.html">normedtype</a></span> <span class="id"><a href="mathcomp.analysis.sequences.html">sequences</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="mathcomp.analysis.esum.html">esum</a></span> <span class="id"><a href="mathcomp.analysis.measure.html">measure</a></span> <span class="id"><a href="mathcomp.analysis.realfun.html">realfun</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_measure.html">lebesgue_measure</a></span> <span class="id"><a href="mathcomp.analysis.lebesgue_integral.html">lebesgue_integral</a></span>.<br/>
 <br/>
-<pre>
-(******************************************************************************)
-(*                               Charges                                      *)
-(*                                                                            *)
-(* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
-(*                                                                            *)
-(* This file contains a formalization of charges (a.k.a. signed measures) and *)
-(* their theory (Hahn decomposition theorem, etc.).                           *)
-(*                                                                            *)
-(* * Structures for functions on classes of sets                              *)
-(* {additive_charge set T -&gt; \bar R} == notation for additive charges where   *)
-(*                              T is a semiring of sets and R is a            *)
-(*                              numFieldType                                  *)
-(*                              The HB class is AdditiveCharge.               *)
-(*  {charge set T -&gt; \bar R} == type of charges over T a semiring of sets     *)
-(*                              where R is a numFieldType                     *)
-(*                              The HB class is Charge.                       *)
-(*                  isCharge == factory corresponding to the "textbook        *)
-(*                              definition" of charges                        *)
-(*                                                                            *)
-(* * Instances of mathematical structures                                     *)
-(*  measure_of_charge nu nu0 == measure corresponding to the charge nu, nu0   *)
-(*                              is a proof that nu is non-negative            *)
-(*              crestr nu mD == restriction of the charge nu to the domain D  *)
-(*                              where mD is a proof that D is measurable      *)
-(*             crestr0 nu mD == csrestr nu mD that returns 0 for              *)
-(*                              non-measurable sets                           *)
-(*                     czero == zero charge                                   *)
-(*               cscale r nu == charge nu scaled by a factor r : R            *)
-(*                                                                            *)
-(* * Theory                                                                   *)
-(*         nu.-positive_set P == P is a positive set with nu a charge         *)
-(*         nu.-negative_set N == N is a negative set with nu a charge         *)
-(* hahn_decomposition nu P N == the full set can be decomposed in P and N,    *)
-(*                              a positive set and a negative set for the     *)
-(*                              charge nu                                     *)
-(*        jordan_pos nu nuPN == the charge obtained by restricting the charge *)
-(*                              nu to the positive set P of the Hahn          *)
-(*                              decomposition nuPN: hahn_decomposition nu P N *)
-(*        jordan_neg nu nuPN == the charge obtained by restricting the charge *)
-(*                              nu to the positive set N of the Hahn          *)
-(*                              decomposition nuPN: hahn_decomposition nu P N *)
-(*              'd nu '/d mu == Radon-Nikodym derivative of nu w.r.t. mu      *)
-(*                              (the scope is charge_scope)                   *)
-(*                                                                            *)
-(******************************************************************************)</pre>
+<pre class="ssrdoc">
+                              Charges                                      
+                                                                           
+NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   
+                                                                           
+This file contains a formalization of charges (a.k.a. signed measures) and 
+their theory (Hahn decomposition theorem, etc.).                           
+                                                                           
+* Structures for functions on classes of sets                              
+{additive_charge set T -&gt; \bar R} == notation for additive charges where   
+                             T is a semiring of sets and R is a            
+                             numFieldType                                  
+                             The HB class is AdditiveCharge.               
+ {charge set T -&gt; \bar R} == type of charges over T a semiring of sets     
+                             where R is a numFieldType                     
+                             The HB class is Charge.                       
+                 isCharge == factory corresponding to the "textbook        
+                             definition" of charges                        
+                                                                           
+* Instances of mathematical structures                                     
+ measure_of_charge nu nu0 == measure corresponding to the charge nu, nu0   
+                             is a proof that nu is non-negative            
+             crestr nu mD == restriction of the charge nu to the domain D  
+                             where mD is a proof that D is measurable      
+            crestr0 nu mD == csrestr nu mD that returns 0 for              
+                             non-measurable sets                           
+                    czero == zero charge                                   
+              cscale r nu == charge nu scaled by a factor r : R            
+                                                                           
+* Theory                                                                   
+        nu.-positive_set P == P is a positive set with nu a charge         
+        nu.-negative_set N == N is a negative set with nu a charge         
+hahn_decomposition nu P N == the full set can be decomposed in P and N,    
+                             a positive set and a negative set for the     
+                             charge nu                                     
+       jordan_pos nu nuPN == the charge obtained by restricting the charge 
+                             nu to the positive set P of the Hahn          
+                             decomposition nuPN: hahn_decomposition nu P N 
+       jordan_neg nu nuPN == the charge obtained by restricting the charge 
+                             nu to the positive set N of the Hahn          
+                             decomposition nuPN: hahn_decomposition nu P N 
+             'd nu '/d mu == Radon-Nikodym derivative of nu w.r.t. mu      
+                             (the scope is charge_scope)                   
+                                                                           
+</pre>
 <br/>
 <span class="kwd">Reserved</span> <span class="kwd">Notation</span> "{ '<span class="id">additive_charge</span>' '<span class="id">set</span>' <span class="id">T</span> '-&gt;' '\<span class="id">bar</span>' <span class="id">R</span> }"<br/>
 &nbsp;&nbsp;(<span class="kwd">at</span> <span class="id">level</span> 36, <span class="id">T</span>, <span class="id">R</span> <span class="kwd">at</span> <span class="id">next</span> <span class="id">level</span>,<br/>
