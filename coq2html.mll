@@ -286,7 +286,7 @@ let path = ident ("." ident)*
 let start_proof = ("Proof" space* ".") | ("Proof" space+ "with") | ("Next" space+ "Obligation.")
 let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
 let globkind = ['a'-'z']+
-let xref = (['A'-'Z' 'a'-'z' '0'-'9' '_' '.'] | utf8)+ | "<>"
+let xref = (['A'-'Z' 'a'-'z' '0'-'9' '_' '.' '\'' ':' '[' ']' '*' '=' '+'] | utf8)+ | "<>"
 let integer = ['0'-'9']+
 
 rule coq_bol = parse

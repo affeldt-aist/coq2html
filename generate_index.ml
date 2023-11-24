@@ -9,7 +9,7 @@ let alphabets = (* ['A'; ...; 'Z'; '_'] *)
     if code <= Char.code 'Z' then iter (succ code) (Char.chr code :: store)
     else store
   in
-  List.rev ('_' :: iter (Char.code 'A') [])
+  List.rev ('*' :: '_' :: iter (Char.code 'A') [])
 
 let write_html_file txt filename =
   let oc = open_out filename in
@@ -76,7 +76,14 @@ let generate_topfile output_dir xrefs =
   write_html_file body (Filename.concat output_dir "index.html")
 
 let is_initial c s =
-  if s = "" then false else Char.uppercase_ascii (String.get s 0) = c
+  if s = "" then false else
+    match c, String.get s 0 with
+    | _, '_' -> c = '_'
+    | _, ('a'..'z' as s0) -> Char.uppercase_ascii s0 = c
+    | _, ('A'..'Z' as s0) -> s0 = c
+    | '*', _ -> true
+    | _, _ -> false
+
 
 let generate output_dir xref_table xref_modules =
   let indexed_items =
