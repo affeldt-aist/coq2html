@@ -91,6 +91,8 @@ let generate output_dir xref_table xref_modules =
         let items =
           Hashtbl.fold (fun (name, pos) xref store ->
             match xref with
+            | Def (path, "binder") -> (*ignore binders*)
+               store
             | Def (path, typ) when is_initial c path ->
                let linkname = !%"%s.html#%s" name path in
                let module_ = name in
