@@ -441,7 +441,7 @@ and ssr_doc_bol = parse
 
 and ssr_doc = parse
   (* Leave verbatim mode *)
-  | space* ("(***" "*"+ "***)" "\n" as s)
+  | space* ("(***" "*"+ "***)" as s)
       { fprintf !oc "%s" s;
         () }
   | "\n"

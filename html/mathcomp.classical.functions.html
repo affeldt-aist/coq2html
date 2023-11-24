@@ -132,8 +132,8 @@
 (*                           a ringType, comRingType, or lmodType.            *)
 (*                   fctE == multi-rule for fct                               *)
 (*                                                                            *)
-(******************************************************************************)
-</pre>
+(******************************************************************************)</pre>
+<br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>
 <span class="id">Unset</span> <span class="id">Printing</span> <span class="kwd">Implicit</span> <span class="id">Defensive</span>.<br/>
@@ -393,8 +393,8 @@
 <pre>
 (**********)
 (* Theory *)
-(**********)
-</pre>
+(**********)</pre>
+<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="phant_funS">phant_funS</a></span> <span class="id">aT</span> <span class="id">rT</span> (<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>) (<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>)<br/>
 &nbsp;&nbsp;(<span class="id">f</span> : {<span class="kwd">fun</span> <span class="id">A</span> &gt;-&gt; <span class="id">B</span>}) <span class="id">of</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssreflect.html#phantom">phantom</a></span> (<span class="id">_</span> -&gt; <span class="id">_</span>) <span class="id">f</span> := @<span class="id"><a href="mathcomp.classical.functions.html#funS">funS</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">f</span>.<br/>
 <span class="kwd">Notation</span> "'<span class="id">funS_</span>  <span class="id">f</span>" := (<span class="id"><a href="mathcomp.classical.functions.html#phant_funS">phant_funS</a></span> (<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssreflect.html#Phantom">Phantom</a></span> (<span class="id">_</span> -&gt; <span class="id">_</span>) <span class="id">f</span>))<br/>
@@ -514,8 +514,8 @@ Qed.</div>
 <pre>
 (**********************)
 (* Structure Equality *)
-(**********************)
-</pre>
+(**********************)</pre>
+<br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="funP">funP</a></span> {<span class="id">aT</span> <span class="id">rT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} {<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>} (<span class="id">f</span> <span class="id">g</span> : {<span class="kwd">fun</span> <span class="id">A</span> &gt;-&gt; <span class="id">B</span>}) :<br/>
 &nbsp;&nbsp;<span class="id">f</span> = <span class="id">g</span> &lt;-&gt; <span class="id">f</span> =1 <span class="id">g</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof8')">Proof.</span></div>
@@ -529,8 +529,8 @@ Qed.</div>
 <pre>
 (************************)
 (* Preliminary Builders *)
-(************************)
-</pre>
+(************************)</pre>
+<br/>
 <span class="id"><a name="Inv_Can">HB.factory</a></span> <span class="kwd">Record</span> <span class="id">Inv_Can</span> {<span class="id">aT</span> <span class="id">rT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} (<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>) <span class="id">of</span> <span class="id"><a href="mathcomp.classical.functions.html#Inv">Inv</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">f</span> :=<br/>
 &nbsp;&nbsp;{ <span class="id">funK</span> : {<span class="kwd">in</span> <span class="id">A</span>, <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#cancel">cancel</a></span> <span class="id">f</span> <span class="id">f</span>^-1} }.<br/>
 <span class="id"><a name="Builders_105">HB.builders</a></span> <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span>} <span class="id">A</span> (<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>) <span class="id">of</span> @<span class="id"><a href="mathcomp.classical.functions.html#Inv_Can">Inv_Can</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">A</span> <span class="id">f</span>.<br/>
@@ -562,8 +562,8 @@ Qed.</div>
 <pre>
 (*********************)
 (* Trivial instances *)
-(*********************)
-</pre>
+(*********************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="OInverse">OInverse</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span> : <span class="kwd">Type</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} {<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>}.<br/>
 <br/>
@@ -870,8 +870,8 @@ Qed.</div>
 <pre>
 (************)
 (* Builders *)
-(************)
-</pre>
+(************)</pre>
+<br/>
 <span class="id"><a name="CanV">HB.factory</a></span> <span class="kwd">Record</span> <span class="id">CanV</span> {<span class="id">aT</span> <span class="id">rT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} {<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>} (<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>) :=<br/>
 &nbsp;&nbsp;{ <span class="id">inv</span>; <span class="id">invS</span> : {<span class="id">homo</span> <span class="id">inv</span> : <span class="id">x</span> / <span class="id">B</span> <span class="id">x</span> &gt;-&gt; <span class="id">A</span> <span class="id">x</span>}; <span class="id">invK</span> : {<span class="kwd">in</span> <span class="id">B</span>, <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#cancel">cancel</a></span> <span class="id">inv</span> <span class="id">f</span>}; }.<br/>
 <span class="id"><a name="Builders_424">HB.builders</a></span> <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} {<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>} (<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>) <span class="id">of</span> <span class="id"><a href="mathcomp.classical.functions.html#CanV">CanV</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">A</span> <span class="id">B</span> <span class="id">f</span>.<br/>
@@ -962,8 +962,8 @@ Qed.</div>
 <pre>
 (**********)
 (* Fun in *)
-(**********)
-</pre>
+(**********)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="surj_oinv">surj_oinv</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} {<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>} {<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>} (<span class="id">fsurj</span> : <span class="id"><a href="mathcomp.classical.functions.html#set_surj">set_surj</a></span> <span class="id">A</span> <span class="id">B</span> <span class="id">f</span>).<br/>
 <br/>
@@ -1044,8 +1044,8 @@ Qed.</div>
 <pre>
 (*********************)
 (* Partial injection *)
-(*********************)
-</pre>
+(*********************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="split">split</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span>} (<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>) (<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>).<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="split_">split_</a></span> (<span class="id">dflt</span> : <span class="id"><a href="mathcomp.classical.functions.html#split.rT">rT</a></span> -&gt; <span class="id"><a href="mathcomp.classical.functions.html#split.aT">aT</a></span>) (<span class="id">f</span> : <span class="id"><a href="mathcomp.classical.functions.html#split.aT">aT</a></span> -&gt; <span class="id"><a href="mathcomp.classical.functions.html#split.rT">rT</a></span>) := <span class="id">f</span>.<br/>
@@ -1094,8 +1094,8 @@ Qed.</div>
 <pre>
 (*****************)
 (* More Builders *)
-(*****************)
-</pre>
+(*****************)</pre>
+<br/>
 <span class="id"><a name="Inj">HB.factory</a></span> <span class="kwd">Record</span> <span class="id">Inj</span> {<span class="id">aT</span> <span class="id">rT</span>} (<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>) (<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>) :=<br/>
 &nbsp;&nbsp;&nbsp;{ <span class="id">inj</span> : {<span class="kwd">in</span> <span class="id">A</span> &amp;, <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#injective">injective</a></span> <span class="id">f</span>} }.<br/>
 <span class="id"><a name="Builders_541">HB.builders</a></span> <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span>} <span class="id">A</span> (<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>) <span class="id">of</span> <span class="id"><a href="mathcomp.classical.functions.html#Inj">Inj</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">A</span> <span class="id">f</span>.<br/>
@@ -1146,8 +1146,8 @@ Qed.</div>
 <pre>
 (********************)
 (* Simple Factories *)
-(********************)
-</pre>
+(********************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="Pinj">Pinj</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} {<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>} (<span class="id">finj</span> : {<span class="kwd">in</span> <span class="id">A</span> &amp;, <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#injective">injective</a></span> <span class="id">f</span>}).<br/>
 #[<span class="id">local</span>] <span class="id">HB.instance</span> <span class="kwd">Definition</span> <span class="id">_</span> := <span class="id"><a href="mathcomp.classical.functions.html#Build">Inj.Build</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="mathcomp.classical.functions.html#Pinj.f">f</a></span> <span class="id"><a href="mathcomp.classical.functions.html#Pinj.finj">finj</a></span>.<br/>
@@ -1265,21 +1265,20 @@ Qed.</div>
 <pre>
 (*************)
 (* Instances *)
-(*************)
-</pre>
+(*************)</pre>
+<br/>
 <pre>
 (*************************************)
 (* The identity is a split bijection *)
-(*************************************)
-</pre>
+(*************************************)</pre>
+<br/>
 <span class="id"><a name="hb_instance_665">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> <span class="id">T</span> <span class="id">A</span> := @<span class="id"><a href="mathcomp.classical.functions.html#Build">Can2.Build</a></span> <span class="id">T</span> <span class="id">T</span> <span class="id">A</span> <span class="id">A</span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#idfun">idfun</a></span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#idfun">idfun</a></span><br/>
 &nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> =&gt; <span class="id">y</span>) (<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> =&gt; <span class="id">y</span>) (<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#erefl">erefl</a></span>) (<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#erefl">erefl</a></span>).<br/>
 <br/>
 <pre>
 (**********************************************************)
 (* Iteration preserves Fun, Injectivity, and Surjectivity *)
-(**********************************************************)
-</pre>
+(**********************************************************)</pre>
 <span class="kwd">Section</span> <span class="id"><a name="iter_inv">iter_inv</a></span>.<br/>
 <br/>
 <span class="kwd">Context</span> {<span class="id">aT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>}.<br/>
@@ -1358,8 +1357,8 @@ Qed.</div>
 <pre>
 (**********)
 (* Unbind *)
-(**********)
-</pre>
+(**********)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="Unbind">Unbind</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} {<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>} (<span class="id">dflt</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>).<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="unbind">unbind</a></span> (<span class="id">f</span> : <span class="id"><a href="mathcomp.classical.functions.html#Unbind.aT">aT</a></span> -&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="mathcomp.classical.functions.html#Unbind.rT">rT</a></span>) <span class="id">x</span> := <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#odflt">odflt</a></span> (<span class="id"><a href="mathcomp.classical.functions.html#Unbind.dflt">dflt</a></span> <span class="id">x</span>) (<span class="id">f</span> <span class="id">x</span>).<br/>
@@ -1430,8 +1429,8 @@ Qed.</div>
 <pre>
 (*********)
 (* Odflt *)
-(*********)
-</pre>
+(*********)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="Odflt">Odflt</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">T</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">T</span>} (<span class="id">x</span> : <span class="id">T</span>).<br/>
 <br/>
@@ -1450,8 +1449,8 @@ Qed.</div>
 <pre>
 (************)
 (* Subtypes *)
-(************)
-</pre>
+(************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="SubType">SubType</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">T</span> : <span class="kwd">Type</span>} {<span class="id">P</span> : <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#pred">pred</a></span> <span class="id">T</span>} (<span class="id">sT</span> : <span class="id">subType</span> <span class="id">P</span>) (<span class="id">x0</span> : <span class="id">sT</span>).<br/>
 <br/>
@@ -1485,8 +1484,8 @@ Qed.</div>
 <pre>
 (***********)
 (* To setT *)
-(***********)
-</pre>
+(***********)</pre>
+<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="to_setT">to_setT</a></span> {<span class="id">T</span>} (<span class="id">x</span> : <span class="id">T</span>) : [<span class="id">set</span>: <span class="id">T</span>] :=<br/>
 &nbsp;&nbsp;@<span class="id"><a href="mathcomp.classical.classical_sets.html#SigSub">SigSub</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">x</span> (<span class="id"><a href="mathcomp.classical.classical_sets.html#mem_set">mem_set</a></span> <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Logic.html#I">I</a></span> : <span class="id">x</span> \<span class="kwd">in</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span>).<br/>
 <span class="id"><a name="hb_instance_843">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> <span class="id">T</span> := <span class="id"><a href="mathcomp.classical.functions.html#Build">Can.Build</a></span> <span class="id">T</span> [<span class="id">set</span>: <span class="id">T</span>] <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> <span class="id"><a href="mathcomp.classical.functions.html#to_setT">to_setT</a></span><br/>
@@ -1504,8 +1503,8 @@ Qed.</div>
 <pre>
 (**********)
 (* Subfun *)
-(**********)
-</pre>
+(**********)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="subfun">subfun</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">T</span>} {<span class="id">A</span> <span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">T</span>}.<br/>
 <br/>
@@ -1568,8 +1567,7 @@ Qed.</div>
 <pre>
 (*************)
 (* Inclusion *)
-(*************)
-</pre>
+(*************)</pre>
 <span class="kwd">Section</span> <span class="id"><a name="incl">incl</a></span>.<br/>
 <span class="kwd">Context</span>  {<span class="id">T</span>} {<span class="id">A</span> <span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">T</span>}.<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="incl">incl</a></span> (<span class="id">AB</span> : <span class="id"><a href="mathcomp.classical.functions.html#incl.A">A</a></span> `&lt;=` <span class="id"><a href="mathcomp.classical.functions.html#incl.B">B</a></span>) := @<span class="id">id</span> <span class="id"><a href="mathcomp.classical.functions.html#incl.T">T</a></span>.<br/>
@@ -1593,8 +1591,8 @@ Qed.</div>
 <pre>
 (*******************)
 (* Ad hoc function *)
-(*******************)
-</pre>
+(*******************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="mkfun">mkfun</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">aT</span>} {<span class="id">rT</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">aT</span>} {<span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">rT</span>}.<br/>
 <span class="kwd">Notation</span> <span class="id"><a name="isfun">isfun</a></span> <span class="id">f</span> := {<span class="id">homo</span> <span class="id">f</span> : <span class="id">x</span> / <span class="id"><a href="mathcomp.classical.functions.html#mkfun.A">A</a></span> <span class="id">x</span> &gt;-&gt; <span class="id"><a href="mathcomp.classical.functions.html#mkfun.B">B</a></span> <span class="id">x</span>}.<br/>
@@ -1613,8 +1611,8 @@ Qed.</div>
 <pre>
 (***********)
 (* set_val *)
-(***********)
-</pre>
+(***********)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="set_val">set_val</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">T</span>} {<span class="id">A</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">T</span>}.<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="set_val">set_val</a></span> : <span class="id"><a href="mathcomp.classical.functions.html#set_val.A">A</a></span> -&gt; <span class="id"><a href="mathcomp.classical.functions.html#set_val.T">T</a></span> := <span class="id"><a href="mathcomp.classical.functions.html#eqincl">eqincl</a></span> (<span class="id"><a href="mathcomp.classical.classical_sets.html#set_mem_set">set_mem_set</a></span> <span class="id"><a href="mathcomp.classical.functions.html#set_val.A">A</a></span>) \<span class="id">o</span> <span class="id">val</span>.<br/>
@@ -1635,8 +1633,8 @@ Qed.</div>
 <pre>
 (**********)
 (* Squash *)
-(**********)
-</pre>
+(**********)</pre>
+<br/>
 <span class="id"><a name="hb_instance_977">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> <span class="id">T</span> := <span class="id"><a href="mathcomp.classical.functions.html#Build">CanV.Build</a></span> <span class="id">T</span> $|<span class="id">T</span>| <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#squash">squash</a></span> (<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Logic.html#I">I</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#in1W">in1W</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#unsquashK">unsquashK</a></span>).<br/>
 <span class="id"><a name="hb_instance_988">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> <span class="id">T</span> := <span class="id"><a href="mathcomp.classical.functions.html#copy">SplitInj.copy</a></span> (@<span class="id"><a href="mathcomp.classical.classical_sets.html#unsquash">unsquash</a></span> <span class="id">T</span>) <span class="id"><a href="mathcomp.classical.classical_sets.html#squash">squash</a></span>^-1%<span class="id">FUN</span>.<br/>
@@ -1645,8 +1643,8 @@ Qed.</div>
 <pre>
 (***********************)
 (* pickle and unpickle *)
-(***********************)
-</pre>
+(***********************)</pre>
+<br/>
 <span class="id"><a name="hb_instance_999">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> (<span class="id">T</span> : <span class="id">countType</span>) :=<br/>
 &nbsp;&nbsp;<span class="id"><a href="mathcomp.classical.functions.html#Build">Inj.Build</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> (@<span class="id">choice.pickle</span> <span class="id">T</span>) (<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#in2W">in2W</a></span> (<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#pcan_inj">pcan_inj</a></span> <span class="id">choice.pickleK</span>)).<br/>
 <span class="id"><a name="hb_instance_1007">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> (<span class="id">T</span> : <span class="id">countType</span>) :=<br/>
@@ -1655,8 +1653,8 @@ Qed.</div>
 <pre>
 (***********)
 (* set0fun *)
-(***********)
-</pre>
+(***********)</pre>
+<br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="set0fun_inj">set0fun_inj</a></span> {<span class="id">P</span> <span class="id">T</span>} : <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrfun.html#injective">injective</a></span> (@<span class="id"><a href="mathcomp.classical.classical_sets.html#set0fun">set0fun</a></span> <span class="id">P</span> <span class="id">T</span>).<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof89')">Proof.</span></div>
 <div class="proofscript" id="proof89">
@@ -1670,8 +1668,8 @@ Qed.</div>
 <pre>
 (************)
 (* cast_ord *)
-(************)
-</pre>
+(************)</pre>
+<br/>
 <span class="id"><a name="hb_instance_1021">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> {<span class="id">m</span> <span class="id">n</span>} {<span class="id">eq_mn</span> : <span class="id">m</span> = <span class="id">n</span>} :=<br/>
 &nbsp;&nbsp;<span class="id"><a href="mathcomp.classical.functions.html#Build">Can2.Build</a></span> '<span class="id">I_m</span> '<span class="id">I_n</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> (<span class="id">cast_ord</span> <span class="id">eq_mn</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Logic.html#I">I</a></span>) (<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Logic.html#I">I</a></span>)<br/>
@@ -1680,8 +1678,8 @@ Qed.</div>
 <pre>
 (************************)
 (* enum_val &amp; enum_rank *)
-(************************)
-</pre>
+(************************)</pre>
+<br/>
 <span class="id"><a name="hb_instance_1038">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> (<span class="id">T</span> : <span class="id">finType</span>) :=<br/>
 &nbsp;&nbsp;<span class="id"><a href="mathcomp.classical.functions.html#Build">Can2.Build</a></span> <span class="id">T</span> <span class="id">_</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> <span class="id">enum_rank</span> (<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Logic.html#I">I</a></span>) (<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Logic.html#I">I</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#in1W">in1W</a></span> <span class="id">enum_rankK</span>) (<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#in1W">in1W</a></span> <span class="id">enum_valK</span>).<br/>
@@ -1693,8 +1691,8 @@ Qed.</div>
 <pre>
 (**************)
 (* Finset val *)
-(**************)
-</pre>
+(**************)</pre>
+<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="finset_val">finset_val</a></span> {<span class="id">T</span> : <span class="id">choiceType</span>} {<span class="id">X</span> : {<span class="id">fset</span> <span class="id">T</span>}} (<span class="id">x</span> : <span class="id">X</span>) : [<span class="id">set</span>` <span class="id">X</span>] :=<br/>
 &nbsp;&nbsp;<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id">x</span> \<span class="kwd">in</span> [<span class="id">set</span>` <span class="id">X</span>]) (<span class="id">val</span> <span class="id">x</span>) (<span class="id"><a href="mathcomp.classical.classical_sets.html#mem_set">mem_set</a></span> (<span class="id">valP</span> <span class="id">x</span>)).<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="val_finset">val_finset</a></span> {<span class="id">T</span> : <span class="id">choiceType</span>} {<span class="id">X</span> : {<span class="id">fset</span> <span class="id">T</span>}} (<span class="id">x</span> : [<span class="id">set</span>` <span class="id">X</span>]) : <span class="id">X</span> :=<br/>
@@ -1722,8 +1720,8 @@ Qed.</div>
 <pre>
 (*****************)
 (* 'I_n and `I_n *)
-(*****************)
-</pre>
+(*****************)</pre>
+<br/>
 <span class="id"><a name="hb_instance_1106">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> <span class="id">n</span> := <span class="id"><a href="mathcomp.classical.functions.html#Build">Can2.Build</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#setT">setT</a></span> (@<span class="id"><a href="mathcomp.classical.classical_sets.html#ordII">ordII</a></span> <span class="id">n</span>)<br/>
 &nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Logic.html#I">I</a></span>) (<span class="kwd">fun</span> <span class="id">_</span> <span class="id">_</span> =&gt; <span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.Init.Logic.html#I">I</a></span>) (<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#in1W">in1W</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#ordIIK">ordIIK</a></span>) (<span class="id"><a href="https://coq.inria.fr/doc/V8.18.0/stdlib/Coq.ssr.ssrbool.html#in1W">in1W</a></span> <span class="id"><a href="mathcomp.classical.classical_sets.html#IIordK">IIordK</a></span>).<br/>
 <span class="id"><a name="hb_instance_1123">HB.instance</a></span> <span class="kwd">Definition</span> <span class="id">_</span> <span class="id">n</span> := <span class="id"><a href="mathcomp.classical.functions.html#copy">SplitBij.copy</a></span> (@<span class="id"><a href="mathcomp.classical.classical_sets.html#IIord">IIord</a></span> <span class="id">n</span>) (<span class="id"><a href="mathcomp.classical.classical_sets.html#ordII">ordII</a></span>^-1).<br/>
@@ -1731,8 +1729,8 @@ Qed.</div>
 <pre>
 (***********)
 (* Glueing *)
-(***********)
-</pre>
+(***********)</pre>
+<br/>
 <span class="kwd">Definition</span> <span class="id"><a name="glue">glue</a></span> {<span class="id">T</span> <span class="id">T</span>'} {<span class="id">X</span> <span class="id">Y</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">T</span>} {<span class="id">A</span> <span class="id">B</span> : <span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id">T</span>'}<br/>
 &nbsp;&nbsp;<span class="id">of</span> [<span class="id">disjoint</span> <span class="id">X</span> &amp; <span class="id">Y</span>] &amp; [<span class="id">disjoint</span> <span class="id">A</span> &amp; <span class="id">B</span>] :=<br/>
 &nbsp;&nbsp;<span class="kwd">fun</span> (<span class="id">f</span> <span class="id">g</span> : <span class="id">T</span> -&gt; <span class="id">T</span>') (<span class="id">u</span> : <span class="id">T</span>) =&gt; <span class="kwd">if</span> <span class="id">u</span> \<span class="kwd">in</span> <span class="id">X</span> <span class="kwd">then</span> <span class="id">f</span> <span class="id">u</span> <span class="kwd">else</span> <span class="id">g</span> <span class="id">u</span>.<br/>
@@ -1840,8 +1838,8 @@ Qed.</div>
 <pre>
 (************************************)
 (* Z-module addition is a bijection *)
-(************************************)
-</pre>
+(************************************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="addition">addition</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">V</span> : <span class="id">zmodType</span>} (<span class="id">x</span> : <span class="id">V</span>).<br/>
 <br/>
@@ -1863,8 +1861,8 @@ Qed.</div>
 <pre>
 (************************************)
 (* Z-module opposite is a bijection *)
-(************************************)
-</pre>
+(************************************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="addition">addition</a></span>.<br/>
 <span class="kwd">Context</span> {<span class="id">V</span> : <span class="id">zmodType</span>} (<span class="id">x</span> : <span class="id">V</span>).<br/>
 <br/>
@@ -1886,8 +1884,8 @@ Qed.</div>
 <pre>
 (*************)
 (* emtpyType *)
-(*************)
-</pre>
+(*************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id">empty</span>.<br/>
 <span class="kwd">Context</span> {<span class="id">T</span> : <span class="id">emptyType</span>} {<span class="id">T</span>' : <span class="kwd">Type</span>} {<span class="id">X</span> : <span class="id">set</span> <span class="id">T</span>}.<br/>
 <span class="kwd">Implicit</span> <span class="kwd">Type</span> <span class="id">Y</span> : <span class="id">set</span> <span class="id">T</span>'.<br/>
@@ -1917,8 +1915,8 @@ Qed.</div>
 <pre>
 (************************)
 (* Theory of surjection *)
-(************************)
-</pre>
+(************************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id">surj_lemmas</span>.<br/>
 <span class="kwd">Variables</span> <span class="id">aT</span> <span class="id">rT</span> : <span class="kwd">Type</span>.<br/>
 <span class="kwd">Implicit</span> <span class="id">Types</span> (<span class="id">A</span> : <span class="id">set</span> <span class="id">aT</span>) (<span class="id">B</span> : <span class="id">set</span> <span class="id">rT</span>) (<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>).<br/>
@@ -2094,8 +2092,8 @@ Qed.</div>
 <pre>
 (**************)
 (* Injections *)
-(**************)
-</pre>
+(**************)</pre>
+<br/>
 <span class="kwd">Lemma</span> <span class="id">trivIset_inj</span> <span class="id">T</span> <span class="id"><a href="mathcomp.classical.classical_sets.html#set">I</a></span> (<span class="id">D</span> : <span class="id">set</span> <span class="id">I</span>) (<span class="id">F</span> : <span class="id">I</span> -&gt; <span class="id">set</span> <span class="id">T</span>) :<br/>
 &nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">i</span>, <span class="id">D</span> <span class="id">i</span> -&gt; <span class="id">F</span> <span class="id">i</span> !=<span class="id">set0</span>) -&gt; <span class="id">trivIset</span> <span class="id"><a href="mathcomp.classical.functions.html#set_inj">D</a></span> <span class="id">F</span> -&gt; <span class="id">set_inj</span> <span class="id">D</span> <span class="id">F</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof129')">Proof.</span></div>
@@ -2107,8 +2105,8 @@ Qed.</div>
 <pre>
 (**************)
 (* Bijections *)
-(**************)
-</pre>
+(**************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id">set_bij_lemmas</span>.<br/>
 <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span> : <span class="kwd">Type</span>} {<span class="id">A</span> : <span class="id">set</span> <span class="id">aT</span>} {<span class="id">B</span> : <span class="id">set</span> <span class="id">rT</span>} {<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>}.<br/>
 <span class="kwd">Definition</span> <span class="id">fun_set_bij</span> <span class="id">of</span> <span class="id">set_bij</span> <span class="id">A</span> <span class="id"><a href="mathcomp.classical.functions.html#set_bij_lemmas.f">B</a></span> <span class="id">f</span> := <span class="id">f</span>.<br/>
@@ -2197,8 +2195,8 @@ Qed.</div>
 <pre>
 (*****************************)
 (* Patching and restrictions *)
-(*****************************)
-</pre>
+(*****************************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id">patch</span>.<br/>
 <span class="kwd">Context</span> {<span class="id">aT</span> <span class="id">rT</span> : <span class="kwd">Type</span>} (<span class="id">d</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>) (<span class="id">A</span> : <span class="id">set</span> <span class="id">aT</span>).<br/>
 <span class="kwd">Definition</span> <span class="id">patch</span> (<span class="id">f</span> : <span class="id">aT</span> -&gt; <span class="id">rT</span>) <span class="id">u</span> := <span class="kwd">if</span> <span class="id">u</span> \<span class="kwd">in</span> <span class="id">A</span> <span class="kwd">then</span> <span class="id">f</span> <span class="id"><a href="mathcomp.classical.functions.html#patch.d">u</a></span> <span class="kwd">else</span> <span class="id">d</span> <span class="id">u</span>.<br/>
@@ -2307,8 +2305,8 @@ Qed.</div>
 <pre>
 (**************************************)
 (* Restriction of domain and codomain *)
-(**************************************)
-</pre>
+(**************************************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id">RestrictionLeft</span>.<br/>
 <span class="kwd">Context</span> {<span class="id">U</span> <span class="id">V</span> : <span class="kwd">Type</span>} (<span class="id">v</span> : <span class="id">V</span>) {<span class="id">A</span> : <span class="id">set</span> <span class="id">U</span>} {<span class="id">B</span> : <span class="id">set</span> <span class="id">V</span>}.<br/>
 <br/>

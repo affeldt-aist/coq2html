@@ -94,8 +94,8 @@
 (*               einfs u := [sequence ereal_inf (sdrop u n)]_n                *)
 (*        limn_e{inf,sup} == limit inferior/superior for \bar R               *)
 (*                                                                            *)
-(******************************************************************************)
-</pre>
+(******************************************************************************)</pre>
+<br/>
 <span class="kwd">Set</span> <span class="kwd">Implicit</span> <span class="kwd">Arguments</span>.<br/>
 <span class="id">Unset</span> <span class="id">Strict</span> <span class="kwd">Implicit</span>.<br/>
 <span class="id">Unset</span> <span class="id">Printing</span> <span class="kwd">Implicit</span> <span class="id">Defensive</span>.<br/>
@@ -235,8 +235,8 @@ Qed.</div>
 <pre>
 (*********************)
 (* Sequences of sets *)
-(*********************)
-</pre>
+(*********************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="seqDU">seqDU</a></span>.<br/>
 <span class="kwd">Variables</span> (<span class="id"><a name="seqDU.T">T</a></span> : <span class="kwd">Type</span>).<br/>
 <span class="kwd">Implicit</span> <span class="id">Types</span> <span class="id">F</span> : (<span class="id"><a href="mathcomp.classical.classical_sets.html#set">set</a></span> <span class="id"><a href="mathcomp.analysis.sequences.html#seqDU.T">T</a></span>)^<span class="id">nat</span>.<br/>
@@ -374,8 +374,8 @@ Qed.</div>
 <pre>
 (************************************)
 (* Convergence of patched sequences *)
-(************************************)
-</pre>
+(************************************)</pre>
+<br/>
 <span class="kwd">Section</span> <span class="id"><a name="sequences_patched">sequences_patched</a></span>.<br/>
 <br/>
 <span class="kwd">Section</span> <span class="id"><a name="sequences_patched.NatShift">NatShift</a></span>.<br/>
@@ -1480,8 +1480,8 @@ Qed.</div>
 <pre>
 (********************************)
 (* Sequences of natural numbers *)
-(********************************)
-</pre>
+(********************************)</pre>
+<br/>
 <span class="kwd">Lemma</span> <span class="id">__deprecated__nat_dvg_real</span> (<span class="id">R</span> : <span class="id">realType</span>) (<span class="id">u_</span> : <span class="id">nat</span> ^<span class="id">nat</span>) : <span class="id">u_</span> --&gt; \<span class="id">oo</span> -&gt;<br/>
 &nbsp;&nbsp;([<span class="id">sequence</span> (<span class="id">u_</span> <span class="id">n</span>)%:<span class="id">R</span> : <span class="id">R</span>^<span class="id">o</span>]<span class="id">_n</span> --&gt; +<span class="id">oo</span>)%<span class="id">R</span>.<br/>
 <div><span class="toggleproof" onclick="toggleDisplay('proof123')">Proof.</span></div>
@@ -1560,8 +1560,8 @@ Qed.</div>
 <pre>
 (**************************************)
 (* Sequences of extended real numbers *)
-(**************************************)
-</pre>
+(**************************************)</pre>
+<br/>
 <span class="kwd">Notation</span> "\<span class="id">big</span> [ <span class="id">op</span> / <span class="id">idx</span> ]<span class="id">_</span> ( <span class="id">m</span> &lt;= <span class="id">i</span> &lt;<span class="id">oo</span> | <span class="id">P</span> ) <span class="id">F</span>" :=<br/>
 &nbsp;&nbsp;(<span class="id">lim</span> (<span class="kwd">fun</span> <span class="id">n</span> =&gt; (\<span class="id">big</span>[ <span class="id">op</span> / <span class="id">idx</span> ]<span class="id">_</span>(<span class="id">m</span> &lt;= <span class="id">i</span> &lt; <span class="id">n</span> | <span class="id">P</span>) <span class="id">F</span>))) : <span class="id">big_scope</span>.<br/>
 <span class="kwd">Notation</span> "\<span class="id">big</span> [ <span class="id">op</span> / <span class="id">idx</span> ]<span class="id">_</span> ( <span class="id">m</span> &lt;= <span class="id">i</span> &lt;<span class="id">oo</span> ) <span class="id">F</span>" :=<br/>
