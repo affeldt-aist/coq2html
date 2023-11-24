@@ -113,3 +113,7 @@ a:active {text-decoration : none; }
 pre.ssrdoc {
     border: solid;
 }
+
+div.ssrdoc {
+    border: solid;
+}

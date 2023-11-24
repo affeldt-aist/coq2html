@@ -314,6 +314,13 @@ rule coq_bol = parse
 	fprintf !oc "%s" "</pre>\n";
 	skip_newline lexbuf
       }
+  (* Enter ssrdoc markdown mode *)
+  | space* ("(***" (['a'-'z']+ as mode) "*"+ "***)" "\n" as s)
+      { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
+        ssr_doc_bol lexbuf;
+	fprintf !oc "%s" "</div>\n";
+	skip_newline lexbuf
+      }
   | eof
       { () }
   | space* as s

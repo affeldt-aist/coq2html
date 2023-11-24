@@ -5,9 +5,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module $NAME</title>
 <meta name="description" content="Documentation of Coq module $NAME" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+
 <link href="coq2html.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body>
+<body onload="init()">
 <h1 class="title">Module $NAME</h1>
 <div class="coq">

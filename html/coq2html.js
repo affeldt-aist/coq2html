@@ -33,12 +33,8 @@ function renderMarkdowns()
           .use(texmath, { engine: katex,
                           delimiters: 'dollars'} );
     const elements = document.querySelectorAll('.markdown');
-    console.log(elements);
     for (let elem of elements) {
-	console.log(elem.textContent);
-	const result = md.render(elem.textContent);
-	console.log(result);
-	elem.innerHTML = result;
+	elem.innerHTML = md.render(elem.textContent);
     }
 }
 
