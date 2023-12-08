@@ -20,17 +20,18 @@ let write_html_file txt filename =
   
 type kind = Global | EntryKind of string
 
-let kinds = [Global;
+let kinds = [EntryKind "file";
              EntryKind "def";
              EntryKind "prf";
              EntryKind "abbrev";
-             EntryKind "file";
+             Global;
             ]
 
-let skind = function Global -> "Global"
-                   | EntryKind "def" -> "Definition"
-                   | EntryKind "prf" -> "Lemma"
-                   | EntryKind "abbrev" -> "Abbreviation"
+let skind = function Global -> "Global Index"
+                   | EntryKind "def" -> "Definitions"
+                   | EntryKind "prf" -> "Lemmas"
+                   | EntryKind "abbrev" -> "Abbreviations"
+                   | EntryKind "file" -> "Files"
                    | EntryKind other -> other
 
 let is_kind = function
@@ -44,7 +45,7 @@ type item = {kind: kind; name: string; linkname: string; module_: string}
 
 let table citems =
   let mkrow kind =
-    (!%"<td>%s Index</td>" (skind kind))
+    (!%"<td>%s</td>" (skind kind))
     ^ (List.map (fun (c, items) ->
            if List.exists (fun item -> kind = Global || item.kind = kind) items then
              !%{|<td><a href="index_%s_%c.html">%c</a></td>|} (linkname_of_kind kind) c c
