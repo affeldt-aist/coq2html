@@ -1,5 +1,15 @@
 let (!%) s = Printf.sprintf s
 
+let html_escape s =
+  String.to_seq s
+  |> Seq.map (function
+       | '<' -> "&lt;"
+       | '>' -> "&gt;"
+       | '&' -> "&amp;"
+       | c -> String.make 1 c)
+  |> List.of_seq
+  |> String.concat ""
+                
 type xref =
   | Def of string * string    (* path, type *)
   | Ref of string * string * string (* unit, path, type *)
@@ -60,12 +70,25 @@ let table citems =
 
 (* generate an html file e.g. mathcomp.classical.functions.html *)
 let generate_with_capital output_dir table kind (c, items) =
+  let html_of_item item =
+    if item.kind = EntryKind "not" then
+      let (scope, notation) = 
+        match Str.(bounded_split_delim (regexp ":") item.name 4) with
+        | [_; _; ""; notation] -> ("<span class=\"warning\">no scope</span>", notation)
+        | [_; _; scope; notation] -> ("in " ^ scope, notation)
+        | _ ->
+           Printf.eprintf "=== %s\n" item.name;
+             failwith "HOGEHOGE"
+      in
+      !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (html_escape notation) (linkname_of_kind item.kind) item.module_ scope
+    else
+      !%{|<a href="%s">%s</a> [%s, in %s]|} item.linkname item.name (linkname_of_kind item.kind) item.module_
+  in
   if items = [] then () else
     let body =
       let h2 = if kind = Global then !%"%c" c else !%"%c (%s)" c (skind kind) in
       List.filter (fun item -> kind = Global || item.kind = kind) items
-      |> List.map (fun item ->
-             !%{|<a href="%s">%s</a> [%s, in %s]|} item.linkname item.name (skind item.kind) item.module_)
+      |> List.map html_of_item
       |> String.concat "<br>"
       |> (^) (!%"%s<h2>%s</h2>" table h2)
     in

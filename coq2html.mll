@@ -110,10 +110,8 @@ let crossref m pos =
       let url = url_for_module m' in  (* can raise Not_found *)
       if p = "" then
         Link url
-      else if Str.string_match re_sane_path p 0 then
-        Link(url ^ "#" ^ p)
       else
-        Nolink
+        Link(url ^ "#" ^ p)
   with Not_found ->
     Nolink
 
@@ -299,7 +297,12 @@ let path = ident ("." ident)*
 let start_proof = ("Proof" space* ".") | ("Proof" space+ "with") | ("Next" space+ "Obligation.")
 let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
 let globkind = ['a'-'z']+
-let xref = (['A'-'Z' 'a'-'z' '0'-'9' '_' '.' '\'' ':' '[' ']' '*' '=' '+'] | utf8)+ | "<>"
+
+let quoted = ['\"'] [' '-'~']* ['\"']
+let special_symbols = ['!' '#'-'\'' '*'-'-' '/'-'~']+
+
+let xref = (['A'-'Z' 'a'-'z' '0'-'9' '#'-'~'] | utf8)+ | "<>"
+
 let integer = ['0'-'9']+
 
 rule coq_bol = parse
@@ -375,6 +378,10 @@ and coq = parse
       { newline(); coq_bol lexbuf }
   | eof
       { () }
+  | quoted as q
+      {ident (Lexing.lexeme_start lexbuf) q; coq lexbuf}
+  | special_symbols as id
+      {ident (Lexing.lexeme_start lexbuf) id; coq lexbuf}
   | _ as c
       { character c; coq lexbuf }
 
