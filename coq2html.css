@@ -127,3 +127,7 @@ pre.ssrdoc {
 div.ssrdoc {
     border: solid;
 }
+
+.warning {
+    color: #cd0000;
+}
