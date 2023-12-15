@@ -226,6 +226,8 @@ let ident pos id =
   | Anchor p ->
       fprintf !oc "<span class=\"id\"><a name=\"%s\">%s</a></span>" p id
 
+let ident_escape pos id = ident pos @@ Generate_index.html_escape id
+
 let space s =
   for _ = 1 to String.length s do fprintf !oc "&nbsp;" done
 
@@ -379,9 +381,9 @@ and coq = parse
   | eof
       { () }
   | quoted as q
-      {ident (Lexing.lexeme_start lexbuf) q; coq lexbuf}
+      {ident_escape (Lexing.lexeme_start lexbuf) q; coq lexbuf}
   | special_symbols as id
-      {ident (Lexing.lexeme_start lexbuf) id; coq lexbuf}
+      {ident_escape (Lexing.lexeme_start lexbuf) id; coq lexbuf}
   | _ as c
       { character c; coq lexbuf }
 
