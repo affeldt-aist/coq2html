@@ -74,7 +74,7 @@ let url_for_module m =
   (*eprintf "url_for_module %s\n" m;*)
   let rec url_for = function
   | [] ->
-      if Hashtbl.mem xref_modules m then m ^ ".html" else raise Not_found
+      if Hashtbl.mem xref_modules m then m ^ ".html" else ("NOTFOUND the module url for "^m)
   | (pref, url) :: rem ->
       if starts_with m pref then url_concat url m ^ ".html" else url_for rem
   in url_for !documentation_urls

@@ -16,7 +16,7 @@ https://yoshihiro503.github.io/coq2html/
 ### Usage
 In the case using in mathcomp analysis directory:
 ```
-../coq2html/coq2html -d html/ -base mathcomp -Q theories analysis -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ classical/*.v classical/*.glob theories/*.v theories/*.glob
+../coq2html/coq2html -d html/ -base mathcomp -Q theories analysis -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ -external https://math-comp.github.io/htmldoc/ mathcomp.ssreflect -external https://math-comp.github.io/htmldoc/ mathcomp.algebra classical/*.v classical/*.glob theories/*.v theories/*.glob
 ```
 
 ## Overview
