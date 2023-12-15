@@ -228,6 +228,10 @@ let ident pos id =
 
 let ident_escape pos id = ident pos @@ Generate_index.html_escape id
 
+(* special hack:
+   The references of notations in glob file sometime include white space.
+   c.f. https://coq.zulipchat.com/#narrow/stream/237656-Coq-devs-.26-plugin-devs/topic/Bug.3F.3A.20position.20of.20reference.20of.20notations.20in.20glob.20file/near/406709205
+ *)
 let ident_escape_with_white pos id =
   let pos' =
     match crossref !current_module pos with

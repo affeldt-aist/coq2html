@@ -6,6 +6,7 @@ let html_escape s =
        | '<' -> "&lt;"
        | '>' -> "&gt;"
        | '&' -> "&amp;"
+       | ' ' -> "&nbsp;"
        | c -> String.make 1 c)
   |> List.of_seq
   |> String.concat ""
@@ -68,19 +69,63 @@ let table citems =
   ^ (List.map mkrow kinds |> String.concat "")
   ^ "</tbody></table>"
 
+let html_of_notation_item item =
+  let (scope, notation) = 
+    match Str.(bounded_split_delim (regexp ":") item.name 4) with
+    | [_; _; ""; notation] -> ("<span class=\"warning\">no scope</span>", notation)
+    | [_; _; scope; notation] -> ("in " ^ scope, notation)
+    | _ ->
+       failwith (!%"unexpected notation format in glob file: name=%s" item.name)
+  in
+  let show notation =
+    let len = String.length notation in
+    let rec iter pos tags =
+      let text_of_placeholder s =
+        Str.(global_replace (regexp_string "_")  s " ")
+(*        |> fun s -> Str.(global_replace (regexp_string "x") s "x")*)
+      in
+      if pos < len then
+        match String.index_from_opt notation pos '\'' with
+        | Some pos' when pos = pos' -> quoted (pos+1) tags []
+        | Some pos' ->
+           quoted (pos'+1)
+             (text_of_placeholder (String.sub notation pos (pos'-pos)) :: tags) []
+        | None ->
+           List.rev (
+               text_of_placeholder (String.sub notation pos (len - pos)) :: tags)
+      else List.rev tags
+    and quoted pos tags store =
+      let tag_of_quoted ss =
+        String.concat "" (List.rev ss)
+        |> !%"<span class=\"notation-symbol\">%s</span>"
+      in
+      if pos < len then
+        match String.index_from_opt notation pos '\'' with
+        | Some pos' when pos' = len - 1 ->
+           tag_of_quoted (String.sub notation pos (pos'-pos) :: store) :: tags
+           |> List.rev
+        | Some pos' when String.get notation (pos'+1) = '\'' ->
+           (* continuous two quotation *)
+           let s = String.sub notation pos (pos' - pos) in
+           quoted (pos'+2) tags ("\'" :: s :: store)
+        | Some pos' ->
+           (* termination of the quote *)
+           let tag = tag_of_quoted (String.sub notation pos (pos' - pos) :: store) in
+           iter (pos' + 1) (tag :: tags)
+        | None ->
+           failwith "unclosed quote"
+      else
+        List.rev (tag_of_quoted store :: tags)
+    in
+    String.concat "" (iter 0 [])
+  in
+  !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (show notation) (linkname_of_kind item.kind) item.module_ scope
+
 (* generate an html file e.g. mathcomp.classical.functions.html *)
 let generate_with_capital output_dir table kind (c, items) =
   let html_of_item item =
     if item.kind = EntryKind "not" then
-      let (scope, notation) = 
-        match Str.(bounded_split_delim (regexp ":") item.name 4) with
-        | [_; _; ""; notation] -> ("<span class=\"warning\">no scope</span>", notation)
-        | [_; _; scope; notation] -> ("in " ^ scope, notation)
-        | _ ->
-           Printf.eprintf "=== %s\n" item.name;
-             failwith "HOGEHOGE"
-      in
-      !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (html_escape notation) (linkname_of_kind item.kind) item.module_ scope
+      html_of_notation_item item
     else
       !%{|<a href="%s">%s</a> [%s, in %s]|} item.linkname item.name (linkname_of_kind item.kind) item.module_
   in
