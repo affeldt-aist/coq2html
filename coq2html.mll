@@ -157,7 +157,7 @@ let coq_gallina_keywords = mkset [
 
 let mathcomp_hierarchy_builders = mkset [
   "HB.instance"; "HB.builders"; "HB.factory"; "HB.mixin";
-  "HB.structures"
+  "HB.structure"
 ]
 
 (** HTML generation *)
@@ -227,6 +227,15 @@ let ident pos id =
       fprintf !oc "<span class=\"id\"><a name=\"%s\">%s</a></span>" p id
 
 let ident_escape pos id = ident pos @@ Generate_index.html_escape id
+
+let ident_escape_with_white pos id =
+  let pos' =
+    match crossref !current_module pos with
+    | Nolink -> pos+1
+    | _ -> pos
+  in
+  ident_escape pos' id
+     
 
 let space s =
   for _ = 1 to String.length s do fprintf !oc "&nbsp;" done
@@ -301,7 +310,8 @@ let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
 let globkind = ['a'-'z']+
 
 let quoted = ['\"'] [' '-'~']* ['\"']
-let special_symbols = ['!' '#'-'\'' '*'-'-' '/'-'~']+
+let symbol = ['!' '#'-'\'' '*'-'/' ':'-'?' '['-'`' '{'-'~']
+let non_whites = ['!' '#'-'\'' '*'-'-' '/'-'~']+
 
 let xref = (['A'-'Z' 'a'-'z' '0'-'9' '#'-'~'] | utf8)+ | "<>"
 
@@ -388,7 +398,10 @@ and coq = parse
       { () }
   | quoted as q
       {ident_escape (Lexing.lexeme_start lexbuf) q; coq lexbuf}
-  | special_symbols as id
+  | ' ' (symbol non_whites* as id)
+      {output_char !oc ' ';
+       ident_escape_with_white (Lexing.lexeme_start lexbuf) id; coq lexbuf}
+  | non_whites as id
       {ident_escape (Lexing.lexeme_start lexbuf) id; coq lexbuf}
   | _ as c
       { character c; coq lexbuf }
