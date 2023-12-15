@@ -311,6 +311,12 @@ rule coq_bol = parse
   | (space* as s) (start_proof as sp)
       { start_proof s sp;
         skip_newline lexbuf }
+  (* Enter special syntax mode e.g. markdown syntax *)
+  | space* "(***" (['a'-'z' '-']+ as mode)
+      { fprintf !oc "<div class=\"doc %s\">" mode;
+        custom_mode lexbuf;
+        end_doc();
+        skip_newline lexbuf }
   | space* "(** " ("*"+ as sect)
       { start_section sect;
         doc lexbuf;
@@ -332,8 +338,8 @@ rule coq_bol = parse
 	fprintf !oc "%s" "</pre>\n";
 	skip_newline lexbuf
       }
-  (* Enter ssrdoc markdown mode *)
-  | space* ("(***" (['a'-'z']+ as mode) "*"+ "***)" "\n" as s)
+  (* Enter ssrdoc with special syntax mode e.g. markdown syntax *)
+  | space* ("(***" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n" as s)
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
@@ -460,6 +466,14 @@ and doc = parse
       { () }
   | _ as c
       { character c; doc lexbuf }
+
+and custom_mode = parse
+  | "*)"
+      { () }
+  | eof
+      { () }
+  | _ as c
+      { character c; custom_mode lexbuf }
 
 (* beginning of line *)
 and ssr_doc_bol = parse
