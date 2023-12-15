@@ -136,6 +136,11 @@ div.ssrdoc {
     color: #cd0000;
 }
 
+:target {
+    background-color: yellow;
+    transition: background-color 0.5s;
+}
+
 @media screen and (max-width:960px) {
 
     body {
