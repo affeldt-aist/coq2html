@@ -141,6 +141,10 @@ div.ssrdoc {
     transition: background-color 0.5s;
 }
 
+.darkmode--activated span.katex {
+    color: white;
+}
+
 @media screen and (max-width:960px) {
 
     body {

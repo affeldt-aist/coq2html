@@ -12,7 +12,8 @@ function renderMarkdowns()
 function showDarkmodeWidget()
 {
     new Darkmode({
-	label: '🌓', // default: ''
+	time: '0.1s',
+	label: '🌓',
     }).showWidget();
 }
 
