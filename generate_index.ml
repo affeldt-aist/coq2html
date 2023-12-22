@@ -12,7 +12,7 @@ let html_escape s =
   |> String.concat ""
                 
 type xref =
-  | Def of string * string    (* path, type *)
+  | Defs of (string * string) list    (* path, type *)
   | Ref of string * string * string (* unit, path, type *)
 
 let alphabets = (* ['A'; ...; 'Z'; '_'] *)
@@ -160,13 +160,15 @@ let generate output_dir xref_table xref_modules =
         let items =
           Hashtbl.fold (fun (name, pos) xref store ->
             match xref with
-            | Def (path, "binder") -> (*ignore binders*)
-               store
-            | Def (path, typ) when is_initial c path ->
-               let linkname = !%"%s.html#%s" name path in
-               let module_ = name in
-               {kind=EntryKind typ; name=path; linkname; module_} :: store
-            | _ -> store) xref_table []
+            | Defs defs ->
+               List.filter (fun (_, typ) -> typ <> "binder") defs
+               |> List.filter (fun (path, _) -> is_initial c path)
+               |> List.map (fun (path, typ) ->
+                      let linkname = !%"%s.html#%s" name path in
+                      let module_ = name in
+                      {kind=EntryKind typ; name=path; linkname; module_})
+               |> fun is -> is @ store
+            | Ref _ -> store) xref_table []
         in
         
         Hashtbl.fold (fun filename _ store ->

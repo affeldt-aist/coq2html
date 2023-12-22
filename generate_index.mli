@@ -1,5 +1,5 @@
 type xref =
-  | Def of string * string
+  | Defs of (string * string) list
   | Ref of string * string * string
 
 val html_escape : string -> string

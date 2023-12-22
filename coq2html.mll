@@ -46,8 +46,17 @@ let add_reference curmod pos dp sp id ty =
 
 let add_definition curmod pos sp id ty =
   (*eprintf "add_definition %s %d %s %s %s\n" curmod pos sp id ty;*)
-  if not (Hashtbl.mem xref_table (curmod, pos))
-  then Hashtbl.add xref_table (curmod, pos) (Def(path sp id, ty))
+  match Hashtbl.find_opt xref_table (curmod, pos) with
+  | None ->
+     Hashtbl.add xref_table (curmod, pos) (Defs [path sp id, ty])
+  | Some (Defs defs) ->
+     Hashtbl.replace xref_table (curmod, pos) (Defs ((path sp id, ty) :: defs))
+  | Some (Ref (unit, path_, typ)) ->
+     (* ignore references if the glob file has a reference and definitions at a
+        same position.
+        issue: https://github.com/yoshihiro503/coq2html/issues/2
+      *)
+     Hashtbl.add xref_table (curmod, pos) (Defs [path sp id, ty])
 
 (* Map module names to URLs *)
 
@@ -97,15 +106,15 @@ let module_name_of_file_name f =
 
 (* Produce a HTML link if possible *)
 
-type link = Link of string | Anchor of string | Nolink
+type link = Link of string | Anchors of string list | Nolink
 
 let re_sane_path = Str.regexp "[A-Za-z0-9_.\x80-\xFF]+$"
 
 let crossref m pos =
   (*eprintf "crossref %s %d\n" m pos;*)
   try match Hashtbl.find xref_table (m, pos) with
-  | Def(p, _) ->
-      Anchor p
+  | Defs defs ->
+      Anchors (List.map fst defs)
   | Ref(m', p, _) ->
       let url = url_for_module m' in  (* can raise Not_found *)
       if p = "" then
@@ -209,6 +218,17 @@ let end_doc () =
   set_enum_depth 0;
   fprintf !oc "</div>\n"
 
+let nested_ids_anchor classes ids text =
+  let id0 = List.hd ids in
+  let opens = 
+    List.map (fun id ->sprintf "<span id=\"%s\" class=\"id\">"id ) ids
+    |> String.concat ""
+  in
+  let closes = List.map (fun _ -> "</span>") ids |> String.concat "" in
+  fprintf !oc {|%s
+  <a name="%s" class="%s">%s</a>
+%s|} opens id0 classes text closes
+
 let ident pos id =
   if StringSet.mem id coq_gallina_keywords then
     fprintf !oc "<span class=\"gallina-kwd\">%s</span>" id
@@ -216,15 +236,17 @@ let ident pos id =
     fprintf !oc "_"
   else if StringSet.mem id coq_vernaculars then
     fprintf !oc "<span class=\"vernacular\">%s</span>" id
-  else if StringSet.mem id mathcomp_hierarchy_builders then
-    fprintf !oc "<span class=\"hierarchy-builder\">%s</span>" id
   else match crossref !current_module pos with
   | Nolink ->
       fprintf !oc "<span class=\"id\">%s</span>" id
   | Link p ->
       fprintf !oc "<span class=\"id\"><a href=\"%s\">%s</a></span>" p id
-  | Anchor p ->
-      fprintf !oc "<span class=\"id\"><a name=\"%s\">%s</a></span>" p id
+  | Anchors ps ->
+       let classes =
+         if StringSet.mem id mathcomp_hierarchy_builders then
+           "hierarchy-builder" else ""
+       in
+       nested_ids_anchor classes ps id
 
 let ident_escape pos id = ident pos @@ Generate_index.html_escape id
 

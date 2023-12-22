@@ -97,7 +97,7 @@ span.gallina-kwd {
   color:  #228b22;
 }
 
-span.hierarchy-builder {
+.hierarchy-builder {
   color: #ff4500;
   margin: 2em 0;
   border: solid 1px #cd0000;
