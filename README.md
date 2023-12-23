@@ -2,22 +2,39 @@
 
 ## Fork by yoshihiro503
 
-* The branch is [yoshihiro503%40generate_index](https://github.com/yoshihiro503/coq2html/tree/yoshihiro503%40generate_index)
-
 ### The Additional Features of this fork
-* Generate Indexes
+
+* Generate Indexes: `index.html`
 * `-Q <dir> <coqdir>` option
-* TODO: Markdown support
+* Markdown and katex notation in documentation comment
+* Clickable notations
+* Design for mobile phone
+* Darkmode
 
-### pages
 
-https://yoshihiro503.github.io/coq2html/
+### Usage example
 
-### Usage
 In the case using in mathcomp analysis directory:
+```console
+../coq2html/coq2html \\
+  -d html/ -base mathcomp -Q theories analysis \\
+  -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ \\
+  -external https://math-comp.github.io/htmldoc/ mathcomp.ssreflect \\
+  -external https://math-comp.github.io/htmldoc/ mathcomp.algebra \\
+  classical/*.v classical/*.glob \\
+  theories/*.v theories/*.glob
 ```
-../coq2html/coq2html -d html/ -base mathcomp -Q theories analysis -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ -external https://math-comp.github.io/htmldoc/ mathcomp.ssreflect -external https://math-comp.github.io/htmldoc/ mathcomp.algebra classical/*.v classical/*.glob theories/*.v theories/*.glob
+
+```tree
+.
+├── coq2html/
+└── analysis/
 ```
+
+### Demo pages
+
+* mathcomp analysis: https://yoshihiro503.github.io/coq2html/
+* monae: https://yoshihiro503.github.io/coq2html/monae-html/
 
 ## Overview
 
