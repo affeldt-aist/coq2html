@@ -17,6 +17,7 @@
 In the case using in mathcomp analysis directory:
 ```console
 ../coq2html/coq2html \\
+  -title "Mathcomp Analysis" \\
   -d html/ -base mathcomp -Q theories analysis \\
   -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ \\
   -external https://math-comp.github.io/htmldoc/ mathcomp.ssreflect \\

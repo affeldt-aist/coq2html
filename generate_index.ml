@@ -38,9 +38,10 @@ let alphabets = (* ['A'; ...; 'Z'; '_'] *)
   in
   List.rev ('*' :: '_' :: iter (Char.code 'A') [])
 
-let write_html_file txt filename =
+let write_html_file txt filename title =
   let oc = open_out filename in
-  output_string oc (Str.global_replace (Str.regexp "<h1.*</h1>") "" Resources.header);
+  output_string oc (Str.global_replace (Str.regexp "<title>.*</title>") (!%"<title>%s</title>" title)
+                      (Str.global_replace (Str.regexp "<h1.*</h1>") "" Resources.header));   
   output_string oc txt;
   output_string oc Resources.footer;
   close_out oc
@@ -153,12 +154,13 @@ let generate_with_capital output_dir table kind (c, items) =
       |> String.concat "<br>"
       |> (^) (!%"%s<h2>%s</h2>" table h2)
     in
-    write_html_file body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c))
+    let title = !%"%C (%s)" c (skind kind) in
+    write_html_file body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
 
 (* generate index.html *)
-let generate_topfile output_dir xrefs =
+let generate_topfile output_dir xrefs title =
   let body = table xrefs in
-  write_html_file body (Filename.concat output_dir "index.html")
+  write_html_file body (Filename.concat output_dir "index.html") title
 
 let is_initial c s =
   if s = "" then false else
@@ -170,7 +172,7 @@ let is_initial c s =
     | _, _ -> false
 
 
-let generate output_dir xref_table xref_modules =
+let generate output_dir xref_table xref_modules title =
   let indexed_items =
     List.map (fun c ->
         let items =
@@ -201,5 +203,5 @@ let generate output_dir xref_table xref_modules =
   List.iter (fun kind ->
       List.iter (generate_with_capital output_dir (table indexed_items) kind) indexed_items)
     kinds;
-  generate_topfile output_dir indexed_items
+  generate_topfile output_dir indexed_items title
 

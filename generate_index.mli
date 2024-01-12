@@ -6,4 +6,4 @@ val escaped : string -> string
 
 val sanitize_linkname : string -> string
 
-val generate : string -> (string * int, xref) Hashtbl.t -> (string, unit) Hashtbl.t -> unit
+val generate : string -> (string * int, xref) Hashtbl.t -> (string, unit) Hashtbl.t -> string -> unit

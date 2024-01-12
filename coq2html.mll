@@ -575,6 +575,7 @@ let make_redirect fromfile toURL =
     (global_replace (Str.regexp "\\$URL") toURL Resources.redirect);
   close_out oc
 
+let title = ref ""
 let output_dir = ref Filename.current_dir_name
 let logical_name_base = ref ""
 let generate_css = ref true
@@ -621,6 +622,8 @@ let _ =
       eprintf "Don't know what to do with file %s\n" f; exit 2
     end in
   Arg.parse (Arg.align [
+    "-title", Arg.String (fun s -> title := s),
+      "<title>  Set the title of the index.html";
     "-base", Arg.String (fun s -> logical_name_base := s ^ "."),
       "<coqdir>  Set the name space for the modules being processed";
     "-coqlib", Arg.String (fun s -> add_documentation_url "Coq" s),
@@ -660,7 +663,7 @@ let _ =
   end;
   List.iter process_glob_file (List.rev !glob_files);
   List.iter process_v_file (List.rev !v_files);
-  Generate_index.generate !output_dir xref_table xref_modules;
+  Generate_index.generate !output_dir xref_table xref_modules !title;
   write_file Resources.js (Filename.concat !output_dir "coq2html.js");
   if !generate_css then
     write_file Resources.css (Filename.concat !output_dir "coq2html.css")
