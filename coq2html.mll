@@ -165,8 +165,10 @@ let coq_gallina_keywords = mkset [
 ]
 
 let mathcomp_hierarchy_builders = mkset [
-  "HB.instance"; "HB.builders"; "HB.factory"; "HB.mixin";
-  "HB.structure"
+  "HB.check"; "HB.locate"; "HB.about"; "HB.howto";
+  "HB.status"; "HB.graph"; "HB.mixin"; "HB.structure";
+  "HB.saturate"; "HB.instance"; "HB.factory"; "HB.builders";
+  "HB.end"; "HB.export"; "HB.reexport"; "HB.declare";
 ]
 
 (** HTML generation *)
