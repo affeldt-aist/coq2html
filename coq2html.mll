@@ -350,7 +350,7 @@ rule coq_bol = parse
       { start_proof s sp;
         skip_newline lexbuf }
   (* Enter special syntax mode e.g. markdown syntax *)
-  | space* "(***" (['a'-'z' '-']+ as mode)
+  | space* "(**" (['a'-'z' '-']+ as mode)
       { fprintf !oc "<div class=\"doc %s\">" mode;
         custom_mode lexbuf;
         end_doc();
@@ -377,7 +377,7 @@ rule coq_bol = parse
 	skip_newline lexbuf
       }
   (* Enter ssrdoc with special syntax mode e.g. markdown syntax *)
-  | space* ("(***" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n" as s)
+  | space* ("(**" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n" as s)
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
