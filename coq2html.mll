@@ -114,13 +114,13 @@ let crossref m pos =
   (*eprintf "crossref %s %d\n" m pos;*)
   try match Hashtbl.find xref_table (m, pos) with
   | Defs defs ->
-      Anchors (List.map fst defs)
+      Anchors (List.map (fun (path, _) -> sanitize_linkname path) defs)
   | Ref(m', p, _) ->
       let url = url_for_module m' in  (* can raise Not_found *)
       if p = "" then
         Link url
       else
-        Link(url ^ "#" ^ p)
+        Link(url ^ "#" ^ (sanitize_linkname p))
   with Not_found ->
     Nolink
 
@@ -251,21 +251,6 @@ let ident pos id =
            "hierarchy-builder" else ""
        in
        nested_ids_anchor classes ps id
-
-let ident_escape pos id = ident pos @@ Generate_index.html_escape id
-
-(* special hack:
-   The references of notations in glob file sometime include white space.
-   c.f. https://coq.zulipchat.com/#narrow/stream/237656-Coq-devs-.26-plugin-devs/topic/Bug.3F.3A.20position.20of.20reference.20of.20notations.20in.20glob.20file/near/406709205
- *)
-let ident_escape_with_white pos id =
-  let pos' =
-    match crossref !current_module pos with
-    | Nolink -> pos+1
-    | _ -> pos
-  in
-  ident_escape pos' id
-     
 
 let space s =
   for _ = 1 to String.length s do fprintf !oc "&nbsp;" done
@@ -427,12 +412,22 @@ and coq = parse
   | eof
       { () }
   | quoted as q
-      {ident_escape (Lexing.lexeme_start lexbuf) q; coq lexbuf}
+      {ident (Lexing.lexeme_start lexbuf) (escaped q); coq lexbuf}
   | ' ' (symbol non_whites* as id)
       {output_char !oc ' ';
-       ident_escape_with_white (Lexing.lexeme_start lexbuf) id; coq lexbuf}
+       (* special hack:
+          The references of notations in glob file sometime include white space.
+          c.f. https://coq.zulipchat.com/#narrow/stream/237656-Coq-devs-.26-plugin-devs/topic/Bug.3F.3A.20position.20of.20reference.20of.20notations.20in.20glob.20file/near/406709205
+        *)
+       let pos' =
+         let pos = Lexing.lexeme_start lexbuf in
+         match crossref !current_module pos with
+         | Nolink -> pos + 1
+         | _ -> pos
+       in
+       ident pos' (escaped id); coq lexbuf}
   | non_whites as id
-      {ident_escape (Lexing.lexeme_start lexbuf) id; coq lexbuf}
+      {ident (Lexing.lexeme_start lexbuf) (escaped id); coq lexbuf}
   | _ as c
       { character c; coq lexbuf }
 

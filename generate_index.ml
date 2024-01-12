@@ -1,16 +1,32 @@
 let (!%) s = Printf.sprintf s
 
-let html_escape s =
-  String.to_seq s
-  |> Seq.map (function
-       | '<' -> "&lt;"
-       | '>' -> "&gt;"
-       | '&' -> "&amp;"
-       | ' ' -> "&nbsp;"
-       | c -> String.make 1 c)
-  |> List.of_seq
-  |> String.concat ""
-                
+let escaped =
+  let buff = Buffer.create 5 in
+  fun s ->
+  Buffer.clear buff;
+  for i = 0 to String.length s - 1 do
+    match s.[i] with
+    | '<' -> Buffer.add_string buff "&lt;"
+    | '>' -> Buffer.add_string buff "&gt;"
+    | '&' -> Buffer.add_string buff "&amp;"
+    | '\"' -> Buffer.add_string buff "&quot;"
+    | c -> Buffer.add_char buff c
+  done;
+  Buffer.contents buff
+
+let sanitize_linkname s =
+  let rec loop esc i =
+    if i < 0 then if esc then escaped s else s
+    else match s.[i] with
+         | 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' | '_' -> loop esc (i-1)
+         | '<' | '>' | '&' | '\'' | '\"' -> loop true (i-1)
+         | '-' | ':' -> loop esc (i-1) (* should be safe in HTML5 attribute name syntax *)
+         | _ ->
+            (* This name contains complex characters:
+               this is probably a notation string, we simply hash it. *)
+            Digest.to_hex (Digest.string s)
+  in loop false (String.length s - 1)
+
 type xref =
   | Defs of (string * string) list    (* path, type *)
   | Ref of string * string * string (* unit, path, type *)
@@ -164,7 +180,7 @@ let generate output_dir xref_table xref_modules =
                List.filter (fun (_, typ) -> typ <> "binder") defs
                |> List.filter (fun (path, _) -> is_initial c path)
                |> List.map (fun (path, typ) ->
-                      let linkname = !%"%s.html#%s" name path in
+                      let linkname = !%"%s.html#%s" name (sanitize_linkname path) in
                       let module_ = name in
                       {kind=EntryKind typ; name=path; linkname; module_})
                |> fun is -> is @ store
