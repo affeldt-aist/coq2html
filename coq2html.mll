@@ -152,6 +152,8 @@ let coq_vernaculars = mkset [
   "Require"; "Reserved"; "Scheme"; "Scope"; "Section";
   "Strategy"; "Structure"; "SubClass"; "Tactic"; "Theorem";
   "Transparent"; "Universe"; "Variable"; "Variables"; "Variant";
+  "Unset"; "Strict"; "Printing"; "Defensive"; "Number"; "Declare";
+  "Delimit"; "Bind"; "Local";
 ]
 
 let coq_gallina_keywords = mkset [
