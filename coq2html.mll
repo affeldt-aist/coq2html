@@ -229,9 +229,8 @@ let nested_ids_anchor classes ids text =
     |> String.concat ""
   in
   let closes = List.map (fun _ -> "</span>") ids |> String.concat "" in
-  fprintf !oc {|%s
-  <a name="%s" class="%s">%s</a>
-%s|} opens id0 classes text closes
+  fprintf !oc {|%s<a name="%s" class="%s">%s</a>%s|} opens id0 classes
+    text closes
 
 let ident pos id =
   if StringSet.mem id coq_gallina_keywords then
