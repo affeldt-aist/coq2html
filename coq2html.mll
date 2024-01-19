@@ -575,7 +575,9 @@ let make_redirect fromfile toURL =
     (global_replace (Str.regexp "\\$URL") toURL Resources.redirect);
   close_out oc
 
-let title = ref ""
+let default_title () = Filename.basename @@ Sys.getcwd ()
+
+let title = ref (default_title ())
 let output_dir = ref Filename.current_dir_name
 let logical_name_base = ref ""
 let generate_css = ref true
