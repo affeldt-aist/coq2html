@@ -224,7 +224,7 @@ let end_doc () =
 
 let nested_ids_anchor classes ids text =
   let id0 = List.hd ids in
-  let opens = 
+  let opens =
     List.map (fun id ->sprintf "<span id=\"%s\" class=\"id\">"id ) ids
     |> String.concat ""
   in
@@ -304,9 +304,10 @@ let end_proof kwd =
 let global_replace re subst txt =
   Str.global_substitute re (fun _ -> subst) txt
 
-let start_html_page modname =
-  output_string !oc
-    (global_replace (Str.regexp "\\$NAME") modname Resources.header)
+let start_html_page modname all_files =
+  global_replace (Str.regexp "\\$NAME") modname Resources.header
+  |> global_replace (Str.regexp_string "$FILES") (sidebar_files all_files)
+  |> output_string !oc
 
 let end_html_page () =
   output_string !oc Resources.footer
@@ -324,8 +325,8 @@ let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
 let globkind = ['a'-'z']+
 
 let quoted = ['\"'] [' '-'~']* ['\"']
-let symbol = ['!' '#'-'\'' '*'-'/' ':'-'?' '['-'`' '{'-'~']
-let non_whites = ['!' '#'-'\'' '*'-'-' '/'-'~']+
+let symbol = ['!' '#' '$' '*' '\'' '*'-'-' '/' ':'-'?' '['-'`' '{'-'~'] (*'"', '%', '.', '(', ')' *)
+let non_whites = (['A'-'Z' 'a'-'z' '0'-'9'] | symbol)+
 
 let xref = (['A'-'Z' 'a'-'z' '0'-'9' '#'-'~'] | utf8)+ | "<>"
 
@@ -364,6 +365,12 @@ rule coq_bol = parse
       }
   (* Enter ssrdoc with special syntax mode e.g. markdown syntax *)
   | space* ("(**" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n" as s)
+      { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
+        ssr_doc_bol lexbuf;
+	fprintf !oc "%s" "</div>\n";
+	skip_newline lexbuf
+      }
+  | space* ("(***" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n" as s)
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
@@ -589,10 +596,11 @@ let process_v_file f =
   let module_name = !logical_name_base ^ module_name_of_file_name pref_f in
   current_module := module_name;
   let friendly_name = if !use_short_names then base_f else module_name in
+  let all_files = Generate_index.all_files xref_modules in
   let ic = open_in f in
   oc := open_out (Filename.concat !output_dir (module_name ^ ".html"));
   enum_depth := 0; in_proof := false;
-  start_html_page friendly_name;
+  start_html_page friendly_name all_files;
   coq_bol (Lexing.from_channel ic);
   end_html_page();
   close_out !oc; oc := stdout;

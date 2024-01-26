@@ -15,8 +15,8 @@
 
 body {
   font-family: Arial, Helvetica;
-  margin-left: 5em;
-  margin-right: 5em;
+  margin-left: 0em;
+  margin-right: 0em;
   font-size: large;
 }
 
@@ -47,8 +47,8 @@ h1, h2, h3 {
 }
 
 div.coq {
-  margin-left: 15%;
-  margin-right: 15%;
+  margin-left: 0%;
+  margin-right: 0%;
   font-family: monospace;
 }
 
@@ -130,6 +130,20 @@ div.ssrdoc {
     border: solid 2px;
     padding-left: 1em;
     padding-right: 1em;
+}
+
+.sidebar {
+    height: 100%;
+    width: 200px;
+    position: fixed;
+    margin-left: 12px;
+    //padding: 16px;
+    overflow-y: scroll;
+}
+
+div.content {
+    margin-left: 232px;
+    padding-left: 12px;
 }
 
 .warning {

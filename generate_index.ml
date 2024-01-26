@@ -38,10 +38,34 @@ let alphabets = (* ['A'; ...; 'Z'; '_'] *)
   in
   List.rev ('*' :: '_' :: iter (Char.code 'A') [])
 
-let write_html_file txt filename title =
+type file_path =
+  | Dir of (string * file_path list)
+  | File of string
+
+let sidebar_files all_files =
+  let rec tag_of_file_path parents = function
+    | File name ->
+       let link = (String.concat "." (List.rev (name :: parents))) ^ ".html" in
+       !%{|<li><a href="%s">%s</a></li>|} link name
+    | Dir (name, fs) ->
+       !%{|<li><details><summary>%s</summary>
+          <ul>
+          %s
+          </ul>
+          </details>
+          </li>|} name (List.map (tag_of_file_path (name :: parents)) fs |> String.concat "\n")
+  in
+  List.map (tag_of_file_path []) all_files
+  |> String.concat "\n"
+
+let write_html_file all_files txt filename title =
   let oc = open_out filename in
-  output_string oc (Str.global_replace (Str.regexp "<title>.*</title>") (!%"<title>%s</title>" title)
-                      (Str.global_replace (Str.regexp "<h1.*</h1>") "" Resources.header));   
+  let header =
+    Str.global_replace (Str.regexp "<h1.*</h1>") "" Resources.header
+    |> Str.global_replace (Str.regexp "<title>.*</title>") (!%"<title>%s</title>" title)
+    |> Str.global_replace (Str.regexp_string "$FILES") (sidebar_files all_files)
+  in
+  output_string oc header;
   output_string oc txt;
   output_string oc Resources.footer;
   close_out oc
@@ -139,7 +163,7 @@ let html_of_notation_item item =
   !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (show notation) (linkname_of_kind item.kind) item.module_ scope
 
 (* generate an html file e.g. mathcomp.classical.functions.html *)
-let generate_with_capital output_dir table kind (c, items) =
+let generate_with_capital output_dir table all_files kind (c, items) =
   let html_of_item item =
     if item.kind = EntryKind "not" then
       html_of_notation_item item
@@ -155,12 +179,12 @@ let generate_with_capital output_dir table kind (c, items) =
       |> (^) (!%"%s<h2>%s</h2>" table h2)
     in
     let title = !%"%C (%s)" c (skind kind) in
-    write_html_file body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
+    write_html_file all_files body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
 
 (* generate index.html *)
-let generate_topfile output_dir xrefs title =
+let generate_topfile output_dir all_files xrefs title =
   let body = table xrefs in
-  write_html_file body (Filename.concat output_dir "index.html") title
+  write_html_file all_files body (Filename.concat output_dir "index.html") title
 
 let is_initial c s =
   if s = "" then false else
@@ -171,6 +195,25 @@ let is_initial c s =
     | '*', _ -> true
     | _, _ -> false
 
+let all_files xref_modules =
+  let rec iter = function
+    | [] -> []
+    | [single_name] :: rest ->
+       File single_name :: iter rest
+    | (dir_name :: path) :: rest ->
+       let (brothers, rest) =
+         List.partition (fun p -> List.hd p = dir_name) rest
+       in
+       let fs =
+         List.map List.tl brothers
+         |> iter
+       in
+       Dir (dir_name, fs) :: iter rest
+  in
+  Hashtbl.to_seq_keys xref_modules
+  |> List.of_seq
+  |> List.map (String.split_on_char '.') 
+  |> iter
 
 let generate output_dir xref_table xref_modules title =
   let indexed_items =
@@ -200,8 +243,9 @@ let generate output_dir xref_table xref_modules title =
         |> fun items -> (c, items))
       alphabets
   in
+  let all_files = all_files xref_modules in
   List.iter (fun kind ->
-      List.iter (generate_with_capital output_dir (table indexed_items) kind) indexed_items)
+      List.iter (generate_with_capital output_dir (table indexed_items) all_files kind) indexed_items)
     kinds;
-  generate_topfile output_dir indexed_items title
+  generate_topfile output_dir all_files indexed_items title
 

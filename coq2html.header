@@ -14,5 +14,13 @@
 </head>
 
 <body onload="init()">
+
+<div class="sidebar">
+  <h2>Files</h2>
+  $FILES
+</div>
+
 <h1 class="title">Module $NAME</h1>
 <div class="coq">
+
+<div class="content">

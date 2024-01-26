@@ -19,7 +19,7 @@ coq2html: $(GEN_IDX).cmi $(GEN_IDX).cmx coq2html.cmx
 coq2html.cmx: resources.cmx
 resources.cmx: resources.cmi
 
-RESOURCES=header footer css redirect
+RESOURCES=header footer css js redirect
 
 resources.ml: $(RESOURCES:%=coq2html.%)
 	(for i in $(RESOURCES); do \
