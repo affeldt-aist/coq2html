@@ -205,7 +205,7 @@ let all_files xref_modules =
          List.partition (fun p -> List.hd p = dir_name) rest
        in
        let fs =
-         List.map List.tl brothers
+         (path :: List.map List.tl brothers)
          |> iter
        in
        Dir (dir_name, fs) :: iter rest

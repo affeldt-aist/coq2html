@@ -590,13 +590,12 @@ let generate_css = ref true
 let use_short_names = ref false
 let generate_redirects = ref false
 
-let process_v_file f =
+let process_v_file all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
   let base_f = Filename.basename pref_f in
   let module_name = !logical_name_base ^ module_name_of_file_name pref_f in
   current_module := module_name;
   let friendly_name = if !use_short_names then base_f else module_name in
-  let all_files = Generate_index.all_files xref_modules in
   let ic = open_in f in
   oc := open_out (Filename.concat !output_dir (module_name ^ ".html"));
   enum_depth := 0; in_proof := false;
@@ -671,7 +670,8 @@ let _ =
     exit 2
   end;
   List.iter process_glob_file (List.rev !glob_files);
-  List.iter process_v_file (List.rev !v_files);
+  let all_files = Generate_index.all_files xref_modules in
+  List.iter (process_v_file all_files) (List.rev !v_files);
   Generate_index.generate !output_dir xref_table xref_modules !title;
   write_file Resources.js (Filename.concat !output_dir "coq2html.js");
   if !generate_css then
