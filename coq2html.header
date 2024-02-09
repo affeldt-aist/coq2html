@@ -15,12 +15,18 @@
 
 <body onload="init()">
 
-<div class="sidebar">
-  <h2>Files</h2>
-  $FILES
-</div>
+  <header>
+    <p><a href="./index.html">coq2html</a></p>
+    <h1 class="title">Module $NAME</h1>
+    <p><a href="">source</a></p>
+  </header>
 
-<h1 class="title">Module $NAME</h1>
-<div class="coq">
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      $FILES
+    </div>
 
-<div class="content">
+  <div class="coq">
+
+    <div class="content">

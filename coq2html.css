@@ -13,28 +13,66 @@
      span.id      any other identifier
 */
 
+* {
+    box-sizing: border-box;
+}
+
 body {
   font-family: Arial, Helvetica;
-  margin-left: 0em;
-  margin-right: 0em;
+  margin: 8px;
   font-size: large;
 }
 
-h1.title {
-  font-size: 2em;
-  text-align: center
+header h1 {
+    font-size: 1.5em;
+    text-align: center;
+    font-weight: bold;
+    align-items: center;
 }
 
-h1 {
-  margin-left: 0em;
-  padding: 0px;
-  text-align: center
+header > * {
+    display: inline-block;
+    vertical-align: middle;
+}
+header {
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    width: 100vw;
+    height: 3em;
+    max-width: 100%;
+    padding: 0 1em;
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    z-index: 1;
+    background: #f2f1f1;
+}
+
+main {
+    margin-top: 4em;
+}
+
+div.sidebar {
+    left: 8px;
+    height: calc(100vh - 4em);
+    width: 200px;
+    position: fixed;
+    overflow-y: scroll;
+}
+
+li {
+    list-style: none;
+}
+ul {
+    padding-inline-start: 10px;
 }
 h2 {
   margin-left: 0em;
   padding: 0px;
   color: #580909
 }
+
 h3 {
   margin-left: 0em;
   padding: 0px;
@@ -130,15 +168,6 @@ div.ssrdoc {
     border: solid 2px;
     padding-left: 1em;
     padding-right: 1em;
-}
-
-.sidebar {
-    height: 100%;
-    width: 200px;
-    position: fixed;
-    margin-left: 12px;
-    //padding: 16px;
-    overflow-y: scroll;
 }
 
 div.content {

@@ -61,7 +61,7 @@ let sidebar_files all_files =
 let write_html_file all_files txt filename title =
   let oc = open_out filename in
   let header =
-    Str.global_replace (Str.regexp "<h1.*</h1>") "" Resources.header
+    Str.global_replace (Str.regexp "<h1.*</h1>") (!%"<h1>%s</h1>" title) Resources.header
     |> Str.global_replace (Str.regexp "<title>.*</title>") (!%"<title>%s</title>" title)
     |> Str.global_replace (Str.regexp_string "$FILES") (sidebar_files all_files)
   in
