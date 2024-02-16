@@ -162,6 +162,9 @@ let html_of_notation_item item =
   in
   !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (show notation) (linkname_of_kind item.kind) item.module_ scope
 
+let compare_case_insensitive s1 s2 =
+  String.(compare (lowercase s1) (lowercase s2))
+
 (* generate an html file e.g. mathcomp.classical.functions.html *)
 let generate_with_capital output_dir table all_files kind (c, items) =
   let html_of_item item =
@@ -212,6 +215,7 @@ let all_files xref_modules =
   in
   Hashtbl.to_seq_keys xref_modules
   |> List.of_seq
+  |> List.sort compare_case_insensitive
   |> List.map (String.split_on_char '.') 
   |> iter
 
