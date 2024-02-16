@@ -48,12 +48,13 @@ let sidebar_files all_files =
        let link = (String.concat "." (List.rev (name :: parents))) ^ ".html" in
        !%{|<li><a href="%s">%s</a></li>|} link name
     | Dir (name, fs) ->
-       !%{|<li><details><summary>%s</summary>
+       let current_path = List.rev (name :: parents) |> String.concat "." in
+       !%{|<li><details id="%s"><summary>%s</summary>
           <ul>
           %s
           </ul>
           </details>
-          </li>|} name (List.map (tag_of_file_path (name :: parents)) fs |> String.concat "\n")
+          </li>|} current_path name (List.map (tag_of_file_path (name :: parents)) fs |> String.concat "\n")
   in
   List.map (tag_of_file_path []) all_files
   |> String.concat "\n"
