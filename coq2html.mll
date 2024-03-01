@@ -91,9 +91,22 @@ let url_for_module m =
 let directory_mappings : (string * string) list ref = ref []
 
 let add_directory_mapping physical_dir path =
+  let physical_dir = if physical_dir = "." then "" else physical_dir in
   directory_mappings := (physical_dir, path) :: !directory_mappings
 
-let module_name_of_file_name f =
+let find_directory_mapping physical_path =
+  List.filter_map (fun (dir, path) ->
+      if starts_with physical_path dir then Some (dir, path) else None)
+    !directory_mappings
+  |> List.sort (fun (x,_) (y,_) -> compare (String.length x) (String.length y))
+  |> List.rev
+  |> function
+    | [] -> None
+    | dir :: _ -> Some dir
+
+
+
+(*let module_name_of_file_name f =
   let concat f = Str.(split (regexp "/")) f
                  |> List.filter (fun s -> s <> "." && s <> "..")
                  |> String.concat "."
@@ -103,6 +116,12 @@ let module_name_of_file_name f =
   | Some (physical_dir, path) ->
      Str.(replace_first (regexp_string physical_dir)) path f
      |> concat
+*)
+let module_name_of_file_name f =
+  match find_directory_mapping f with
+  | Some (physical_dir, path) ->
+     Str.(replace_first (regexp_string physical_dir)) path f
+  | None -> f
 
 (* Produce a HTML link if possible *)
 
