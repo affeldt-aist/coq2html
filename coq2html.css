@@ -34,13 +34,13 @@ div.sidebar {
     position: fixed;
     overflow-y: scroll;
 }
-
-li {
+div.sidebar li {
     list-style: none;
 }
-ul {
+div.sidebar ul {
     padding-inline-start: 10px;
 }
+
 h1 {
     font-size: 1.5em;
     font-weight: bold;
