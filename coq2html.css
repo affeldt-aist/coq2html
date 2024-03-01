@@ -175,6 +175,10 @@ div.content {
     color: white;
 }
 
+.darkmode--activated span.docright {
+    color: white;
+}
+
 @media screen and (max-width:960px) {
 
     body {
