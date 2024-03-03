@@ -88,45 +88,61 @@ let url_for_module m =
       if starts_with m pref then url_concat url m ^ ".html" else url_for rem
   in url_for !documentation_urls
 
-let directory_mappings : (string * string) list ref = ref []
+let directory_mappings : (string list * string) list ref = ref []
 
 let add_directory_mapping physical_dir path =
-  let physical_dir = if physical_dir = "." then "" else physical_dir in
+  let physical_dir =
+    if physical_dir = "." then []
+    else String.split_on_char '/' physical_dir
+  in
   directory_mappings := (physical_dir, path) :: !directory_mappings
 
+let list_take n xs =
+  let rec iter store = function
+    | (n, _) when n <= 0 -> List.rev store
+    | (n, []) -> List.rev store
+    | (n, x :: xs) -> iter (x :: store) (n - 1, xs)
+  in
+  iter [] (n, xs)
+
+let list_drop n xs =
+  let rec iter = function
+    | (n, xs) when n <= 0 -> xs
+    | (n, []) -> []
+    | (n, _ :: xs) -> iter (n - 1, xs)
+  in
+  iter (n, xs)
+
+let list_max_by measure xs =
+  match xs with
+  | [] -> None
+  | x0 :: xs ->
+     List.fold_left (fun (m, y) x -> if measure x > m then (measure x, x) else (m, y))
+       (measure x0, x0) xs
+     |> snd
+     |> Option.some
+
 let find_directory_mapping physical_path =
+  let is_prefix prefix =
+    list_take (List.length prefix) physical_path = prefix
+  in
   List.filter_map (fun (dir, path) ->
-      if starts_with physical_path dir then Some (dir, path) else None)
+      if is_prefix dir then Some (dir, path) else None)
     !directory_mappings
-  |> List.sort (fun (x,_) (y,_) -> compare (String.length x) (String.length y))
-  |> List.rev
-  |> function
-    | [] -> None
-    | dir :: _ -> Some dir
+  |> list_max_by (fun (dir, _) -> List.length dir)
 
-
-
-(*let module_name_of_file_name f =
-  let concat f = Str.(split (regexp "/")) f
-                 |> List.filter (fun s -> s <> "." && s <> "..")
-                 |> String.concat "."
-  in
-  match List.find_opt (fun (dir, _) -> starts_with f dir) !directory_mappings with
-  | None -> concat f
-  | Some (physical_dir, path) ->
-     Str.(replace_first (regexp_string physical_dir)) path f
-     |> concat
-*)
 let module_name_of_file_name f =
-  let concat f = Str.(split (regexp "/")) f
-                 |> List.filter (fun s -> s <> "." && s <> "..")
-                 |> String.concat "."
-  in
-  match find_directory_mapping f with
+(*  let concat f =
+    String.split_on_char '/' f
+    |> List.filter (fun s -> s <> "." && s <> "..")
+    |> String.concat "."
+  in*)
+  let file_path = String.split_on_char '/' f in
+  match find_directory_mapping file_path with
   | Some (physical_dir, path) ->
-     Str.(replace_first (regexp_string physical_dir)) path f
-     |> concat
-  | None -> concat f
+     path :: list_drop (List.length physical_dir) file_path
+     |> String.concat "."
+  | None -> String.concat "." file_path
 
 (* Produce a HTML link if possible *)
 
