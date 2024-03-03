@@ -29,7 +29,7 @@ main {
 
 div.sidebar {
     left: 8px;
-    height: calc(100vh - 4em);
+    height: calc(100vh);
     width: 200px;
     position: fixed;
     overflow-y: scroll;
