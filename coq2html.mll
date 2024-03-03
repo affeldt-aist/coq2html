@@ -118,10 +118,15 @@ let find_directory_mapping physical_path =
      |> concat
 *)
 let module_name_of_file_name f =
+  let concat f = Str.(split (regexp "/")) f
+                 |> List.filter (fun s -> s <> "." && s <> "..")
+                 |> String.concat "."
+  in
   match find_directory_mapping f with
   | Some (physical_dir, path) ->
      Str.(replace_first (regexp_string physical_dir)) path f
-  | None -> f
+     |> concat
+  | None -> concat f
 
 (* Produce a HTML link if possible *)
 
