@@ -35,7 +35,7 @@ In the case using in mathcomp analysis directory:
 ### Demo pages
 
 * mathcomp analysis: https://yoshihiro503.github.io/coq2html/
-* monae: https://yoshihiro503.github.io/coq2html/monae-html/
+* monae: https://yoshihiro503.github.io/coq2html/monae/
 
 ## Overview
 
