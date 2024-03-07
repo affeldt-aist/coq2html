@@ -430,7 +430,7 @@ and skip_newline = parse
 
 and coq = parse
   | end_proof as ep
-      { end_proof ep;
+      { if !in_proof then end_proof ep;
         skip_newline lexbuf }
   | "(**r "
       { start_doc_right();
