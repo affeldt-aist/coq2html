@@ -137,7 +137,7 @@ let module_name_of_file_name f =
     |> List.filter (fun s -> s <> "." && s <> "..")
     |> String.concat "."
   in*)
-  let file_path = String.split_on_char '/' f in
+  let file_path = String.split_on_char '/' f |> List.filter ((<>) ".") in
   match find_directory_mapping file_path with
   | Some (physical_dir, path) ->
      path :: list_drop (List.length physical_dir) file_path
