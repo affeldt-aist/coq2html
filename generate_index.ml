@@ -164,7 +164,7 @@ let html_of_notation_item item =
   !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (show notation) (linkname_of_kind item.kind) item.module_ scope
 
 let compare_case_insensitive s1 s2 =
-  String.(compare (lowercase s1) (lowercase s2))
+  String.(compare (lowercase_ascii s1) (lowercase_ascii s2))
 
 (* generate an html file e.g. mathcomp.classical.functions.html *)
 let generate_with_capital output_dir table all_files kind (c, items) =
