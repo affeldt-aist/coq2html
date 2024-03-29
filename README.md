@@ -1,49 +1,34 @@
-# coq2html: an HTML documentation generator for Coq
-
-## Fork by yoshihiro503
-
-### The Additional Features of this fork
-
-* Generate Indexes: `index.html`
-* `-Q <dir> <coqdir>` option
-* Markdown and katex notation in documentation comment
-* Clickable notations
-* Design for mobile phone
-* Darkmode
-
-
-### Usage example
-
-In the case using in mathcomp analysis directory:
-```console
-../coq2html/coq2html \\
-  -title "Mathcomp Analysis" \\
-  -d html/ -base mathcomp -Q theories analysis \\
-  -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ \\
-  -external https://math-comp.github.io/htmldoc/ mathcomp.ssreflect \\
-  -external https://math-comp.github.io/htmldoc/ mathcomp.algebra \\
-  classical/*.v classical/*.glob \\
-  theories/*.v theories/*.glob
-```
-
-```tree
-.
-├── coq2html/
-└── analysis/
-```
-
-### Demo pages
-
-* mathcomp analysis: https://yoshihiro503.github.io/coq2html/
-* monae: https://yoshihiro503.github.io/coq2html/monae/
+# (a fork of) coq2html: an HTML documentation generator for Coq
 
 ## Overview
 
-coq2html is an HTML documentation generator for Coq source files.  It is an alternative to the standard coqdoc documentation generator distributed along with Coq.  The major feature of coq2html is its ability to fold proof scripts: in the generated HTML, proof scripts are initially hidden, but can be revealed one by one by clicking on the "Proof" keyword.  Here is an example of [folding in action](https://compcert.org/doc/html/compcert.common.Memory.html#Mem.valid_access_dec)
+This is a fork of coq2html.
+
+coq2html is an HTML documentation generator for Coq source files.  It is an alternative to the standard coqdoc documentation generator distributed along with Coq.  The major feature of coq2html is its ability to fold proof scripts: in the generated HTML, proof scripts are initially hidden, but can be revealed one by one by clicking on the "Proof" keyword.  Here is an example of [folding in action](https://compcert.org/doc/html/compcert.common.Memory.html#Mem.valid_access_dec).
 
 **Compatibility:** to produce cross-references, coq2html reads `.glob` files produced by Coq.  The format of those files sometimes changes between major releases of Coq, thus breaking coq2html.  The current version of coq2html is believed to be compatible with Coq 8.6 to 8.19.
 
+This fork extends coq2html with:
+* generation of indexes (like coqdoc)
+* clickable notations (like coqdoc)
+* an option `-Q <dir> <coqdir>`
+* Markdown and LaTeX notations in comments
+* darkmode
+* a sidebar that displays the modules tree
+* design for mobile phone (wip)
+
+The motivation for this fork it to provide a better documentation tool for [MathComp-Analysis](https://github.com/math-comp/analysis)
+which so far has been relying on a fragile combination of coqdoc and sed scripts.
+
 **History:** coq2html was developed and originally distributed as part of the [CompCert](https://compcert.org/) project when it became clear that the coqdoc of the time was not able to format the CompCert Coq sources the desired way.  This is the release of coq2html as a stand-alone tool, independent from CompCert.
+
+**Compatibility:** to produce cross-references, coq2html reads `.glob` files produced by `coqc`.  Their format is documented in [documented](https://github.com/coq/coq/blob/master/interp/dumpglob.mli).  `.glob` files exists since Coq 7.3 (2002-05) but their format has been changing silently between major releases of Coq; it was first documented officially in 2021. For this reason, coq2html has long been only believed to be compatible with Coq 8.6 to 8.13.
+
+### Examples of documentation generated using this fork of coq2hml:
+
+* [MathComp-Analysis](https://github.com/math-comp/analysis): https://yoshihiro503.github.io/coq2html/
+* [Monae](https://yoshihiro503.github.io/coq2html/monae/): https://yoshihiro503.github.io/coq2html/monae/
+* [CompCert](https://compcert.org/): https://yoshihiro503.github.io/coq2html/compcert/
 
 ## Usage
 
@@ -53,15 +38,41 @@ coq2html is an HTML documentation generator for Coq source files.  It is an alte
 
 Summary of options:
 
-Option              | Summary
---------------------|----------------------------
-`-base` _COQDIR_    | Set the name space for the modules being processed
-`-coqlib` _URL_     | Set base URL for Coq standard library
-`-d` _DIR_          | Output files to directory _DIR_ (default: current directory)
+Option                     | Summary
+---------------------------|----------------------------
+`-base` _COQDIR_           | Set the name space for the modules being processed
+`-coqlib` _URL_            | Set base URL for Coq standard library
+`-d` _DIR_                 | Output files to directory _DIR_ (default: current directory)
 `-external` _URL_ _COQDIR_ | Set base URL for linking references whose names start with _COQDIR_
-`-no-css`           | Do not add coq2html.css to the output directory
-`-redirect`         | Generate redirection files 
-`-short-names`      | Use short, unqualified module names in the output
+`-no-css`                  | Do not add coq2html.css to the output directory
+`-redirect`                | Generate redirection files
+`-short-names`             | Use short, unqualified module names in the output
+`-title` _TITLE_           | Set the title of the index page
+`-Q` _DIR_ _COQDIR_        | Map the directory _DIR_ to correspond to the module name _COQDIR_ (similar to `coqc`)
+`-fragile-mathcomp-break`  | In framed Mardown documentation comment, always put two spaces at the end of a line
+
+
+### Usage example
+
+Let us assume that the project [MathComp-Analysis](https://github.com/math-comp/analysis)
+is in the directory `analysis` and that coq2hml is installed in the directory `coq2html`
+with the following file hierarchy:
+```tree
+.
+├── coq2html/
+└── analysis/
+```
+Then the following command generates the documentation of MathComp-Analysis:
+```console
+../coq2html/coq2html \
+  -title "Mathcomp Analysis" \
+  -d html/ -base mathcomp -Q theories analysis \
+  -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ \
+  -external https://math-comp.github.io/htmldoc/ mathcomp.ssreflect \
+  -external https://math-comp.github.io/htmldoc/ mathcomp.algebra \
+  classical/*.v classical/*.glob \
+  theories/*.v theories/*.glob
+```
 
 ### HTML generation
 
@@ -117,18 +128,46 @@ The cross-references to the Coq standard library use the online version of this 
 ```
 for the 8.14.1 version of the standard library.
 
-Using the `-external` option, you can add cross-references to other external libraries whose coqdoc or coq2html-generated documentation is accessible online.  For example, 
+Using the `-external` option, you can add cross-references to other external libraries whose coqdoc or coq2html-generated documentation is accessible online.  For example,
 ```
         coq2html -external https://math-comp.github.io/htmldoc_1_12_0 mathcomp ...
 ```
 should produce cross-references to the `mathcomp` library modules.  (Warning: untested feature.)
 
-## Markup language for documentation comments
+## Special handling of proof scripts
 
-Documentation comments start with `(** ` (two stars followed by a space) or `(**r ` (two stars, the "r" character, one space).
+Proof scripts are Coq text (outside comments) that
+* starts with `Proof` or `Next Obligation` at the beginning of a line;
+* ends with `Qed.` or `Defined.` or `Save.` or `Admitted.` or `Abort.` at the end of a line.
+
+A proof script can start and end on the same line, e.g. `Proof. auto. Qed.`
+
+Proof scripts are formatted in a smaller font and folded by default, leaving only the starting line (`Proof`, etc) visible.  Clicking on this first line displays the whole proof script.
+
+The syntax of proof scripts is strict.  In particular, after stating a `Theorem` or `Lemma`, it does not work to omit the `Proof` keyword and start the script immediately, nor to abort it immediately with `Admitted.` or `Abort.`.  Likewise, the dot `.` must follow `Qed`, `Defined`, etc, without spaces.  For example, the following proof scripts won't be properly formatted:
+```
+Lemma x:...
+auto. Qed.                      (* No "Proof." to mark the beginning of the script. *)
+
+Lemma x:...
+Admitted.                       (* No "Proof." to mark the beginning of the script. *)
+
+Lemma x:...
+Proof. auto. Defined .          (* Whitespace between "Defined" and "." *)
+
+Lemma x:...  Proof. Admitted.   (* "Proof" must start a new line. *)
+```
+
+## Documentation comments
+
+Documentation comments start with
+- `(** ` (two stars followed by a space),
+- `(**r ` (two stars, the "r" character, one space), or
+- `(**md ` (two stars, the "md" string, one space).
 ```
      (** This is a documentation comment. *)
      (**r This is a right-aligned documentation comment. *)
+     (**md This is a Markdown comment. *)
      (* This is a regular comment. *)
 ```
 Regular, non-documentation comments are removed from the HTML output, except within proof scripts, where they are kept as is.
@@ -141,6 +180,24 @@ Documentation comments of the `(**` kind are formatted as described next, then i
      | nil                         (**r the empty list *)
      | cons (hd: A) (tl: list A).  (**r the  nonempty list [hd::tl] *)
 ```
+
+Documentation comments of the `(**md` kind are interpreted as Mardown input with possibly LaTeX mathematical notations (between `$` and `$`) inserted.
+
+In addition, comments formatted as follows (80 characters wide)
+```
+     (**md***************************************************************************)
+     (*                                                                             *)
+     (* Some Mardown + LaTeX comment.                                               *)
+     (*                                                                             *)
+     (*******************************************************************************)
+```
+are displayed inside a frame.
+
+## Markup language for coq2html
+
+Inside documentation comments that are not Markdown, one can use the following features to improve the rendering of comments.
+Many of them are subsumed by the Mardown language available in Mardown + LaTeX documentation comments which
+should be preferred when possible.
 
 ### Inline Coq text
 
@@ -187,7 +244,7 @@ Lists start with a dash `-` at the beginning of the line.  Subsequent lines star
 -     [cons h t], also written [h :: t], denoting the nonempty list
       with head [h] and tail [t].
 
-  If we remove the [nil] case and declare a [CoInductive], we get infinite 
+  If we remove the [nil] case and declare a [CoInductive], we get infinite
   streams instead of lists. *)
 ```
 Nested lists are built using two, three or four dashes instead of one:
@@ -230,3 +287,25 @@ Lemma x:...  Proof. Admitted.   (* "Proof" must start a new line. *)
 
 - The formatting of right-hanging documentation comments `(**r` is inflexible and not appropriate for narrow display windows or long source lines.
 
+## Implementation overview
+
+Main (OCaml) files:
+- Main file, modified from the original version of coq2html:
+  + [coq2html.mll](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.mll)
+- Added by this fork of coq2html to generate an index like coqdoc and a sidebar:
+  + [generate_index.ml](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.ml)
+  + [generate_index.mli](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.mli)
+
+Static HTML/CSS/JavaScript files:
+- [coq2html.header](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.header): HTML
+- [coq2html.footer](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.footer): HTML
+- [coq2html.redirect](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.redirect): HTML
+- [coq2html.css](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.css): CSS
+- [coq2html.js](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.js): JavaScript
+
+Dependencies (via `coq2html.header`):
+- [markdown-it-texmath](https://github.com/goessner/markdown-it-texmath) for Markdown + LaTeX
+- [Darkmode.js](https://darkmodejs.learn.uno/) for darkmode
+
+File automatically generated from the HTML/CSS/JavaScript files by the Makefile:
+- `resources.ml`: OCaml (where the HTML/CSS/JavaScript files are turned into OCaml strings)

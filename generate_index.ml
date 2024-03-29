@@ -1,3 +1,15 @@
+(* *********************************************************************)
+(*                                                                     *)
+(*        Addition to the the Coq2HTML documentation generator         *)
+(*                                                                     *)
+(*  Copyright National Institute of Advanced Industrial Science and    *)
+(*  Technology.  All rights reserved.  This file is distributed        *)
+(*  under the terms of the GNU General Public License as published by  *)
+(*  the Free Software Foundation, either version 2 of the License, or  *)
+(*  (at your option) any later version.                                *)
+(*                                                                     *)
+(* *********************************************************************)
+
 let (!%) s = Printf.sprintf s
 
 let escaped =
@@ -147,7 +159,7 @@ let html_of_notation_item item =
            tag_of_quoted (String.sub notation pos (pos'-pos) :: store) :: tags
            |> List.rev
         | Some pos' when String.get notation (pos'+1) = '\'' ->
-           (* continuous two quotation *)
+           (* two contiguous quotations *)
            let s = String.sub notation pos (pos' - pos) in
            quoted (pos'+2) tags ("\'" :: s :: store)
         | Some pos' ->
@@ -166,7 +178,9 @@ let html_of_notation_item item =
 let compare_case_insensitive s1 s2 =
   String.(compare (lowercase_ascii s1) (lowercase_ascii s2))
 
-(* generate an html file e.g. mathcomp.classical.functions.html *)
+(*
+ * generate an html file, e.g., mathcomp.classical.functions.html
+ *)
 let generate_with_capital output_dir table all_files kind (c, items) =
   let html_of_item item =
     if item.kind = EntryKind "not" then
@@ -185,7 +199,9 @@ let generate_with_capital output_dir table all_files kind (c, items) =
     let title = !%"%C (%s)" c (skind kind) in
     write_html_file all_files body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
 
-(* generate index.html *)
+(*
+ * generate index.html
+ *)
 let generate_topfile output_dir all_files xrefs title =
   let body = table xrefs in
   write_html_file all_files body (Filename.concat output_dir "index.html") title
