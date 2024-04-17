@@ -47,8 +47,6 @@ Option                     | Summary
 `-short-names`             | Use short, unqualified module names in the output
 `-title` _TITLE_           | Set the title of the index page
 `-Q` _DIR_ _COQDIR_        | Map the directory _DIR_ to correspond to the module name _COQDIR_ (similar to `coqc`)
-`-fragile-mathcomp-break`  | In framed Mardown documentation comment, always put two spaces at the end of a line
-
 
 ### Usage example
 
