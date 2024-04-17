@@ -10,6 +10,8 @@
 (*                                                                     *)
 (* *********************************************************************)
 
+type range = int * int
+
 let (!%) s = Printf.sprintf s
 
 let escaped =
@@ -82,7 +84,7 @@ let write_html_file all_files txt filename title =
   output_string oc txt;
   output_string oc Resources.footer;
   close_out oc
-  
+
 type kind = Global | EntryKind of string
 
 let kinds = [EntryKind "file";
@@ -124,7 +126,7 @@ let table citems =
   ^ "</tbody></table>"
 
 let html_of_notation_item item =
-  let (scope, notation) = 
+  let (scope, notation) =
     match Str.(bounded_split_delim (regexp ":") item.name 4) with
     | [_; _; ""; notation] -> ("<span class=\"warning\">no scope</span>", notation)
     | [_; _; scope; notation] -> ("in " ^ scope, notation)
@@ -233,7 +235,7 @@ let all_files xref_modules =
   Hashtbl.to_seq_keys xref_modules
   |> List.of_seq
   |> List.sort compare_case_insensitive
-  |> List.map (String.split_on_char '.') 
+  |> List.map (String.split_on_char '.')
   |> iter
 
 let generate output_dir xref_table xref_modules title =
@@ -242,7 +244,7 @@ let generate output_dir xref_table xref_modules title =
         let items =
           Hashtbl.fold (fun (name, pos) xref store ->
             match xref with
-            | Defs defs ->
+            | range, Defs defs ->
                List.filter (fun (_, typ) -> typ <> "binder") defs
                |> List.filter (fun (path, _) -> is_initial c path)
                |> List.map (fun (path, typ) ->
@@ -250,9 +252,9 @@ let generate output_dir xref_table xref_modules title =
                       let module_ = name in
                       {kind=EntryKind typ; name=path; linkname; module_})
                |> fun is -> is @ store
-            | Ref _ -> store) xref_table []
+            | range, Ref _ -> store) xref_table []
         in
-        
+
         Hashtbl.fold (fun filename _ store ->
             let basename = Str.(split (regexp_string ".") filename) |> List.rev |> List.hd in
             if is_initial c basename then
@@ -269,4 +271,3 @@ let generate output_dir xref_table xref_modules title =
       List.iter (generate_with_capital output_dir (table indexed_items) all_files kind) indexed_items)
     kinds;
   generate_topfile output_dir all_files indexed_items title
-

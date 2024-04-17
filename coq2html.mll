@@ -25,7 +25,7 @@ let fragile_mathcomp_break = ref false
 (* Record cross-references found in .glob files *)
 
 (* (name of module, character position in file) -> cross-reference *)
-let xref_table : (string * int, xref) Hashtbl.t = Hashtbl.create 273
+let xref_table : (string * int, range * xref) Hashtbl.t = Hashtbl.create 273
 
 (* Records all module names for which a .glob file is given *)
 let xref_modules : (string, unit) Hashtbl.t = Hashtbl.create 29
@@ -41,24 +41,27 @@ let add_module m =
   (*eprintf "add_module %s\n" m;*)
   Hashtbl.add xref_modules m ()
 
-let add_reference curmod pos dp sp id ty =
+let add_reference curmod pos_from pos_to dp sp id ty =
   (*eprintf "add_reference %s %d %s %s %s %s\n" curmod pos dp sp id ty;*)
-  if not (Hashtbl.mem xref_table (curmod, pos))
-  then Hashtbl.add xref_table (curmod, pos) (Ref(dp, path sp id, ty))
+  let range = (pos_from, pos_to) in
+  if not (Hashtbl.mem xref_table (curmod, pos_from))
+  then Hashtbl.add xref_table (curmod, pos_from) (range, Ref(dp, path sp id, ty))
 
-let add_definition curmod pos sp id ty =
+let add_definition curmod pos_from pos_to sp id ty =
   (*eprintf "add_definition %s %d %s %s %s\n" curmod pos sp id ty;*)
-  match Hashtbl.find_opt xref_table (curmod, pos) with
+  let range = (pos_from, pos_to) in
+  match Hashtbl.find_opt xref_table (curmod, pos_from) with
   | None ->
-     Hashtbl.add xref_table (curmod, pos) (Defs [path sp id, ty])
-  | Some (Defs defs) ->
-     Hashtbl.replace xref_table (curmod, pos) (Defs ((path sp id, ty) :: defs))
-  | Some (Ref (unit, path_, typ)) ->
+     Hashtbl.add xref_table (curmod, pos_from) (range, Defs [path sp id, ty])
+  | Some (range0, Defs defs) ->
+    if range <> range0 then eprintf "Warning: different pathes which have same starting position exists: module '%s', '%s' [%d:%d]\n" curmod (path sp id) pos_from pos_to;
+     Hashtbl.replace xref_table (curmod, pos_from) (range, Defs ((path sp id, ty) :: defs))
+  | Some (_, Ref (unit, path_, typ)) ->
      (* ignore references if the glob file has a reference and definitions at a
         same position.
         issue: https://github.com/yoshihiro503/coq2html/issues/2
       *)
-     Hashtbl.add xref_table (curmod, pos) (Defs [path sp id, ty])
+     Hashtbl.add xref_table (curmod, pos_from) (range, Defs [path sp id, ty])
 
 (* Map module names to URLs *)
 
@@ -148,21 +151,31 @@ let module_name_of_file_name f =
 
 (* Produce a HTML link if possible *)
 
-type link = Link of string | Anchors of string list | Nolink
+type link = Link of int * string | Anchors of int * string list | Nolink of int option
 
-let crossref m pos =
-  (*eprintf "crossref %s %d\n" m pos;*)
-  try match Hashtbl.find xref_table (m, pos) with
-  | Defs defs ->
-      Anchors (List.map (fun (path, _) -> sanitize_linkname path) defs)
-  | Ref(m', p, _) ->
-      let url = url_for_module m' in  (* can raise Not_found *)
+let crossref m pos max_pos =
+(*  eprintf "crossref %s %d\n" m pos;*)
+  match Hashtbl.find_opt xref_table (m, pos) with
+  | Some (_range, Defs [(path, "not")]) ->
+    let pos' = pos + String.length path in
+    Anchors (pos', [sanitize_linkname path])
+  | Some (range, Defs defs) ->
+    Anchors (snd range + 1, List.map (fun (path, _) -> sanitize_linkname path) defs)
+  | Some (range, Ref(m', p, _)) ->
+      let url = url_for_module m' in
       if p = "" then
-        Link url
+        Link (snd range + 1, url)
       else
-        Link(url ^ "#" ^ (sanitize_linkname p))
-  with Not_found ->
-    Nolink
+        Link (snd range + 1, url ^ "#" ^ (sanitize_linkname p))
+  | None ->
+    let rec search_next pos =
+      eprintf "[search_next %d %d]" pos; flush stderr;
+      if pos > max_pos then None
+      else if Hashtbl.find_opt xref_table (m, pos) = None then
+        search_next (pos + 1)
+      else Some pos
+    in
+    Nolink (search_next pos)
 
 (** Keywords *)
 
@@ -200,7 +213,7 @@ let coq_gallina_keywords = mkset [
   "Prop"; "SProp"; "Set"; "Type";
   "as"; "at"; "cofix"; "else"; "end"; "fix"; "for"; "forall"; "fun";
   "if"; "in"; "let"; "match"; "return"; "then"; "where"; "with";
-  "using"; "with";
+  "using";
 (* "The following are keywords defined in notations or plugins
     loaded in the prelude" (reference manual) *)
   "IF"; "by"; "exists"; "exists2"; "using";
@@ -269,25 +282,65 @@ let nested_ids_anchor classes ids text =
     |> String.concat ""
   in
   let closes = List.map (fun _ -> "</span>") ids |> String.concat "" in
-  fprintf !oc {|%s<a name="%s" class="%s">%s</a>%s|} opens id0 classes
-    text closes
+  sprintf {|%s<a name="%s" class="%s">%s</a>%s|} opens id0 classes
+    (escaped text) closes
 
-let ident pos id =
-  if StringSet.mem id coq_gallina_keywords then
-    fprintf !oc "<span class=\"gallina-kwd\">%s</span>" id
-  else if StringSet.mem id coq_vernaculars then
-    fprintf !oc "<span class=\"vernacular\">%s</span>" id
-  else match crossref !current_module pos with
-  | Nolink ->
-      fprintf !oc "<span class=\"id\">%s</span>" id
-  | Link p ->
-      fprintf !oc "<span class=\"id\"><a href=\"%s\">%s</a></span>" p id
-  | Anchors ps ->
+let is_gallina_keyword id =
+  StringSet.find_opt id coq_gallina_keywords
+
+let is_vernacular id =
+  StringSet.to_seq coq_vernaculars
+  |> Seq.find (fun key -> String.starts_with ~prefix:key id)
+
+let ident_partial pos id =
+  let name pos' id =
+    if pos' - pos > String.length id then id
+    else String.sub id 0 (pos' - pos)
+  in
+  match is_gallina_keyword (String.trim id), is_vernacular (String.trim id) with
+  | Some keyword, _ ->
+    let tags = sprintf "<span class=\"gallina-kwd\">%s</span>" (escaped id) in
+    (pos + String.length id, tags)
+  | None, Some vernac ->
+    let tags = sprintf "<span class=\"vernacular\">%s</span>" (escaped id) in
+    (pos + String.length vernac, tags)
+  | None, None ->
+    let max_pos = pos + String.length id in
+    match crossref !current_module pos max_pos with
+    | Nolink None ->
+(*      eprintf "   Nolink '%s'\n" id; *)
+      pos, sprintf "<span class=\"id\">%s</span>" (escaped id)
+    | Nolink (Some pos') ->
+(*      eprintf "   Nolink '%s'\n" (name pos' id); *)
+      pos', sprintf "<span class=\"id\">%s</span>" (escaped (name pos' id))
+    | Link (pos', p) ->
+(*      eprintf "   Link '%s'\n" (name pos' id); *)
+      pos', sprintf "<span class=\"id\"><a href=\"%s\">%s</a></span>" p (escaped (name pos' id))
+    | Anchors (pos', ps) ->
+(*      eprintf "   Anchors '%s'\n" (name pos' id); *)
        let classes =
          if StringSet.mem id mathcomp_hierarchy_builders then
            "hierarchy-builder" else ""
        in
-       nested_ids_anchor classes ps id
+       pos', nested_ids_anchor classes ps (name pos' id)
+
+let idents pos id =
+(*  eprintf "idents: %d '%s'\n" pos id;*)
+  let rec iter pos id =
+    if id = "" then () else begin
+      let (pos', tags) = ident_partial pos id in
+      fprintf !oc "%s" tags;
+      let rpos' = pos' - pos in
+      if pos' <= pos then begin
+        iter pos' ""
+      end else if rpos' > String.length id then begin
+        iter pos' ""
+      end else
+      let id' = String.sub id rpos' (String.length id - rpos') in
+      iter pos' id'
+    end
+  in
+  iter pos id
 
 let space s =
   for _ = 1 to String.length s do fprintf !oc "&nbsp;" done
@@ -334,8 +387,8 @@ let start_proof s kwd =
     kwd;
   fprintf !oc "<div class=\"proofscript\" id=\"proof%d\">\n" !proof_counter
 
-let end_proof kwd =
-  fprintf !oc "%s</div>\n" kwd;
+let end_proof spaces kwd =
+  fprintf !oc "%s%s</div>\n" spaces kwd;
   in_proof := false
 
 (* Like Str.global_replace but don't interpret '\1' etc in replacement text *)
@@ -358,7 +411,7 @@ let path = ident ("." ident)*
 let start_proof = ("Proof" space* ".") | ("Proof" space+ "with") | ("Next" space+ "Obligation.")
 let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
 let quoted = ['\"'] [' '-'~']* ['\"']
-let symbol = ['!' '#' '$' '*' '\'' '*'-'-' '/' ':'-'?' '['-'`' '{'-'~'] (*'"', '%', '.', '(', ')' *)
+let symbol = ['!' '#' '$' '&' '\'' '*'-'-' '/' ':'-'@' '['-'`' '{'-'~'] (*'"', '%', '.', '(', ')' *)
 let non_whites = (['A'-'Z' 'a'-'z' '0'-'9'] | symbol)+
 
 let xref = ['A'-'Z' 'a'-'z' '0'-'9' '#'-'~']+ | "<>"
@@ -421,8 +474,8 @@ and skip_newline = parse
       { coq lexbuf }
 
 and coq = parse
-  | end_proof as ep
-      { if !in_proof then end_proof ep;
+  | (space* as s) (end_proof as ep)
+      { if !in_proof then end_proof s ep;
         skip_newline lexbuf }
   | "(**r "
       { start_doc_right();
@@ -433,8 +486,8 @@ and coq = parse
       { if !in_proof then start_comment();
         comment lexbuf;
         coq lexbuf }
-  | path as id
-      { ident (Lexing.lexeme_start lexbuf) id; coq lexbuf }
+(*  | path as id
+      { ident (Lexing.lexeme_start lexbuf) id; coq lexbuf }*)
   | (". ") (space* as s) (start_proof as sp)
       { newline();
         start_proof s sp;
@@ -445,22 +498,23 @@ and coq = parse
   | eof
       { () }
   | quoted as q
-      {ident (Lexing.lexeme_start lexbuf) (escaped q); coq lexbuf}
-  | ' ' (symbol non_whites* as id)
-      {output_char !oc ' ';
+      {idents (Lexing.lexeme_start lexbuf) q; coq lexbuf}
+  | (' '? non_whites+ as id)
+      {(*output_char !oc ' ';*)
        (* special hack:
           The references of notations in glob file sometime include white space.
           c.f. https://coq.zulipchat.com/#narrow/stream/237656-Coq-devs-.26-plugin-devs/topic/Bug.3F.3A.20position.20of.20reference.20of.20notations.20in.20glob.20file/near/406709205
         *)
-       let pos' =
+(*       let pos' =
          let pos = Lexing.lexeme_start lexbuf in
          match crossref !current_module pos with
          | Nolink -> pos + 1
          | _ -> pos
-       in
-       ident pos' (escaped id); coq lexbuf}
-  | non_whites as id
-      {ident (Lexing.lexeme_start lexbuf) (escaped id); coq lexbuf}
+         in*)
+
+       idents (Lexing.lexeme_start lexbuf) id; coq lexbuf}
+(*  | non_whites as id
+      {idents (Lexing.lexeme_start lexbuf) id; coq lexbuf}*)
   | _ as c
       { character c; coq lexbuf }
 
@@ -470,7 +524,7 @@ and bracket = parse
   | '['
       { character '['; bracket lexbuf; character ']'; bracket lexbuf }
   | path as id
-      { ident (Lexing.lexeme_start lexbuf) id; bracket lexbuf }
+      { idents (Lexing.lexeme_start lexbuf) id; bracket lexbuf }
   | eof
       { () }
   | _ as c
@@ -570,20 +624,22 @@ and globfile = parse
   | "F" (path as m) space* "\n"
       { current_module := m; add_module m;
         globfile lexbuf }
-  | "R" (integer as pos) ":" (integer)
+  | "R" (integer as pos1) ":" (integer as pos2)
     space+ (xref as dp)
     space+ (xref as sp)
     space+ (xref as id)
     space+ (ident as ty)
     space* "\n"
-      { add_reference !current_module (int_of_string pos) dp sp id ty;
+      { add_reference !current_module (int_of_string pos1) (int_of_string pos2)
+          dp sp id ty;
         globfile lexbuf }
   | (ident as ty)
-    space+ (integer as pos) ":" (integer)
+    space+ (integer as pos1) ":" (integer as pos2)
     space+ (xref as sp)
     space+ (xref as id)
     space* "\n"
-      { add_definition !current_module (int_of_string pos) sp id ty;
+      { add_definition !current_module (int_of_string pos1) (int_of_string pos2)
+          sp id ty;
         globfile lexbuf }
   | [^ '\n']* "\n"
       { globfile lexbuf }
