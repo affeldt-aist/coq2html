@@ -20,8 +20,6 @@ open Generate_index
 
 let current_module = ref ""
 
-let fragile_mathcomp_break = ref false
-
 (* Record cross-references found in .glob files *)
 
 (* (name of module, character position in file) -> cross-reference *)
@@ -608,7 +606,7 @@ and doc = parse
       { character c; doc lexbuf }
 
 and custom_mode = parse
-  | "*)"
+  | space* "*)"
       { () }
   | eof
       { () }
@@ -628,11 +626,8 @@ and ssr_doc_bol = parse
       { ssr_doc lexbuf }
 
 and ssr_doc = parse
-  | "*)"
-      {
-        if !fragile_mathcomp_break then character ' ';
-        ssr_doc lexbuf
-      }
+  | space* "*)"
+      { ssr_doc lexbuf }
   | "\n"
       { character '\n'; ssr_doc_bol lexbuf }
   | eof
@@ -758,8 +753,6 @@ let _ =
       "   Generate redirection files modname.html -> coqdir.modname.html";
     "-short-names", Arg.Set use_short_names,
       "   Use short, unqualified module names in the output";
-    "-fragile-mathcomp-break", Arg.Unit (fun () -> fragile_mathcomp_break := true),
-      "   Always put two spaces at the end of lines in markdown mode";
   ])
   process_file
   "Usage: coq2html [options] file.glob ... file.v ...\nOptions are:";
