@@ -169,7 +169,7 @@ let crossref m pos max_pos =
         Link (snd range + 1, url ^ "#" ^ (sanitize_linkname p))
   | None ->
     let rec search_next pos =
-      eprintf "[search_next %d %d]" pos; flush stderr;
+      eprintf "[search_next %d]" pos; flush stderr;
       if pos > max_pos then None
       else if Hashtbl.find_opt xref_table (m, pos) = None then
         search_next (pos + 1)
@@ -449,20 +449,20 @@ rule coq_bol = parse
 	comment lexbuf;
         if !in_proof then coq lexbuf else skip_newline lexbuf }
   (* Enter verbatim mode *)
-  | space* ("(***" "*"+ "***)" "\n" as s)
+  | space* ("(***" "*"+ "***)" "\n")
       { fprintf !oc "<pre class=\"ssrdoc\">\n";
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</pre>\n";
 	skip_newline lexbuf
       }
   (* Enter ssrdoc with special syntax mode e.g. markdown syntax *)
-  | space* ("(**" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n" as s)
+  | space* ("(**" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n")
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
 	skip_newline lexbuf
       }
-  | space* ("(***" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n" as s)
+  | space* ("(***" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n")
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
@@ -616,7 +616,7 @@ and custom_mode = parse
 (* beginning of line *)
 and ssr_doc_bol = parse
   (* Leave verbatim mode *)
-  | space* ("(***" "*"+ "***)" as s)
+  | space* ("(***" "*"+ "***)")
       { () }
   | "(* "
       { ssr_doc_bol lexbuf }
