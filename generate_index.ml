@@ -231,6 +231,8 @@ let all_files xref_modules =
          |> iter
        in
        Dir (dir_name, fs) :: iter rest
+    | [] :: _ ->
+      failwith "Generate_index.all_files: Please report: This is an unexpected case."
   in
   Hashtbl.to_seq_keys xref_modules
   |> List.of_seq
