@@ -1,0 +1,24 @@
+#+title: Documentation for Developers
+#+author: Yoshihiro Imai
+
+* Main data flow
+
+#+CAPTION: Overview
+[[./overview.jpg]]
+
+ * `process_glob_file`
+A glob file is a text file that contains reference information for the location information of tokens when the v-file is divided into tokens.
+This process creates a table for each glob file that can look up the reference information using the location information as a key.
+
+ * `process_v_file`
+Generates html files while parsing v files.
+The above-mentioned reference information table is also used to generate the html file so that the user can click on lemmas or function names to jump to the referenced destination.
+
+ * `Generate_index.generate`
+
+Create an index page like the one in coqdoc for each module from the reference table.
+
+* How markdown + TeX notation is available
+* Darkmode
+* How the State of the menu toggles are kept by page transitions
+Save the status to localStorage property of window
