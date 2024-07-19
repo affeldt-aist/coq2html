@@ -10,7 +10,12 @@
 (*                                                                     *)
 (* *********************************************************************)
 
-type range = int * int
+module Range = struct
+  type t = int * int
+  let in_ x (a, b) = a <= x && x <= b
+end
+
+type range = Range.t
 
 let (!%) s = Printf.sprintf s
 

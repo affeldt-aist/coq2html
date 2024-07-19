@@ -10,7 +10,12 @@
 (*                                                                     *)
 (* *********************************************************************)
 
-type range = int * int
+module Range : sig
+  type t = (int * int)
+  val in_ : int -> t -> bool
+end
+
+type range = Range.t
 
 type xref =
   | Defs of (string * string) list

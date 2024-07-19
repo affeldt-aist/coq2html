@@ -151,9 +151,18 @@ let module_name_of_file_name f =
 
 type link = Link of int * string | Anchors of int * string list | Nolink of int option
 
+let find_pos xref_table (m, pos) =
+  match Hashtbl.find_opt xref_table (m, pos) with
+  | Some res -> Some res
+  | None ->
+    begin match Seq.find (fun (_, (range, _)) -> Range.in_ pos range) (Hashtbl.to_seq xref_table) with
+      | None -> None
+      | Some (_, res) -> Some res
+    end
+
 let crossref m pos max_pos =
 (*  eprintf "crossref %s %d\n" m pos;*)
-  match Hashtbl.find_opt xref_table (m, pos) with
+  match find_pos xref_table (m, pos) with
   | Some (_range, Defs [(path, "not")]) ->
     let pos' = pos + String.length path in
     Anchors (pos', [sanitize_linkname path])
@@ -167,7 +176,6 @@ let crossref m pos max_pos =
         Link (snd range + 1, url ^ "#" ^ (sanitize_linkname p))
   | None ->
     let rec search_next pos =
-      eprintf "[search_next %d]" pos; flush stderr;
       if pos > max_pos then None
       else if Hashtbl.find_opt xref_table (m, pos) = None then
         search_next (pos + 1)
@@ -409,10 +417,10 @@ let path = ident ("." ident)*
 let start_proof = ("Proof" space* ".") | ("Proof" space+ "with") | ("Next" space+ "Obligation.")
 let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
 let quoted = ['\"'] [' '-'~']* ['\"']
-let symbol = ['!' '#' '$' '&' '\'' '*'-'-' '/' ':'-'@' '['-'`' '{'-'~'] (*'"', '%', '.', '(', ')' *)
+let symbol = ['!' '#'-'\'' '*'-'/' ':'-'@' '['-'`' '{'-'~'] (*'"', '(', ')' *)
 let non_whites = (['A'-'Z' 'a'-'z' '0'-'9'] | symbol)+
 
-let xref = ['A'-'Z' 'a'-'z' '0'-'9' '#'-'~']+ | "<>"
+let xref = ['A'-'Z' 'a'-'z' '0'-'9' '!' '#'-'~']+ | "<>"
 let integer = ['0'-'9']+
 
 rule coq_bol = parse
