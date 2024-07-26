@@ -309,7 +309,7 @@ let ident_partial pos id =
     (pos + String.length id, tags)
   | None, Some vernac ->
     let tags = sprintf "<span class=\"vernacular\">%s</span>" (escaped id) in
-    (pos + String.length vernac, tags)
+    (pos + String.length id, tags)
   | None, None ->
     let max_pos = pos + String.length id in
     match crossref !current_module pos max_pos with
