@@ -155,7 +155,7 @@ let find_pos xref_table (m, pos) =
   match Hashtbl.find_opt xref_table (m, pos) with
   | Some res -> Some res
   | None ->
-    begin match Seq.find (fun (_, (range, _)) -> Range.in_ pos range) (Hashtbl.to_seq xref_table) with
+    begin match Seq.find (fun ((module_, _), (range, _)) -> module_ = m && Range.in_ pos range) (Hashtbl.to_seq xref_table) with
       | None -> None
       | Some (_, res) -> Some res
     end
