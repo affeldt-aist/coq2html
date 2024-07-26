@@ -23,7 +23,7 @@ let current_module = ref ""
 (* Record cross-references found in .glob files *)
 
 (* (name of module, character position in file) -> cross-reference *)
-let xref_table : (string * int, range * xref) Hashtbl.t = Hashtbl.create 273
+let xref_table = ref XrefTable.empty
 
 (* Records all module names for which a .glob file is given *)
 let xref_modules : (string, unit) Hashtbl.t = Hashtbl.create 29
@@ -40,26 +40,12 @@ let add_module m =
   Hashtbl.add xref_modules m ()
 
 let add_reference curmod pos_from pos_to dp sp id ty =
-  (*eprintf "add_reference %s %d %s %s %s %s\n" curmod pos dp sp id ty;*)
-  let range = (pos_from, pos_to) in
-  if not (Hashtbl.mem xref_table (curmod, pos_from))
-  then Hashtbl.add xref_table (curmod, pos_from) (range, Ref(dp, path sp id, ty))
+  let tbl = XrefTable.add_reference !xref_table curmod pos_from pos_to dp (path sp id) ty in
+  xref_table := tbl
 
 let add_definition curmod pos_from pos_to sp id ty =
-  (*eprintf "add_definition %s %d %s %s %s\n" curmod pos sp id ty;*)
-  let range = (pos_from, pos_to) in
-  match Hashtbl.find_opt xref_table (curmod, pos_from) with
-  | None ->
-     Hashtbl.add xref_table (curmod, pos_from) (range, Defs [path sp id, ty])
-  | Some (range0, Defs defs) ->
-    if range <> range0 then eprintf "Warning: different pathes which have same starting position exists: module '%s', '%s' [%d:%d]\n" curmod (path sp id) pos_from pos_to;
-     Hashtbl.replace xref_table (curmod, pos_from) (range, Defs ((path sp id, ty) :: defs))
-  | Some (_, Ref (unit, path_, typ)) ->
-     (* ignore references if the glob file has a reference and definitions at a
-        same position.
-        issue: https://github.com/yoshihiro503/coq2html/issues/2
-      *)
-     Hashtbl.add xref_table (curmod, pos_from) (range, Defs [path sp id, ty])
+  let tbl = XrefTable.add_definition !xref_table curmod pos_from pos_to (path sp id) ty in
+  xref_table := tbl
 
 (* Map module names to URLs *)
 
@@ -151,18 +137,11 @@ let module_name_of_file_name f =
 
 type link = Link of int * string | Anchors of int * string list | Nolink of int option
 
-let find_pos xref_table (m, pos) =
-  match Hashtbl.find_opt xref_table (m, pos) with
-  | Some res -> Some res
-  | None ->
-    begin match Seq.find (fun ((module_, _), (range, _)) -> module_ = m && Range.in_ pos range) (Hashtbl.to_seq xref_table) with
-      | None -> None
-      | Some (_, res) -> Some res
-    end
+let find_pos xref_table (m, pos) = XrefTable.find xref_table m pos
 
 let crossref m pos max_pos =
 (*  eprintf "crossref %s %d\n" m pos;*)
-  match find_pos xref_table (m, pos) with
+  match find_pos !xref_table (m, pos) with
   | Some (_range, Defs [(path, "not")]) ->
     let pos' = pos + String.length path in
     Anchors (pos', [sanitize_linkname path])
@@ -177,7 +156,7 @@ let crossref m pos max_pos =
   | None ->
     let rec search_next pos =
       if pos > max_pos then None
-      else if Hashtbl.find_opt xref_table (m, pos) = None then
+      else if find_pos !xref_table (m, pos) = None then
         search_next (pos + 1)
       else Some pos
     in
@@ -746,7 +725,7 @@ let _ =
   List.iter process_glob_file (List.rev !glob_files);
   let all_files = Generate_index.all_files xref_modules in
   List.iter (process_v_file all_files) (List.rev !v_files);
-  Generate_index.generate !output_dir xref_table xref_modules !title;
+  Generate_index.generate !output_dir !xref_table xref_modules !title;
   write_file Resources.js (Filename.concat !output_dir "coq2html.js");
   if !generate_css then
     write_file Resources.css (Filename.concat !output_dir "coq2html.css")

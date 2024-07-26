@@ -10,11 +10,6 @@
 (*                                                                     *)
 (* *********************************************************************)
 
-module Range = struct
-  type t = int * int
-  let in_ x (a, b) = a <= x && x <= b
-end
-
 type range = Range.t
 
 let (!%) s = Printf.sprintf s
@@ -46,9 +41,6 @@ let sanitize_linkname s =
             Digest.to_hex (Digest.string s)
   in loop false (String.length s - 1)
 
-type xref =
-  | Defs of (string * string) list    (* path, type *)
-  | Ref of string * string * string (* unit, path, type *)
 
 let alphabets = (* ['A'; ...; 'Z'; '_'] *)
   let rec iter code store =
@@ -245,13 +237,13 @@ let all_files xref_modules =
   |> List.map (String.split_on_char '.')
   |> iter
 
-let generate output_dir xref_table xref_modules title =
+let generate output_dir (xref_table:XrefTable.t) xref_modules title =
   let indexed_items =
     List.map (fun c ->
         let items =
-          Hashtbl.fold (fun (name, pos) xref store ->
+          XrefTable.fold (fun (name, pos) xref store ->
             match xref with
-            | range, Defs defs ->
+            | range, XrefTable.Defs defs ->
                List.filter (fun (_, typ) -> typ <> "binder") defs
                |> List.filter (fun (path, _) -> is_initial c path)
                |> List.map (fun (path, typ) ->
