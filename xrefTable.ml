@@ -27,6 +27,14 @@ let empty = Map.empty
 
 let add_reference xref_table curmod pos_from pos_to dp path ty =
   let range = (pos_from, pos_to) in
+  match Map.find_opt (curmod, pos_from) xref_table with
+  | Some (range0, xref) when range = range ->
+     (* ignore references if the glob file has a reference and definitions at a
+        same position.
+        issue: https://github.com/yoshihiro503/coq2html/issues/2
+      *)
+    xref_table
+  | _ ->
   Map.add (curmod, pos_from) (range, Ref (dp, path, ty)) xref_table
 
 let add_definition xref_table curmod pos_from pos_to path ty =
