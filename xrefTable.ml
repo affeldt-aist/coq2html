@@ -26,7 +26,6 @@ let find map module_name pos =
 let empty = Map.empty
 
 let add_reference xref_table curmod pos_from pos_to dp path ty =
-  Printf.printf "add_reference %s %d-%d %s %s %s\n" curmod pos_from pos_to dp path ty;
   let range = (pos_from, pos_to) in
   Map.add (curmod, pos_from) (range, Ref (dp, path, ty)) xref_table
 
