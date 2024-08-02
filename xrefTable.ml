@@ -17,7 +17,7 @@ let sxref = function
 type t = (Range.t * xref) Map.t
 
 let find map module_name pos =
-  match Map.find_first_opt (fun key -> key >= (module_name, pos)) map with
+  match Map.find_last_opt (fun key -> key <= (module_name, pos)) map with
   | None -> None
   | Some (_key, (range, xref)) ->
     if Range.in_ pos range then Some (range, xref)
