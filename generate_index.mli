@@ -10,11 +10,7 @@
 (*                                                                     *)
 (* *********************************************************************)
 
-type range = int * int
-
-type xref =
-  | Defs of (string * string) list
-  | Ref of string * string * string
+type range = Range.t
 
 val escaped : string -> string
 
@@ -24,4 +20,4 @@ type file_path
 val all_files : (string, unit) Hashtbl.t -> file_path list
 val sidebar_files : file_path list -> string
 
-val generate : string -> (string * int, range * xref) Hashtbl.t -> (string, unit) Hashtbl.t -> string -> unit
+val generate : string -> XrefTable.t -> (string, unit) Hashtbl.t -> string -> unit
