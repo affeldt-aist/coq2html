@@ -3,8 +3,10 @@ OCAMLLEX=ocamllex
 
 GEN_IDX=generate_index
 
-coq2html: $(GEN_IDX).cmi $(GEN_IDX).cmx coq2html.cmx
-	$(OCAMLOPT) -o coq2html str.cmxa resources.cmx $(GEN_IDX).cmx coq2html.cmx
+PROJ_OBJS=range.cmx xrefTable.cmx generate_index.cmx
+
+coq2html: $(PROJ_OBJS:.cmx=.cmi) $(PROJ_OBJS)  coq2html.cmx
+	$(OCAMLOPT) -o coq2html str.cmxa resources.cmx $(PROJ_OBJS) coq2html.cmx
 
 %.cmx: %.ml
 	$(OCAMLOPT) -c $*.ml
@@ -15,6 +17,7 @@ coq2html: $(GEN_IDX).cmi $(GEN_IDX).cmx coq2html.cmx
 %.ml: %.mll
 	$(OCAMLLEX) $*.mll
 
+generate_index.cmx: resources.cmx
 
 coq2html.cmx: resources.cmx
 resources.cmx: resources.cmi
@@ -39,3 +42,8 @@ BINDIR=$(PREFIX)/bin
 
 install:
 	install coq2html $(BINDIR)/coq2html
+
+depend:
+	ocamldep *.mli *.ml > .depend
+
+-include .depend

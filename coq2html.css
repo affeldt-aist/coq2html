@@ -135,6 +135,7 @@ a:active {text-decoration : none; }
 
 .coq :target {
   background-color: yellow;
+  transition: background-color 0.5s;
 }
 
 pre.ssrdoc {
@@ -156,11 +157,6 @@ div.content {
 
 .warning {
     color: #cd0000;
-}
-
-:target {
-    background-color: yellow;
-    transition: background-color 0.5s;
 }
 
 .darkmode--activated .sidebar {

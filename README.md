@@ -305,5 +305,29 @@ Dependencies (via `coq2html.header`):
 - [markdown-it-texmath](https://github.com/goessner/markdown-it-texmath) for Markdown + LaTeX
 - [Darkmode.js](https://darkmodejs.learn.uno/) for darkmode
 
+## Implementation overview
+
+Main (OCaml) files:
+- Main file, modified from the original version of coq2html:
+  + [coq2html.mll](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.mll)
+- Added by this fork of coq2html to generate an index like coqdoc and a sidebar:
+  + [generate_index.ml](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.ml)
+  + [generate_index.mli](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.mli)
+
+Static HTML/CSS/JavaScript files:
+- [coq2html.header](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.header): HTML
+- [coq2html.footer](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.footer): HTML
+- [coq2html.redirect](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.redirect): HTML
+- [coq2html.css](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.css): CSS
+- [coq2html.js](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.js): JavaScript
+
+Dependencies (via `coq2html.header`):
+- [markdown-it-texmath](https://github.com/goessner/markdown-it-texmath) for Markdown + LaTeX
+- [Darkmode.js](https://darkmodejs.learn.uno/) for darkmode
+
+File automatically generated from the HTML/CSS/JavaScript files by the Makefile:
+- `resources.ml`: OCaml (where the HTML/CSS/JavaScript files are turned into OCaml strings)
+
+
 File automatically generated from the HTML/CSS/JavaScript files by the Makefile:
 - `resources.ml`: OCaml (where the HTML/CSS/JavaScript files are turned into OCaml strings)
