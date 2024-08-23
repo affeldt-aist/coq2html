@@ -26,6 +26,7 @@ let find map module_name pos =
 let empty = Map.empty
 
 let add_reference xref_table curmod pos_from pos_to dp path ty =
+  if ty = "sec" then xref_table else
   let range = (pos_from, pos_to) in
   match Map.find_opt (curmod, pos_from) xref_table with
   | Some (range0, xref) when range = range ->
@@ -38,6 +39,7 @@ let add_reference xref_table curmod pos_from pos_to dp path ty =
   Map.add (curmod, pos_from) (range, Ref (dp, path, ty)) xref_table
 
 let add_definition xref_table curmod pos_from pos_to path ty =
+  if ty = "sec" then xref_table else
   (*eprintf "add_definition %s %d %s %s %s\n" curmod pos_from sp id ty;*)
   let range = (pos_from, pos_to) in
   match Map.find_opt (curmod, pos_from) xref_table with
