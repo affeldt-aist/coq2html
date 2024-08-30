@@ -370,6 +370,7 @@ let end_string () =
 let in_proof = ref false
 
 let start_proof s kwd =
+  in_proof := true;
   fprintf !oc "<details>\n";
   space s;
   fprintf !oc "<summary class=\"toggleproof\">%s</summary>\n" kwd;
