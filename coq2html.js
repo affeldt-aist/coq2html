@@ -97,11 +97,9 @@ function setUpSavingDetails() {
     });
 }
 
-function init(cls)
+function init()
 {
-    hideAll(cls);
     renderMarkdowns();
     showDarkmodeWidget();
     setUpSavingDetails();
 }
- 
