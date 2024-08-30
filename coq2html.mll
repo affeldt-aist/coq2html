@@ -2,7 +2,7 @@
 (*                                                                     *)
 (*              The Coq2HTML documentation generator                   *)
 (*                                                                     *)
-(*                   Xavier Leroy, INRIA Paris                         *)
+(*          Xavier Leroy, Collège de France and INRIA Paris            *)
 (*                                                                     *)
 (*  Copyright Institut National de Recherche en Informatique et en     *)
 (*  Automatique.  All rights reserved.  This file is distributed       *)
@@ -137,6 +137,8 @@ let module_name_of_file_name f =
 
 type link = Link of int * string | Anchors of int * string list | Nolink of int option
 
+let re_sane_path = Str.regexp "[A-Za-z0-9_.\x80-\xFF]+$"
+
 let find_pos xref_table (m, pos) = XrefTable.find xref_table m pos
 
 let crossref m pos max_pos =
@@ -238,7 +240,7 @@ let end_doc_right () =
 
 let enum_depth = ref 0
 
-let  set_enum_depth d =
+let set_enum_depth d =
   if !enum_depth < d then begin
     fprintf !oc "<ul>\n";
     fprintf !oc "<li>\n";
@@ -282,6 +284,7 @@ let ident_partial pos id =
     if pos' - pos > String.length id then id
     else String.sub id 0 (pos' - pos)
   in
+  if id = "_" then (pos + 1, "_") else
   match is_gallina_keyword (String.trim id), is_vernacular (String.trim id) with
   | Some keyword, _ ->
     let tags = sprintf "<span class=\"gallina-kwd\">%s</span>" (escaped id) in
@@ -358,22 +361,23 @@ let start_bracket () =
 let end_bracket () =
   fprintf !oc "</span>"
 
+let start_string () =
+  fprintf !oc  "<span class=\"string\">\""
+
+let end_string () =
+  fprintf !oc  "\"</span>"
+
 let in_proof = ref false
-let proof_counter = ref 0
 
 let start_proof s kwd =
   in_proof := true;
-  incr proof_counter;
-  fprintf !oc "<div>";
+  fprintf !oc "<details>\n";
   space s;
-  fprintf !oc
-    "<span class=\"toggleproof\" onclick=\"toggleDisplay('proof%d')\">%s</span></div>\n"
-    !proof_counter
-    kwd;
-  fprintf !oc "<div class=\"proofscript\" id=\"proof%d\">\n" !proof_counter
+  fprintf !oc "<summary class=\"toggleproof\">%s</summary>\n" kwd;
+  fprintf !oc "<div class=\"proofscript\">\n"
 
 let end_proof spaces kwd =
-  fprintf !oc "%s%s</div>\n" spaces kwd;
+  fprintf !oc "%s%s</div></details>\n" spaces kwd;
   in_proof := false
 
 (* Like Str.global_replace but don't interpret '\1' etc in replacement text *)
@@ -391,15 +395,21 @@ let end_html_page () =
 }
 
 let space = [' ' '\t']
-let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
+let utf8 = ['\192'-'\255'] ['\128'-'\191']*
+let identstart = ['A'-'Z' 'a'-'z' '_'] | utf8
+let identnext  = ['A'-'Z' 'a'-'z' '_'  '0'-'9' '\''] | utf8
+let ident = identstart identnext*
 let path = ident ("." ident)*
 let start_proof = ("Proof" space* ".") | ("Proof" space+ "with") | ("Next" space+ "Obligation.")
 let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
+
+let globkind = ['a'-'z']+
+
 let quoted = ['\"'] [' '-'~']* ['\"']
 let symbol = ['!' '#'-'\'' '*'-'/' ':'-'@' '['-'`' '{'-'~'] (*'"', '(', ')' *)
 let non_whites = (['A'-'Z' 'a'-'z' '0'-'9'] | symbol)+
 
-let xref = ['A'-'Z' 'a'-'z' '0'-'9' '!' '#'-'~']+ | "<>"
+let xref = (['A'-'Z' 'a'-'z' '0'-'9' '#'-'~'] | utf8)+ | "<>"
 let integer = ['0'-'9']+
 
 rule coq_bol = parse
@@ -473,6 +483,11 @@ and coq = parse
         coq lexbuf }
 (*  | path as id
       { ident (Lexing.lexeme_start lexbuf) id; coq lexbuf }*)
+  | "\""
+      { start_string();
+        string lexbuf;
+        end_string();
+        coq lexbuf }
   | (". ") (space* as s) (start_proof as sp)
       { newline();
         start_proof s sp;
@@ -503,6 +518,16 @@ and coq = parse
   | _ as c
       { character c; coq lexbuf }
 
+and string = parse
+  | "\"\""
+      { character '\"'; character '\"'; string lexbuf }
+  | "\""
+      { () }
+  | eof
+      { () }
+  | _ as c
+      { character c; string lexbuf }
+
 and bracket = parse
   | ']'
       { () }
@@ -510,6 +535,11 @@ and bracket = parse
       { character '['; bracket lexbuf; character ']'; bracket lexbuf }
   | path as id
       { idents (Lexing.lexeme_start lexbuf) id; bracket lexbuf }
+  | "\""
+      { start_string();
+        string lexbuf;
+        end_string();
+        coq lexbuf }
   | eof
       { () }
   | _ as c
@@ -610,12 +640,12 @@ and globfile = parse
     space+ (xref as dp)
     space+ (xref as sp)
     space+ (xref as id)
-    space+ (ident as ty)
+    space+ (globkind as ty)
     space* "\n"
       { add_reference !current_module (int_of_string pos1) (int_of_string pos2)
           dp sp id ty;
         globfile lexbuf }
-  | (ident as ty)
+  | (globkind as ty)
     space+ (integer as pos1) ":" (integer as pos2)
     space+ (xref as sp)
     space+ (xref as id)
@@ -651,7 +681,7 @@ let process_v_file all_files f =
   let friendly_name = if !use_short_names then base_f else module_name in
   let ic = open_in f in
   oc := open_out (Filename.concat !output_dir (module_name ^ ".html"));
-  enum_depth := 0; in_proof := false; proof_counter := 0;
+  enum_depth := 0; in_proof := false;
   start_html_page friendly_name all_files;
   coq_bol (Lexing.from_channel ic);
   end_html_page();

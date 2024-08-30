@@ -6,6 +6,8 @@ This is a fork of coq2html.
 
 coq2html is an HTML documentation generator for Coq source files.  It is an alternative to the standard coqdoc documentation generator distributed along with Coq.  The major feature of coq2html is its ability to fold proof scripts: in the generated HTML, proof scripts are initially hidden, but can be revealed one by one by clicking on the "Proof" keyword.  Here is an example of [folding in action](https://compcert.org/doc/html/compcert.common.Memory.html#Mem.valid_access_dec).
 
+**Compatibility:** to produce cross-references, coq2html reads `.glob` files produced by Coq.  The format of those files sometimes changes between major releases of Coq, thus breaking coq2html.  The current version of coq2html is believed to be compatible with Coq 8.6 to 8.19.
+
 This fork extends coq2html with:
 * generation of indexes (like coqdoc)
 * clickable notations (like coqdoc)
@@ -43,7 +45,7 @@ Option                     | Summary
 `-d` _DIR_                 | Output files to directory _DIR_ (default: current directory)
 `-external` _URL_ _COQDIR_ | Set base URL for linking references whose names start with _COQDIR_
 `-no-css`                  | Do not add coq2html.css to the output directory
-`-redirect`                | Generate redirection files 
+`-redirect`                | Generate redirection files
 `-short-names`             | Use short, unqualified module names in the output
 `-title` _TITLE_           | Set the title of the index page
 `-Q` _DIR_ _COQDIR_        | Map the directory _DIR_ to correspond to the module name _COQDIR_ (similar to `coqc`)
@@ -120,11 +122,11 @@ For this reason, to get better cross-referencing, you should either do a single 
 
 The cross-references to the Coq standard library use the online version of this library at https://coq.inria.fr/library/, which corresponds to the latest release of Coq.  If you wish to reference a specific version of the standard library, use the `-coqlib` option, e.g.
 ```
-        coq2html -coqlib https://coq.inria.fr/distrib/V8.9.0/stdlib ...
+        coq2html -coqlib https://coq.inria.fr/doc/V8.14.1/stdlib
 ```
-for the 8.9 version of the standard library.
+for the 8.14.1 version of the standard library.
 
-Using the `-external` option, you can add cross-references to other external libraries whose coqdoc or coq2html-generated documentation is accessible online.  For example, 
+Using the `-external` option, you can add cross-references to other external libraries whose coqdoc or coq2html-generated documentation is accessible online.  For example,
 ```
         coq2html -external https://math-comp.github.io/htmldoc_1_12_0 mathcomp ...
 ```
@@ -240,7 +242,7 @@ Lists start with a dash `-` at the beginning of the line.  Subsequent lines star
 -     [cons h t], also written [h :: t], denoting the nonempty list
       with head [h] and tail [t].
 
-  If we remove the [nil] case and declare a [CoInductive], we get infinite 
+  If we remove the [nil] case and declare a [CoInductive], we get infinite
   streams instead of lists. *)
 ```
 Nested lists are built using two, three or four dashes instead of one:
@@ -250,6 +252,58 @@ Nested lists are built using two, three or four dashes instead of one:
 -- Inner list, item #2
 - Outer list, item #2
 ```
+
+### Special handling of proof scripts
+
+Proof scripts are Coq text (outside comments) that
+* starts with `Proof` or `Next Obligation` at the beginning of a line;
+* ends with `Qed.` or `Defined.` or `Save.` or `Admitted.` or `Abort.` at the end of a line.
+
+A proof script can start and end on the same line, e.g. `Proof. auto. Qed.`
+
+Proof scripts are formatted in a smaller font and folded by default, leaving only the starting line (`Proof`, etc) visible.  Clicking on this first line displays the whole proof script.
+
+The syntax of proof scripts is strict.  In particular, after stating a `Theorem` or `Lemma`, it does not work to omit the `Proof` keyword and start the script immediately, nor to abort it immediately with `Admitted.` or `Abort.`.  Likewise, the dot `.` must follow `Qed`, `Defined`, etc, without spaces.  For example, the following proof scripts won't be properly formatted:
+```
+Lemma x:...
+auto. Qed.                      (* No "Proof." to mark the beginning of the script. *)
+
+Lemma x:...
+Admitted.                       (* No "Proof." to mark the beginning of the script. *)
+
+Lemma x:...
+Proof. auto. Defined .          (* Whitespace between "Defined" and "." *)
+
+Lemma x:...  Proof. Admitted.   (* "Proof" must start a new line. *)
+```
+
+## Known limitations
+
+- Cross-referencing (HTML links on identifiers that jump to the definition of the identifiers) is implemented for identifiers bound at the top-level of a Coq source file (by `Definition`, `Fixpoint`, `Inductive`, `Module`, `Variable`, etc), but not for identifiers bound within Coq terms (by `fun`, `match`, `forall`, etc). There is no cross-referencing for user-defined notations either.
+
+- All non-ASCII Unicode characters are treated as being parts of identifiers.  Hence, `A ⊕ B` is read as three identifiers, `A`, `⊕`, and `B`, and links are correctly added to `A` and `B` if they are bound at top-level.  However, `A⊕B` is read as a single identifier, which has no corresponding definition, therefore no link is added.
+
+- The formatting of right-hanging documentation comments `(**r` is inflexible and not appropriate for narrow display windows or long source lines.
+
+## Implementation overview
+
+Main (OCaml) files:
+- Main file, modified from the original version of coq2html:
+  + [coq2html.mll](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.mll)
+- Added by this fork of coq2html to generate an index like coqdoc and a sidebar:
+  + [generate_index.ml](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.ml)
+  + [generate_index.mli](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.mli)
+
+Static HTML/CSS/JavaScript files:
+- [coq2html.header](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.header): HTML
+- [coq2html.footer](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.footer): HTML
+- [coq2html.redirect](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.redirect): HTML
+- [coq2html.css](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.css): CSS
+- [coq2html.js](https://github.com/affeldt-aist/coq2html/blob/master/coq2html.js): JavaScript
+
+Dependencies (via `coq2html.header`):
+- [markdown-it-texmath](https://github.com/goessner/markdown-it-texmath) for Markdown + LaTeX
+- [Darkmode.js](https://darkmodejs.learn.uno/) for darkmode
 
 ## Implementation overview
 
@@ -274,3 +328,6 @@ Dependencies (via `coq2html.header`):
 File automatically generated from the HTML/CSS/JavaScript files by the Makefile:
 - `resources.ml`: OCaml (where the HTML/CSS/JavaScript files are turned into OCaml strings)
 
+
+File automatically generated from the HTML/CSS/JavaScript files by the Makefile:
+- `resources.ml`: OCaml (where the HTML/CSS/JavaScript files are turned into OCaml strings)

@@ -1,4 +1,4 @@
-OCAMLOPT=ocamlopt
+OCAMLOPT=ocamlopt -I +str
 OCAMLLEX=ocamllex
 
 GEN_IDX=generate_index
@@ -19,11 +19,17 @@ coq2html: $(PROJ_OBJS:.cmx=.cmi) $(PROJ_OBJS)  coq2html.cmx
 
 generate_index.cmx: resources.cmx
 
-resources.ml: coq2html.css coq2html.js coq2html.header coq2html.footer coq2html.redirect
-	(for i in header footer css js redirect; do \
+coq2html.cmx: resources.cmx
+resources.cmx: resources.cmi
+
+RESOURCES=header footer css js redirect
+
+resources.ml: $(RESOURCES:%=coq2html.%)
+	(for i in $(RESOURCES); do \
          echo "let $$i = {xxx|"; \
          cat coq2html.$$i; \
          echo '|xxx}'; \
+         echo ''; \
          done) > resources.ml
 
 clean:

@@ -41,7 +41,6 @@ let sanitize_linkname s =
             Digest.to_hex (Digest.string s)
   in loop false (String.length s - 1)
 
-
 let alphabets = (* ['A'; ...; 'Z'; '_'] *)
   let rec iter code store =
     if code <= Char.code 'Z' then iter (succ code) (Char.chr code :: store)
