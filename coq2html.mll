@@ -405,9 +405,9 @@ let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
 
 let globkind = ['a'-'z']+
 
-let quoted = ['\"'] [' '-'~']* ['\"']
+let quoted = ['\"'] ([' ' '!' '#'-'~'] | utf8)* ['\"']
 let symbol = ['!' '#'-'\'' '*'-'/' ':'-'@' '['-'`' '{'-'~'] (*'"', '(', ')' *)
-let non_whites = (['A'-'Z' 'a'-'z' '0'-'9'] | symbol)+
+let non_whites = (['A'-'Z' 'a'-'z' '0'-'9'] | symbol | utf8)+
 
 let xref = (['A'-'Z' 'a'-'z' '0'-'9' '#'-'~'] | utf8)+ | "<>"
 let integer = ['0'-'9']+
@@ -483,11 +483,6 @@ and coq = parse
         coq lexbuf }
 (*  | path as id
       { ident (Lexing.lexeme_start lexbuf) id; coq lexbuf }*)
-  | "\""
-      { start_string();
-        string lexbuf;
-        end_string();
-        coq lexbuf }
   | (". ") (space* as s) (start_proof as sp)
       { newline();
         start_proof s sp;
