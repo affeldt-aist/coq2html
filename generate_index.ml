@@ -197,11 +197,22 @@ let generate_with_capital output_dir table all_files kind (c, items) =
     let title = !%"%C (%s)" c (skind kind) in
     write_html_file all_files body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
 
+let generate_hierarchy_graph output_dir dot_file =
+  let svg_filename = "hierarchy_graph.svg" in
+  let svg_path = Filename.concat output_dir svg_filename in
+  Graphviz.from_file dot_file
+  |> Graphviz.generate_file svg_path;
+  Printf.sprintf {|<h2>Mathmatical Structures</h2><a href="%s"><img src="%s" width="100%%"/></a>|} svg_filename svg_filename
+
 (*
  * generate index.html
  *)
-let generate_topfile output_dir all_files xrefs title =
-  let body = table xrefs in
+let generate_topfile output_dir all_files xrefs title hierarchy_graph_dot_file =
+  let body =
+    if hierarchy_graph_dot_file = "" then table xrefs
+    else
+      table xrefs ^ generate_hierarchy_graph output_dir hierarchy_graph_dot_file
+  in
   write_html_file all_files body (Filename.concat output_dir "index.html") title
 
 let is_initial c s =
@@ -236,7 +247,7 @@ let all_files xref_modules =
   |> List.map (String.split_on_char '.')
   |> iter
 
-let generate output_dir (xref_table:XrefTable.t) xref_modules title =
+let generate output_dir (xref_table:XrefTable.t) xref_modules title hierarchy_dot_file =
   let indexed_items =
     List.map (fun c ->
         let items =
@@ -268,4 +279,4 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title =
   List.iter (fun kind ->
       List.iter (generate_with_capital output_dir (table indexed_items) all_files kind) indexed_items)
     kinds;
-  generate_topfile output_dir all_files indexed_items title
+  generate_topfile output_dir all_files indexed_items title hierarchy_dot_file
