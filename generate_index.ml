@@ -197,7 +197,37 @@ let generate_with_capital output_dir table all_files kind (c, items) =
     let title = !%"%C (%s)" c (skind kind) in
     write_html_file all_files body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
 
-let generate_hierarchy_graph output_dir dot_file =
+let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
+  let all_hb_defs =
+    XrefTable.fold (fun (mod_,_) (_, xref) store ->
+        match xref with
+        | Defs ds ->
+          begin match List.find_opt (fun (path,typ) ->
+              String.ends_with ~suffix:".pack_" path) ds with
+            | Some (path,typ) ->
+              (mod_, path) :: store
+            | None -> store
+          end
+        | _ -> store)
+      xref_table []
+  in
+  let node_with_node (mod_, path) =
+    let name = String.sub path 0 (String.length path - String.length ".pack_")  in
+    let url = mod_ ^ ".html#" ^ name in
+    !%{|%s [URL="%s"]|}  name url
+  in
+  let links = String.concat "; " (List.map node_with_node all_hb_defs) in
+  let tmp = dot_file ^ ".sed" in
+  let cmd = !%{|sed '2i %s' %s > %s|} links dot_file tmp in
+  Printf.eprintf "CMD: %s\n" cmd;
+  let status = Sys.command cmd in
+  if status = 0 then () else prerr_endline "Sed Error";
+  Sys.command (!%"mv %s %s" tmp dot_file)
+  |> ignore
+
+
+let generate_hierarchy_graph xref_table output_dir dot_file =
+  overwrite_dot_file_with_url xref_table dot_file;
   let svg_filename = "hierarchy_graph.svg" in
   let svg_path = Filename.concat output_dir svg_filename in
   Graphviz.from_file dot_file
@@ -207,11 +237,11 @@ let generate_hierarchy_graph output_dir dot_file =
 (*
  * generate index.html
  *)
-let generate_topfile output_dir all_files xrefs title hierarchy_graph_dot_file =
+let generate_topfile output_dir all_files xrefs title xref_table hierarchy_graph_dot_file =
   let body =
     if hierarchy_graph_dot_file = "" then table xrefs
     else
-      table xrefs ^ generate_hierarchy_graph output_dir hierarchy_graph_dot_file
+      table xrefs ^ generate_hierarchy_graph xref_table output_dir hierarchy_graph_dot_file
   in
   write_html_file all_files body (Filename.concat output_dir "index.html") title
 
@@ -279,4 +309,4 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title hierarchy_do
   List.iter (fun kind ->
       List.iter (generate_with_capital output_dir (table indexed_items) all_files kind) indexed_items)
     kinds;
-  generate_topfile output_dir all_files indexed_items title hierarchy_dot_file
+  generate_topfile output_dir all_files indexed_items title xref_table hierarchy_dot_file
