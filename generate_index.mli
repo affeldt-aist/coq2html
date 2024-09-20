@@ -20,4 +20,4 @@ type file_path
 val all_files : (string, unit) Hashtbl.t -> file_path list
 val sidebar_files : file_path list -> string
 
-val generate : string -> XrefTable.t -> (string, unit) Hashtbl.t -> string -> unit
+val generate : string -> XrefTable.t -> (string, unit) Hashtbl.t -> string -> string -> unit
