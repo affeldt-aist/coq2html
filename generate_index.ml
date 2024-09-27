@@ -232,7 +232,7 @@ let generate_hierarchy_graph xref_table output_dir dot_file =
   let svg_path = Filename.concat output_dir svg_filename in
   Graphviz.from_file dot_file
   |> Graphviz.generate_file svg_path;
-  Printf.sprintf {|<h2>Mathmatical Structures</h2><a href="%s"><img src="%s" width="100%%"/></a>|} svg_filename svg_filename
+  Printf.sprintf {|<h2>Mathematical Structures</h2><a href="%s"><img src="%s" width="100%%"/></a>|} svg_filename svg_filename
 
 (*
  * generate index.html
