@@ -1,10 +1,6 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
-
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["yoshihiro503@generate_index"]
+#    branches: ["mcahtml"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,17 +18,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
+  generate-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Clone Mathcomp Analysis
+        uses: actions/checkout@v4
+        with:
+          repository: math-comp/analysis
+          path: analysis
+
+      - name: Set-up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 4.14
+          opam-repositories: |
+            coq-released: https://coq.inria.fr/opam/released
+            default: https://github.com/ocaml/opam-repository.git
+
+      - name: Build Mathcomp Analysis
+        run: cd analysis/ && opam install -y --deps-only . && opam exec -- make -j 4
+
+      - name: Build coq2html
+        run: opam exec -- make
+
+      - run: eval $(opam env) && tools/generate-mathcomp-analysis.sh
+
       - name: Setup Pages
         uses: actions/configure-pages@v3
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
