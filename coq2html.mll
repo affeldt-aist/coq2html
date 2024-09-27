@@ -406,7 +406,7 @@ let end_proof = "Qed." | "Defined." | "Save." | "Admitted." | "Abort."
 let globkind = ['a'-'z']+
 
 let quoted = ['\"'] ([' ' '!' '#'-'~'] | utf8)* ['\"']
-let symbol = ['!' '#'-'\'' '*'-'/' ':'-'@' '['-'`' '{'-'~'] (*'"', '(', ')' *)
+let symbol = ['!' '#'-'\'' '*'-'-' '/' ':'-'@' '['-'`' '{'-'~'] (*'"', '(', ')' *)
 let non_whites = (['A'-'Z' 'a'-'z' '0'-'9'] | symbol | utf8)+
 
 let xref = (['A'-'Z' 'a'-'z' '0'-'9' '#'-'~'] | utf8)+ | "<>"
