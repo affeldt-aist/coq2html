@@ -14,6 +14,17 @@ type range = Range.t
 
 let (!%) s = Printf.sprintf s
 
+let use_file filename f =
+  let ch = open_in filename in
+  try
+    let y = f ch in
+    close_in ch; y
+  with
+  | e -> close_in ch; raise e
+
+let read_file filename = use_file filename (fun ch ->
+    really_input_string ch (in_channel_length ch))
+
 let escaped =
   let buff = Buffer.create 5 in
   fun s ->
@@ -219,7 +230,6 @@ let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
   let links = String.concat "; " (List.map node_with_node all_hb_defs) in
   let tmp = dot_file ^ ".sed" in
   let cmd = !%{|sed '2i %s' %s > %s|} links dot_file tmp in
-  Printf.eprintf "CMD: %s\n" cmd;
   let status = Sys.command cmd in
   if status = 0 then () else prerr_endline "Sed Error";
   Sys.command (!%"mv %s %s" tmp dot_file)
@@ -228,11 +238,15 @@ let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
 
 let generate_hierarchy_graph xref_table output_dir dot_file =
   overwrite_dot_file_with_url xref_table dot_file;
-  let svg_filename = "hierarchy_graph.svg" in
-  let svg_path = Filename.concat output_dir svg_filename in
+  let png_filename = "hierarchy_graph.png" in
+  let png_path = Filename.concat output_dir png_filename in
+  let map_path = Filename.concat output_dir "hierarchy_graph.map" in
   Graphviz.from_file dot_file
-  |> Graphviz.generate_file svg_path;
-  Printf.sprintf {|<h2>Mathematical Structures</h2><a href="%s"><img src="%s" width="100%%"/></a>|} svg_filename svg_filename
+  |> Graphviz.generate_file png_path map_path;
+  let map = read_file map_path in
+  (*TODO: ↓ The map id (#Hierarchy) should be taken from dot file *)
+  Printf.sprintf {|<h2>Mathematical Structures</h2><img src="%s" usemap="#Hierarchy"/>
+%s|} png_filename map
 
 (*
  * generate index.html
