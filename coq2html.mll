@@ -667,6 +667,7 @@ let logical_name_base = ref ""
 let generate_css = ref true
 let use_short_names = ref false
 let generate_redirects = ref false
+let hierarchy_graph_dot_file = ref ""
 
 let process_v_file all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
@@ -735,6 +736,8 @@ let _ =
       "   Generate redirection files modname.html -> coqdir.modname.html";
     "-short-names", Arg.Set use_short_names,
       "   Use short, unqualified module names in the output";
+    "-hierarchy-graph", Arg.Set_string hierarchy_graph_dot_file,
+      "   Show the hierarchy graph of <dot-file> on the index.html"
   ])
   process_file
   "Usage: coq2html [options] file.glob ... file.v ...\nOptions are:";
@@ -750,7 +753,7 @@ let _ =
   List.iter process_glob_file (List.rev !glob_files);
   let all_files = Generate_index.all_files xref_modules in
   List.iter (process_v_file all_files) (List.rev !v_files);
-  Generate_index.generate !output_dir !xref_table xref_modules !title;
+  Generate_index.generate !output_dir !xref_table xref_modules !title !hierarchy_graph_dot_file;
   write_file Resources.js (Filename.concat !output_dir "coq2html.js");
   if !generate_css then
     write_file Resources.css (Filename.concat !output_dir "coq2html.css")
