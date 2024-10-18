@@ -743,12 +743,16 @@ let _ =
   "Usage: coq2html [options] file.glob ... file.v ...\nOptions are:";
   if !v_files = [] then begin
     eprintf "No .v file provided, aborting\n";
-    exit 2
+    exit 1
   end;
   if (try not (Sys.is_directory !output_dir) with Sys_error _ -> true)
   then begin
     eprintf "Error: output directory %s does not exist or is not a directory.\n" !output_dir;
-    exit 2
+    exit 1
+  end;
+  if "" <> !hierarchy_graph_dot_file && not (Sys.file_exists !hierarchy_graph_dot_file) then begin
+    eprintf "Error: The dot file does not exists: '%s'\n" !hierarchy_graph_dot_file;
+    exit 1
   end;
   List.iter process_glob_file (List.rev !glob_files);
   let all_files = Generate_index.all_files xref_modules in

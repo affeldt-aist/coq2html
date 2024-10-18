@@ -230,10 +230,8 @@ let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
   let links = String.concat "; " (List.map node_with_node all_hb_defs) in
   let tmp = dot_file ^ ".sed" in
   let cmd = !%{|sed '2i %s' %s > %s|} links dot_file tmp in
-  let status = Sys.command cmd in
-  if status = 0 then () else prerr_endline "Sed Error";
-  Sys.command (!%"mv %s %s" tmp dot_file)
-  |> ignore
+  Common.shell cmd;
+  Common.shell (!%"mv %s %s" tmp dot_file)
 
 
 let generate_hierarchy_graph xref_table output_dir dot_file =
