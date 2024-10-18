@@ -3,7 +3,7 @@ OCAMLLEX=ocamllex
 
 GEN_IDX=generate_index
 
-PROJ_OBJS=range.cmx xrefTable.cmx generate_index.cmx
+PROJ_OBJS=common.cmx graphviz.cmx range.cmx xrefTable.cmx generate_index.cmx
 
 coq2html: $(PROJ_OBJS:.cmx=.cmi) $(PROJ_OBJS)  coq2html.cmx
 	$(OCAMLOPT) -o coq2html str.cmxa resources.cmx $(PROJ_OBJS) coq2html.cmx

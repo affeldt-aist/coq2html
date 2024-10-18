@@ -14,6 +14,17 @@ type range = Range.t
 
 let (!%) s = Printf.sprintf s
 
+let use_file filename f =
+  let ch = open_in filename in
+  try
+    let y = f ch in
+    close_in ch; y
+  with
+  | e -> close_in ch; raise e
+
+let read_file filename = use_file filename (fun ch ->
+    really_input_string ch (in_channel_length ch))
+
 let escaped =
   let buff = Buffer.create 5 in
   fun s ->
@@ -197,11 +208,53 @@ let generate_with_capital output_dir table all_files kind (c, items) =
     let title = !%"%C (%s)" c (skind kind) in
     write_html_file all_files body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
 
+let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
+  let all_hb_defs =
+    XrefTable.fold (fun (mod_,_) (_, xref) store ->
+        match xref with
+        | Defs ds ->
+          begin match List.find_opt (fun (path,typ) ->
+              String.ends_with ~suffix:".pack_" path) ds with
+            | Some (path,typ) ->
+              (mod_, path) :: store
+            | None -> store
+          end
+        | _ -> store)
+      xref_table []
+  in
+  let node_with_node (mod_, path) =
+    let name = String.sub path 0 (String.length path - String.length ".pack_")  in
+    let url = mod_ ^ ".html#" ^ name in
+    !%{|%s [URL="%s"]|}  name url
+  in
+  let links = String.concat "; " (List.map node_with_node all_hb_defs) in
+  let tmp = dot_file ^ ".sed" in
+  let cmd = !%{|sed '2i %s' %s > %s|} links dot_file tmp in
+  Common.shell cmd;
+  Common.shell (!%"mv %s %s" tmp dot_file)
+
+
+let generate_hierarchy_graph xref_table output_dir dot_file =
+  overwrite_dot_file_with_url xref_table dot_file;
+  let png_filename = "hierarchy_graph.png" in
+  let png_path = Filename.concat output_dir png_filename in
+  let map_path = Filename.concat output_dir "hierarchy_graph.map" in
+  Graphviz.from_file dot_file
+  |> Graphviz.generate_file png_path map_path;
+  let map = read_file map_path in
+  (*TODO: ↓ The map id (#Hierarchy) should be taken from dot file *)
+  Printf.sprintf {|<h2>Mathematical Structures</h2><img src="%s" usemap="#Hierarchy"/>
+%s|} png_filename map
+
 (*
  * generate index.html
  *)
-let generate_topfile output_dir all_files xrefs title =
-  let body = table xrefs in
+let generate_topfile output_dir all_files xrefs title xref_table hierarchy_graph_dot_file =
+  let body =
+    if hierarchy_graph_dot_file = "" then table xrefs
+    else
+      table xrefs ^ generate_hierarchy_graph xref_table output_dir hierarchy_graph_dot_file
+  in
   write_html_file all_files body (Filename.concat output_dir "index.html") title
 
 let is_initial c s =
@@ -236,7 +289,7 @@ let all_files xref_modules =
   |> List.map (String.split_on_char '.')
   |> iter
 
-let generate output_dir (xref_table:XrefTable.t) xref_modules title =
+let generate output_dir (xref_table:XrefTable.t) xref_modules title hierarchy_dot_file =
   let indexed_items =
     List.map (fun c ->
         let items =
@@ -268,4 +321,4 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title =
   List.iter (fun kind ->
       List.iter (generate_with_capital output_dir (table indexed_items) all_files kind) indexed_items)
     kinds;
-  generate_topfile output_dir all_files indexed_items title
+  generate_topfile output_dir all_files indexed_items title xref_table hierarchy_dot_file
