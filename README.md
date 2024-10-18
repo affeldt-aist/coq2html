@@ -49,6 +49,7 @@ Option                     | Summary
 `-short-names`             | Use short, unqualified module names in the output
 `-title` _TITLE_           | Set the title of the index page
 `-Q` _DIR_ _COQDIR_        | Map the directory _DIR_ to correspond to the module name _COQDIR_ (similar to `coqc`)
+`-hierarchy-graph` _FILE_  | Show the hierarchy graph of <dot-file> on the index.html (You need Graphviz command line tool)
 
 ### Usage example
 
@@ -63,13 +64,12 @@ with the following file hierarchy:
 Then the following command generates the documentation of MathComp-Analysis:
 ```console
 ../coq2html/coq2html \
-  -title "Mathcomp Analysis" \
+  -title "MathComp-Analysis" \
   -d html/ -base mathcomp -Q theories analysis \
   -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ \
   -external https://math-comp.github.io/htmldoc/ mathcomp.ssreflect \
   -external https://math-comp.github.io/htmldoc/ mathcomp.algebra \
-  classical/*.v classical/*.glob \
-  theories/*.v theories/*.glob
+  $(find classical/ theories/ -name "*.v" -or -name "*.glob")
 ```
 
 ### HTML generation
