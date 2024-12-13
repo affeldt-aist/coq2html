@@ -242,11 +242,13 @@ let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
     !%{|"%s" [URL="%s"]|}  name url
   in
   let links = String.concat "; " (List.map node_with_node all_hb_defs) in
-  let tmp = dot_file ^ ".sed" in
-  let cmd = !%{|sed '2i %s' %s > %s|} links dot_file tmp in
-  Common.shell cmd;
-  Common.shell (!%"mv %s %s" tmp dot_file)
-
+  let lines = Common.read_lines dot_file in
+  let lines = match lines with (* insert links to second line *)
+     | line1 :: rest -> line1 :: links :: rest
+     | [] ->
+       failwith ("empty lines: " ^ dot_file)
+  in
+  Common.write_lines dot_file lines
 
 let generate_hierarchy_graph title xref_table output_dir dot_file =
   overwrite_dot_file_with_url xref_table dot_file;
