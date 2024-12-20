@@ -4,3 +4,9 @@ coq2html
 resources.ml
 *~
 #*#
+*.annot
+
+html/
+
+ocamldot/ocamldot
+ocamldot/ocamldot.ml
