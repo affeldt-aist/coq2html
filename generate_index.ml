@@ -64,20 +64,34 @@ type file_path =
   | File of string
 
 let sidebar_files all_files =
+  let sort_for_directories files =
+    let comp x y =
+      match x, y with
+      | Dir _, File _ -> -1
+      | File _, Dir _ -> 1
+      | _, _ -> compare x y
+    in
+    List.sort comp files
+  in
   let rec tag_of_file_path parents = function
     | File name ->
        let link = (String.concat "." (List.rev (name :: parents))) ^ ".html" in
        !%{|<li><a href="%s">%s</a></li>|} link name
     | Dir (name, fs) ->
        let current_path = List.rev (name :: parents) |> String.concat "." in
+       let children =
+         sort_for_directories fs
+         |> List.map (tag_of_file_path (name :: parents))
+       in
        !%{|<li><details id="%s"><summary>%s</summary>
           <ul>
           %s
           </ul>
           </details>
-          </li>|} current_path name (List.map (tag_of_file_path (name :: parents)) fs |> String.concat "\n")
+          </li>|} current_path name (String.concat "\n" children)
   in
-  List.map (tag_of_file_path []) all_files
+  sort_for_directories all_files
+  |> List.map (tag_of_file_path [])
   |> String.concat "\n"
 
 let write_html_file all_files txt filename title =

@@ -21,7 +21,6 @@ function setUpSavingDetails() {
     $('details').on('toggle', function(event) {
 	var id = $(this).attr('id')
 	var isOpen = $(this).attr('open')
-	console.log(id, isOpen)
 	window.localStorage.setItem('details-'+id, isOpen)
     })
 
@@ -29,10 +28,10 @@ function setUpSavingDetails() {
 	if (item.includes('details-')) {
 	    var id = item.split('details-')[1];
 	    var status = window.localStorage.getItem(item)
-	    if (status == 'open'){
-		$("#"+CSS.escape(id)).attr('open',true)
-	    }
-	}
+	          if (status == 'open' || status == 'undefined'){
+		            $("#"+CSS.escape(id)).attr('open',true)
+	          }
+	      }
     }
 
     $( document ).ready(function() {
