@@ -26,12 +26,14 @@ sed -i 's/Analysis_stdlib/mathcomp\.analysis_stdlib/' depend.dot
 sed -i 's/\//\./g' depend.dot
 
 $DIR/tools/generate-hierarchy-graph.sh
+HIERARCHY=$OUTDIR/hierarchy-graph.dot
+cp hierarchy-graph.dot $HIERARCHY
 
 $DIR/coq2html -title "MathComp-Analysis($COMMIT_HASH)" -d $OUTDIR -base mathcomp \
   -Q theories analysis -coqlib https://coq.inria.fr/doc/V8.18.0/stdlib/ \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.ssreflect \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.algebra \
-  -hierarchy-graph "hierarchy-graph.dot" \
+  -hierarchy-graph $HIERARCHY \
   -dependency-graph "depend.dot" \
   $FILES
 

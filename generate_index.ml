@@ -249,12 +249,12 @@ let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
 
 
 let generate_hierarchy_graph title xref_table output_dir dot_file =
-  overwrite_dot_file_with_url xref_table dot_file;
+(*  overwrite_dot_file_with_url xref_table dot_file;*)
   let png_filename = "hierarchy_graph.png" in
   let png_path = Filename.concat output_dir png_filename in
   let map_path = Filename.concat output_dir "hierarchy_graph.map" in
   Graphviz.from_file dot_file
-  |> Graphviz.generate_file png_path map_path;
+  |> Graphviz.neato png_path map_path;
   let map = read_file map_path in
   (*TODO: ↓ The map id (#Hierarchy) should be taken from dot file *)
   Printf.sprintf {|<h2>Mathematical Structures (%s only)</h2><img src="%s" title usemap="#Hierarchy"/>
