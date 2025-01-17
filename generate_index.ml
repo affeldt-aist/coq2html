@@ -223,6 +223,8 @@ let generate_with_capital output_dir table all_files kind (c, items) =
     write_html_file all_files body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
 
 let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
+  let dot_content = String.concat "\n" (Common.read_lines dot_file) in
+  let is_exists_in_dot_file name = Common.grep name dot_content in
   let all_hb_defs =
     XrefTable.fold (fun (mod_,_) (_, xref) store ->
         match xref with
@@ -236,12 +238,17 @@ let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
         | _ -> store)
       xref_table []
   in
-  let node_with_node (mod_, path) =
-    let name = String.sub path 0 (String.length path - String.length ".pack_")  in
+  let hb_defs =
+    all_hb_defs
+    |> List.map (fun (mod_, path) ->
+        (mod_, String.sub path 0 (String.length path - String.length ".pack_")))
+    |> List.filter (fun (_, name) -> is_exists_in_dot_file name)
+  in
+  let node_with_node (mod_, name) =
     let url = mod_ ^ ".html#" ^ name in
     !%{|"%s" [URL="%s"]|}  name url
   in
-  let links = String.concat "; " (List.map node_with_node all_hb_defs) in
+  let links = String.concat "; " (List.map node_with_node hb_defs) in
   let lines = Common.read_lines dot_file in
   let lines = match lines with (* insert links to second line *)
      | line1 :: rest -> line1 :: links :: rest

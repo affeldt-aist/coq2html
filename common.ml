@@ -39,3 +39,31 @@ let write_lines filename lines =
   file_using_w filename begin fun out_ch ->
     List.iter (Printf.fprintf out_ch "%s\n") lines
   end
+
+(* very naive brute force algorith *)
+let strstr ~haystack ~needle =
+  assert (needle <> "");
+  let hlen = String.length haystack in
+  let nlen = String.length needle in
+  (* [has_prefix hpos npos] checks
+     haystack.[hpos-npos+i] = needle.[i] for 0 <= i <= npos
+  *)
+  let rec has_prefix hpos npos =
+    if haystack.[hpos] <> needle.[npos] then false
+    else if npos = 0 then true
+    else has_prefix (hpos - 1) (npos - 1)
+  in
+  let npos_init = nlen - 1 in
+  let hlen_nlen = hlen - nlen in
+  (* check from 0 to hlen - nlen *)
+  let rec loop hstart =
+    if hstart > hlen_nlen then None
+    else
+      if has_prefix (hstart + npos_init) npos_init then Some hstart
+      else loop (hstart + 1)
+  in
+  loop 0
+
+let grep word contents =
+  strstr ~haystack:contents ~needle:word
+  |> Option.is_some
