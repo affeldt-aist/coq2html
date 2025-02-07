@@ -129,6 +129,12 @@ let is_kind = function
 let linkname_of_kind = function Global -> "global"
                               | EntryKind s -> s
 
+let linkname_of_capital = function
+  | 'A'..'Z' as c -> String.make 1 c
+  | '_' as c -> String.make 1 c
+  | '*' -> "symbol"
+  | c -> failwith (!%"invalid capital charactor: %c" c)
+
 type item = {kind: kind; name: string; linkname: string; module_: string}
 
 let table citems =
@@ -136,7 +142,7 @@ let table citems =
     (!%"<td>%s</td>" (skind kind))
     ^ (List.map (fun (c, items) ->
            if List.exists (fun item -> kind = Global || item.kind = kind) items then
-             !%{|<td><a href="index_%s_%c.html">%c</a></td>|} (linkname_of_kind kind) c c
+             !%{|<td><a href="index_%s_%s.html">%c</a></td>|} (linkname_of_kind kind) (linkname_of_capital c) c
            else
              !%{|<td>%c</td>|} c) citems
     |> String.concat "")
@@ -220,7 +226,10 @@ let generate_with_capital output_dir table all_files kind (c, items) =
       |> (^) (!%"%s<h2>%s</h2>" table h2)
     in
     let title = !%"%C (%s)" c (skind kind) in
-    write_html_file all_files body (Filename.concat output_dir (!%"index_%s_%c.html" (linkname_of_kind kind) c)) title
+    let filename = Filename.concat output_dir
+        (!%"index_%s_%s.html" (linkname_of_kind kind) (linkname_of_capital c))
+    in
+    write_html_file all_files body filename title
 
 let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
   let dot_content = String.concat "\n" (Common.read_lines dot_file) in

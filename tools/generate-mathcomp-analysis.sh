@@ -32,7 +32,7 @@ $DIR/coq2html -title "MathComp-Analysis($COMMIT_HASH)" -d $OUTDIR -base mathcomp
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.ssreflect \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.algebra \
   -hierarchy-graph "hierarchy-graph.dot" \
-  -dependency-graph "$depend.dot" \
+  -dependency-graph "depend.dot" \
   $FILES
 
 cp hierarchy-graph.dot depend.dot $OUTDIR/
