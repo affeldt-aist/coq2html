@@ -1,0 +1,65 @@
+on:
+  push:
+    branches: ["mcahtml"]
+  pull_request:
+  schedule:
+    - cron: 0 0 * * * # every morning
+
+jobs:
+  generate-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: set the variables for push event
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          branch_name=${{ github.ref_name }}
+          short_sha=$(git rev-parse --short ${{ github.sha }})
+          echo "destination_dir=sample_"$branch_name_$short_sha >> $GITHUB_ENV
+
+      - name: set the variables for PR event
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          branch_name=${{ github.head_ref }}
+          echo "destination_dir=sample_$branch_name" >> $GITHUB_ENV
+
+      - name: Clone Mathcomp Analysis with a specific tag
+        uses: actions/checkout@v4
+        with:
+          repository: math-comp/analysis
+          path: analysis
+          fetch-tags: 1.8.0
+
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+
+      - name: Set-up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 4.14
+          opam-repositories: |
+            coq-released: https://coq.inria.fr/opam/released
+            default: https://github.com/ocaml/opam-repository.git
+
+      - name: Setup Coq temporary fix for the Dependency Graph
+        run: opam install -y coq.8.20.1
+
+      - name: Build Mathcomp Analysis
+        run: cd analysis/ && opam install -y --deps-only . && opam exec -- make all install
+
+      - name: Build coq2html
+        run: opam exec -- make
+
+      - run: |
+          opam exec -- tools/generate-mathcomp-analysis.sh ${GITHUB_SHA::8}
+          mkdir -p artifact
+          mv html artifact/${{ env.destination_dir }}
+
+      - name: Upload htmldoc as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.destination_dir }}
+          path: |
+            artifact
