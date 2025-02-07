@@ -52,6 +52,11 @@ let sanitize_linkname s =
             Digest.to_hex (Digest.string s)
   in loop false (String.length s - 1)
 
+(**
+ * The first charactors of Coq identifiers
+ * - '_' : it can start with '_' as well as the regular alphabet
+ * - '*' : Some notations begin with a symbol, such as `\sum_`.
+ **)
 let alphabets = (* ['A'; ...; 'Z'; '_'] *)
   let rec iter code store =
     if code <= Char.code 'Z' then iter (succ code) (Char.chr code :: store)
@@ -132,7 +137,7 @@ let linkname_of_kind = function Global -> "global"
 let linkname_of_capital = function
   | 'A'..'Z' as c -> String.make 1 c
   | '_' as c -> String.make 1 c
-  | '*' -> "symbol"
+  | '*' -> "symbol"  (* notations that begin with a symbol, e.g. `\sum_` *)
   | c -> failwith (!%"invalid capital charactor: %c" c)
 
 type item = {kind: kind; name: string; linkname: string; module_: string}
