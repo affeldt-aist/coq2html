@@ -1,7 +1,6 @@
 on:
   push:
 #    branches: ["mcahtml"]
-  pull_request:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -46,7 +45,7 @@ jobs:
             default: https://github.com/ocaml/opam-repository.git
 
       - name: Setup Coq temporary fix for the Dependency Graph
-        run: opam install -y coq.8.19.2
+        run: opam install -y coq.8.20.1
 
       - name: Build Mathcomp Analysis
         run: cd analysis/ && opam install -y --deps-only . && opam exec -- make all install
