@@ -275,7 +275,7 @@ let generate_hierarchy_graph title xref_table output_dir dot_file =
   |> Graphviz.generate_file png_path map_path;
   let map = read_file map_path in
   (*TODO: ↓ The map id (#Hierarchy) should be taken from dot file *)
-  Printf.sprintf {|<h2>Mathematical Structures (%s only)</h2><img src="%s" title usemap="#Hierarchy"/>
+  Printf.sprintf {|<h2>Mathematical Structures (%s only)</h2><img src="%s" title usemap="#Hierarchy" class="img-darkmode-enable"/>
 %s|} title png_filename map
 
 let generate_dependency_graph xref_table output_dir dot_file =
@@ -285,7 +285,7 @@ let generate_dependency_graph xref_table output_dir dot_file =
   Graphviz.from_file dot_file
   |> Graphviz.generate_file png_path map_path;
   let map = read_file map_path in
-  Printf.sprintf {|<h2>Clickable Dependency Graph of Files</h2><img src="%s" usemap="#depend"/>%s|} png_filename map
+  Printf.sprintf {|<h2>Clickable Dependency Graph of Files</h2><img src="%s" usemap="#depend" class="img-darkmode-enable"/>%s|} png_filename map
 
 (*
  * generate index.html

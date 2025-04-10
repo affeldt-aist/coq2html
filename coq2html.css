@@ -159,6 +159,10 @@ div.content {
     color: #cd0000;
 }
 
+img.img-darkmode-enable {
+    isolation: auto;
+}
+
 .darkmode--activated .sidebar {
     color: white;
 }
