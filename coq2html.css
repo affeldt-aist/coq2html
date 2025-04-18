@@ -29,10 +29,10 @@ main {
 
 div.sidebar {
     left: 8px;
-    height: calc(100vh);
-    width: 200px;
+    height: 100vh;
+    width: 250px;
     position: fixed;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 div.sidebar li {
     list-style: none;
@@ -64,9 +64,13 @@ h1, h2, h3 {
 }
 
 div.coq {
-  margin-left: 0%;
+  margin-left: 250px; /* サイドバーの分だけ右にずらす */
   margin-right: 0%;
   font-family: monospace;
+
+  overflow-x: auto;
+  overflow-y: auto;
+  height: 100vh;
 }
 
 div.doc {
@@ -151,7 +155,7 @@ div.ssrdoc {
 }
 
 div.content {
-    margin-left: 200px;
+    margin-left: 0px;
     padding-left: 12px;
 }
 
@@ -202,4 +206,8 @@ img.img-darkmode-enable {
 	font-family: monospace;
     }
 
+}
+
+.darkmode-toggle {
+  z-index: 9999 !important;
 }
