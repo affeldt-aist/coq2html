@@ -15,4 +15,5 @@ coqc $VFiles
 GlobFiles="Main.glob"
 $RocqNavi -title "test1" -d ./html $VFiles $GlobFiles
 
-diff -r $DIR/expected_html $DIR/html
+diff -r --exclude=coq2html.css --exclude=coq2html.js \
+  $DIR/expected_html $DIR/html
