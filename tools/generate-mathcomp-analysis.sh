@@ -4,6 +4,7 @@ MATHCOMP_ANALYSIS=./analysis
 COMMIT_HASH=$1
 DIR=$(pwd `dirname .`)
 OUTDIR=$DIR/html/analysis
+INDEX_BLACKLIST_FILE=$DIR/tools/index-blacklist
 
 rm -rf $OUTDIR
 mkdir -p $OUTDIR
@@ -34,6 +35,7 @@ $DIR/rocqnavi -title "MathComp-Analysis($COMMIT_HASH)" -d $OUTDIR -base mathcomp
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.algebra \
   -hierarchy-graph "hierarchy-graph.dot" \
   -dependency-graph "depend.dot" \
+  -index-blacklist $INDEX_BLACKLIST_FILE \
   $FILES
 
 cp hierarchy-graph.dot depend.dot $OUTDIR/

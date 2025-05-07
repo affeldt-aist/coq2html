@@ -669,6 +669,7 @@ let use_short_names = ref false
 let generate_redirects = ref false
 let hierarchy_graph_dot_file = ref ""
 let dependency_graph_dot_file = ref ""
+let index_blacklist_file = ref ""
 
 let process_v_file all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
@@ -741,6 +742,8 @@ let _ =
       "   Show the hierarchy graph of <dot-file> on the index.html";
     "-dependency-graph", Arg.Set_string dependency_graph_dot_file,
       "   Show the dependency graph of <dot-file> on the index.html";
+    "-index-blacklist", Arg.Set_string index_blacklist_file,
+      "   Exclude specified items from the index";
   ])
   process_file
   "Usage: rocqnavi [options] file.glob ... file.v ...\nOptions are:";
@@ -757,10 +760,20 @@ let _ =
     eprintf "Error: The dot file does not exists: '%s'\n" !hierarchy_graph_dot_file;
     exit 1
   end;
+  if "" <> !index_blacklist_file && not (Sys.file_exists !index_blacklist_file) then begin
+    eprintf "Error: The file you specified with the -index-blacklist option does not exist: '%s'\n"
+      !index_blacklist_file;
+    exit 1
+  end;
   List.iter process_glob_file (List.rev !glob_files);
   let all_files = Generate_index.all_files xref_modules in
   List.iter (process_v_file all_files) (List.rev !v_files);
-  Generate_index.generate !output_dir !xref_table xref_modules !title !hierarchy_graph_dot_file !dependency_graph_dot_file;
+  let index_blacklist_opt =
+    if !index_blacklist_file = "" then None
+    else Some (Index_blacklist.from_file !index_blacklist_file)
+  in
+  Generate_index.generate !output_dir !xref_table xref_modules !title
+    !hierarchy_graph_dot_file !dependency_graph_dot_file index_blacklist_opt;
   write_file Resources.js (Filename.concat !output_dir "rocqnavi.js");
   if !generate_css then
     write_file Resources.css (Filename.concat !output_dir "rocqnavi.css")

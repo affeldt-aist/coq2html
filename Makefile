@@ -1,10 +1,11 @@
-OCAMLOPT=ocamlopt -I +str -annot
+PACKAGES=dune-glob
+OCAMLOPT=ocamlfind ocamlopt -linkpkg -package $(PACKAGES) -I +str -I $(OPAM_SWITCH_PREFIX)/lib/dune-glob -annot
 OCAMLLEX=ocamllex
 OUTPUT=rocqnavi
 
 GEN_IDX=generate_index
 
-PROJ_OBJS=common.cmx graphviz.cmx range.cmx xrefTable.cmx generate_index.cmx
+PROJ_OBJS=common.cmx graphviz.cmx range.cmx xrefTable.cmx index_blacklist.cmx generate_index.cmx
 
 all: $(OUTPUT) ocamldot/ocamldot
 

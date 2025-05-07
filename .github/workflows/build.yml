@@ -36,4 +36,5 @@ jobs:
         run: |
           opam install coq.${{ matrix.coq_version }}
 
-      - run: eval $(opam env) && make && make test
+      - run: |
+          opam install -y --deps-only . && opam exec -- make all test

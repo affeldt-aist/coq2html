@@ -56,7 +56,7 @@ jobs:
         run: cd analysis/ && opam install -y --deps-only . && opam exec -- make all install
 
       - name: Build rocqnavi
-        run: opam exec -- make
+        run: opam install -y --deps-only . && opam exec -- make
 
       - run: |
           opam exec -- tools/generate-mathcomp-analysis.sh ${GITHUB_SHA::8}

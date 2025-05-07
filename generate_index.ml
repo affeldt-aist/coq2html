@@ -342,7 +342,14 @@ let all_files xref_modules =
 
 let is_subproof path = String.ends_with ~suffix:"_subproof" path
 
-let generate output_dir (xref_table:XrefTable.t) xref_modules title hierarchy_dot_file dependency_dot_file =
+let generate output_dir (xref_table:XrefTable.t) xref_modules title
+      hierarchy_dot_file dependency_dot_file index_blacklist =
+  let is_blacklisted =
+    match index_blacklist with
+    | None -> fun name -> false
+    | Some blacklist ->
+       fun name -> Index_blacklist.is_listed blacklist name
+  in
   let indexed_items =
     List.map (fun c ->
         let items =
@@ -353,6 +360,7 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title hierarchy_do
                |> List.filter (fun (_, typ) -> typ <> "binder")
                |> List.filter (fun (_, typ) -> typ <> "var")
                |> List.filter (fun (path, _) -> not (is_subproof path))
+               |> List.filter (fun (path, _) -> not (is_blacklisted path))
                |> List.map (fun (path, typ) ->
                       let linkname = !%"%s.html#%s" name (sanitize_linkname path) in
                       let module_ = name in

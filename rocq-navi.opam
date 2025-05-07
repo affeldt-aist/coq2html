@@ -15,6 +15,8 @@ build: [make]
 install: [make "BINDIR=%{bin}%" "install"]
 depends: [
   "ocaml" {>= "4.14"}
+  "ocamlfind"
+  "dune-glob"
 ]
 
 tags: [
