@@ -38,7 +38,7 @@ jobs:
             default: https://github.com/ocaml/opam-repository.git
 
       - name: Build rocqnavi
-        run: opam install -y --deps-only && opam exec -- make
+        run: opam install -y --deps-only . && opam exec -- make
 
       - name: Setup Coq temporary fix for the Dependency Graph
         run: opam install -y coq.8.20.1
