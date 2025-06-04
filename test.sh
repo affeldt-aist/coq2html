@@ -1,3 +1,3 @@
 #!/bin/sh
 
-test/test1/run.sh
+test/test1/run.bash
