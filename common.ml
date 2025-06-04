@@ -67,3 +67,17 @@ let strstr ~haystack ~needle =
 let grep word contents =
   strstr ~haystack:contents ~needle:word
   |> Option.is_some
+
+let list_group_by f xs =
+  let rec iter store = function
+    | [] -> store
+    | x :: xs ->
+       let grp = f x in
+       let mems   = List.filter (fun x -> grp =  f x) xs in
+       let others = List.filter (fun x -> grp <> f x) xs in
+       iter ((grp, x :: mems) :: store) others
+  in
+  iter [] xs
+
+let list_sort_by f xs =
+  List.sort (fun x y -> compare (f x) (f y)) xs

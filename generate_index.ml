@@ -52,17 +52,26 @@ let sanitize_linkname s =
             Digest.to_hex (Digest.string s)
   in loop false (String.length s - 1)
 
+type initial_letter =
+  | Alphabetic of char (* A .. Z *)
+  | Underscore (* '_' *)
+
+let string_of_initial_letter = function
+  | Alphabetic a -> String.make 1 a
+  | Underscore -> "_"
+
 (**
- * The first charactors of Coq identifiers
+ * The initial charactors of Coq identifiers
  * - '_' : it can start with '_' as well as the regular alphabet
  * - '*' : Some notations begin with a symbol, such as `\sum_`.
  **)
-let alphabets = (* ['A'; ...; 'Z'; '_'] *)
+let initials = (* ['A'; ...; 'Z'; '_'] *)
   let rec iter code store =
     if code <= Char.code 'Z' then iter (succ code) (Char.chr code :: store)
-    else store
+    else List.rev store
   in
-  List.rev ('*' :: '_' :: iter (Char.code 'A') [])
+  let alphas = iter (Char.code 'A') [] |> List.map (fun c -> Alphabetic c) in
+  alphas @ [Underscore]
 
 type file_path =
   | Dir of (string * file_path list)
@@ -134,36 +143,51 @@ let is_kind = function
 let linkname_of_kind = function Global -> "global"
                               | EntryKind s -> s
 
-let linkname_of_capital = function
-  | 'A'..'Z' as c -> String.make 1 c
-  | '_' as c -> String.make 1 c
-  | '*' -> "symbol"  (* notations that begin with a symbol, e.g. `\sum_` *)
-  | c -> failwith (!%"invalid capital charactor: %c" c)
+let linkname_of_capital = string_of_initial_letter
 
 type item = {kind: kind; name: string; linkname: string; module_: string}
 
+let notations_html_filename = "index_notations.html"
+
 let table citems =
   let mkrow kind =
-    (!%"<td>%s</td>" (skind kind))
+    (!%"<td>%s</td>\n" (skind kind))
     ^ (List.map (fun (c, items) ->
            if List.exists (fun item -> kind = Global || item.kind = kind) items then
-             !%{|<td><a href="index_%s_%s.html">%c</a></td>|} (linkname_of_kind kind) (linkname_of_capital c) c
+             !%{|<td><a href="index_%s_%s.html">%s</a></td>|} (linkname_of_kind kind) (linkname_of_capital c) (string_of_initial_letter c)
            else
-             !%{|<td>%c</td>|} c) citems
+             !%{|<td>%s</td>|} (string_of_initial_letter c)) citems
     |> String.concat "")
-    |> fun s -> "<tr>" ^ s ^ "</tr>"
+    |> fun s -> "<tr>" ^ s ^ "</tr>\n"
   in
-  "<table><tbody>"
+  "<table><tbody>\n"
   ^ (List.map mkrow kinds |> String.concat "")
+  ^ (!%{|<tr><td><a href="%s">Notations</a></td></tr>|} notations_html_filename)
   ^ "</tbody></table>"
 
-let html_of_notation_item item =
-  let (scope, notation) =
-    match Str.(bounded_split_delim (regexp ":") item.name 4) with
-    | [_; _; ""; notation] -> ("<span class=\"warning\">no scope</span>", notation)
-    | [_; _; scope; notation] -> ("in " ^ scope, notation)
-    | _ ->
-       failwith (!%"unexpected notation format in glob file: name=%s" item.name)
+let notation_of_item item =
+  match Str.(bounded_split_delim (regexp ":") item.name 4) with
+  | [_; _; ""; notation] -> (`NoScope, notation, item)
+  | [_; _; scope; notation] -> (`Scope scope, notation, item)
+  | _ ->
+     failwith (!%"unexpected notation format in glob file: name=%s" item.name)
+
+let show_scope = function
+  | `NoScope -> "no scope"
+  | `Scope scope -> scope
+
+let compare_scope x y =
+  match x, y with
+  | `NoScope, `NoScope -> 0
+  | `NoScope, _ -> -1
+  | _, `NoScope -> 1
+  | `Scope x, `Scope y -> compare x y
+
+let html_of_notation scope notation item =
+  let scope =
+    match scope with
+    | `NoScope -> "<span class=\"warning\">no scope</span>"
+    | `Scope scope -> "in " ^ scope
   in
   let show notation =
     let len = String.length notation in
@@ -209,6 +233,25 @@ let html_of_notation_item item =
   in
   !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (show notation) (linkname_of_kind item.kind) item.module_ scope
 
+let generate_notation_list output_dir table all_files items =
+  let grouped =
+    List.map notation_of_item items
+    |> Common.list_group_by (fun (scope, not, item) -> scope)
+    |> List.sort (fun (s1, _) (s2, _) -> compare_scope s1 s2)
+    |> List.map (fun (scope, nots) -> scope, Common.list_sort_by (fun (_, not, _) -> not) nots)
+  in
+  let html_of_group (scope, notations) =
+    let h2 = !%"<h2>%s</h2>" (show_scope scope) in
+    let tags = List.map (fun (scope, not, item) -> html_of_notation scope not item) notations in
+    h2 ^ String.concat "<br>\n" tags
+  in
+  let body =
+    table ^ (String.concat "" @@ List.map html_of_group grouped)
+  in
+  let filename = Filename.concat output_dir notations_html_filename in
+  let title = "Notations" in
+  write_html_file all_files body filename title
+
 let compare_case_insensitive s1 s2 =
   String.(compare (lowercase_ascii s1) (lowercase_ascii s2))
 
@@ -217,20 +260,17 @@ let compare_case_insensitive s1 s2 =
  *)
 let generate_with_capital output_dir table all_files kind (c, items) =
   let html_of_item item =
-    if item.kind = EntryKind "not" then
-      html_of_notation_item item
-    else
-      !%{|<a href="%s">%s</a> [%s, in %s]|} item.linkname item.name (linkname_of_kind item.kind) item.module_
+    !%{|<a href="%s">%s</a> [%s, in %s]|} item.linkname item.name (linkname_of_kind item.kind) item.module_
   in
   if items = [] then () else
+    let title = !%"%s (%s)" (string_of_initial_letter c) (skind kind) in
     let body =
-      let h2 = if kind = Global then !%"%c" c else !%"%c (%s)" c (skind kind) in
+      let h2 = if kind = Global then string_of_initial_letter c else title in
       List.filter (fun item -> kind = Global || item.kind = kind) items
       |> List.map html_of_item
       |> String.concat "<br>"
       |> (^) (!%"%s<h2>%s</h2>" table h2)
     in
-    let title = !%"%C (%s)" c (skind kind) in
     let filename = Filename.concat output_dir
         (!%"index_%s_%s.html" (linkname_of_kind kind) (linkname_of_capital c))
     in
@@ -307,14 +347,17 @@ let generate_topfile output_dir all_files xrefs title xref_table hierarchy_graph
   let body = table xrefs ^ hierarchy_graph ^ dependency_graph in
   write_html_file all_files body (Filename.concat output_dir "index.html") title
 
-let is_initial c s =
+let is_initial init s =
   if s = "" then false else
-    match c, String.get s 0 with
-    | _, '_' -> c = '_'
-    | _, ('a'..'z' as s0) -> Char.uppercase_ascii s0 = c
-    | _, ('A'..'Z' as s0) -> s0 = c
-    | '*', _ -> true
-    | _, _ -> false
+    match String.get s 0 with
+    | '_' -> Underscore = init
+    | ('a'..'z' as s0) | ('A'..'Z' as s0) ->
+       begin match init with
+       | Alphabetic a when Char.uppercase_ascii s0 = a -> true
+       | _ -> false
+       end
+    | _ -> false
+
 
 let all_files xref_modules =
   let rec iter = function
@@ -342,6 +385,10 @@ let all_files xref_modules =
 
 let is_subproof path = String.ends_with ~suffix:"_subproof" path
 
+let item_of kind module_ path =
+  let linkname = !%"%s.html#%s" module_ (sanitize_linkname path) in
+  {kind; name=path; linkname; module_}
+
 let generate output_dir (xref_table:XrefTable.t) xref_modules title
       hierarchy_dot_file dependency_dot_file index_blacklist =
   let is_blacklisted =
@@ -350,21 +397,29 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title
     | Some blacklist ->
        fun name -> Index_blacklist.is_listed blacklist name
   in
-  let indexed_items =
+  let notation_items =
+    XrefTable.fold (fun (module_, pos) xref store ->
+        match xref with
+        | range, XrefTable.Defs defs ->
+           List.filter_map (function (path, "not") -> Some (item_of (EntryKind "not") module_ path)
+                                   | _ -> None) defs
+           |> fun items -> items @ store
+        | _ -> store
+      ) xref_table []
+  in
+  let indexed_items = (* exclude notations *)
     List.map (fun c ->
         let items =
-          XrefTable.fold (fun (name, pos) xref store ->
+          XrefTable.fold (fun (module_, pos) xref store ->
             match xref with
             | range, XrefTable.Defs defs ->
                List.filter (fun (path, _) -> is_initial c path) defs
                |> List.filter (fun (_, typ) -> typ <> "binder")
                |> List.filter (fun (_, typ) -> typ <> "var")
+               |> List.filter (fun (_, typ) -> typ <> "not")
                |> List.filter (fun (path, _) -> not (is_subproof path))
                |> List.filter (fun (path, _) -> not (is_blacklisted path))
-               |> List.map (fun (path, typ) ->
-                      let linkname = !%"%s.html#%s" name (sanitize_linkname path) in
-                      let module_ = name in
-                      {kind=EntryKind typ; name=path; linkname; module_})
+               |> List.map (fun (path, typ) -> item_of (EntryKind typ) module_ path)
                |> fun is -> is @ store
             | range, Ref _ -> store) xref_table []
         in
@@ -378,10 +433,12 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title
         |> List.sort (fun x y -> compare (String.lowercase_ascii x.name)
                                    (String.lowercase_ascii y.name))
         |> fun items -> (c, items))
-      alphabets
+      initials
   in
   let all_files = all_files xref_modules in
+  let table = table indexed_items in
   List.iter (fun kind ->
-      List.iter (generate_with_capital output_dir (table indexed_items) all_files kind) indexed_items)
+      List.iter (generate_with_capital output_dir table all_files kind) indexed_items)
     kinds;
+  generate_notation_list output_dir table all_files notation_items;
   generate_topfile output_dir all_files indexed_items title xref_table hierarchy_dot_file dependency_dot_file
