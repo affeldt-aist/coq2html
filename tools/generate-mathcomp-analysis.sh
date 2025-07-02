@@ -29,13 +29,20 @@ sed -i 's/\//\./g' depend.dot
 
 $DIR/tools/generate-hierarchy-graph.sh
 
-$DIR/rocqnavi -title "MathComp-Analysis($COMMIT_HASH)" -d $OUTDIR -base mathcomp \
-  -Q theories analysis -coqlib https://coq.inria.fr/doc/V8.20.1/stdlib/ \
+$DIR/rocqnavi -title "MathComp-Analysis($COMMIT_HASH)" -d $OUTDIR \
+  -coqlib https://coq.inria.fr/doc/V8.20.1/stdlib/ \
+  -Q classical mathcomp.classical \
+  -Q reals mathcomp.reals \
+  -Q reals_stdlib mathcomp.reals_stdlib \
+  -Q experimental_reals mathcomp.experimental_reals \
+  -Q theories mathcomp.analysis \
+  -Q analysis_stdlib mathcomp.analysis_stdlib \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.ssreflect \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.algebra \
   -hierarchy-graph "hierarchy-graph.dot" \
   -dependency-graph "depend.dot" \
   -index-blacklist $INDEX_BLACKLIST_FILE \
+  -show-type-infomation-using-coqtop-process \
   $FILES
 
 cp hierarchy-graph.dot depend.dot $OUTDIR/
