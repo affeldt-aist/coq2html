@@ -1,3 +1,6 @@
+let (!%) s = Printf.sprintf s
+
+(* simple execution of external command *)
 let shell cmd =
   Printf.eprintf " $ %s\n" cmd;
   let status = Sys.command cmd in

@@ -40,11 +40,11 @@ let add_module m =
   Hashtbl.add xref_modules m ()
 
 let add_reference curmod pos_from pos_to dp sp id ty =
-  let tbl = XrefTable.add_reference !xref_table curmod pos_from pos_to dp (path sp id) ty in
+  let tbl = XrefTable.add_reference !xref_table curmod pos_from pos_to dp (path sp id) (Glob_kind.of_string ty) in
   xref_table := tbl
 
 let add_definition curmod pos_from pos_to sp id ty =
-  let tbl = XrefTable.add_definition !xref_table curmod pos_from pos_to (path sp id) ty in
+  let tbl = XrefTable.add_definition !xref_table curmod pos_from pos_to (path sp id) (Glob_kind.of_string ty) in
   xref_table := tbl
 
 (* Map module names to URLs *)
@@ -135,7 +135,7 @@ let module_name_of_file_name f =
 
 (* Produce a HTML link if possible *)
 
-type link = Link of int * string | Anchors of int * string list | Nolink of int option
+type link = Link of int * string | Anchors of int * (string * Glob_kind.t) list | Nolink of int option
 
 let re_sane_path = Str.regexp "[A-Za-z0-9_.\x80-\xFF]+$"
 
@@ -144,11 +144,11 @@ let find_pos xref_table (m, pos) = XrefTable.find xref_table m pos
 let crossref m pos max_pos =
 (*  eprintf "crossref %s %d\n" m pos;*)
   match find_pos !xref_table (m, pos) with
-  | Some (_range, Defs [(path, "not")]) ->
+  | Some (_range, Defs [(path, Notation)]) ->
     let pos' = pos + String.length path in
-    Anchors (pos', [sanitize_linkname path])
+    Anchors (pos', [(sanitize_linkname path, Notation)])
   | Some (range, Defs defs) ->
-    Anchors (snd range + 1, List.map (fun (path, _) -> sanitize_linkname path) defs)
+    Anchors (snd range + 1, List.map (fun (path, kind) -> (sanitize_linkname path, kind)) defs)
   | Some (range, Ref(m', p, _)) ->
       let url = url_for_module m' in
       if p = "" then
@@ -262,8 +262,9 @@ let end_doc () =
   set_enum_depth 0;
   fprintf !oc "</div>\n"
 
-let nested_ids_anchor classes ids text =
-  let id0 = List.hd ids in
+let nested_ids_anchor ?coqtop classes ids text =
+  let (id0, kind0) = List.hd ids in
+  let ids = List.map fst ids in
   let opens =
     List.map (fun id ->sprintf "<span id=\"%s\" class=\"id\">"id ) ids
     |> String.concat ""

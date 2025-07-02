@@ -10,9 +10,10 @@
 (*                                                                     *)
 (* *********************************************************************)
 
-type range = Range.t
+open Common
+open Glob_kind
 
-let (!%) s = Printf.sprintf s
+type range = Range.t
 
 let use_file filename f =
   let ch = open_in filename in
@@ -401,7 +402,7 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title
     XrefTable.fold (fun (module_, pos) xref store ->
         match xref with
         | range, XrefTable.Defs defs ->
-           List.filter_map (function (path, "not") -> Some (item_of (EntryKind "not") module_ path)
+           List.filter_map (function (path, Notation) -> Some (item_of (EntryKind "not") module_ path)
                                    | _ -> None) defs
            |> fun items -> items @ store
         | _ -> store
@@ -414,12 +415,12 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title
             match xref with
             | range, XrefTable.Defs defs ->
                List.filter (fun (path, _) -> is_initial c path) defs
-               |> List.filter (fun (_, typ) -> typ <> "binder")
-               |> List.filter (fun (_, typ) -> typ <> "var")
-               |> List.filter (fun (_, typ) -> typ <> "not")
+               |> List.filter (fun (_, typ) -> typ <> Binder)
+               |> List.filter (fun (_, typ) -> typ <> SectionVariableReference)
+               |> List.filter (fun (_, typ) -> typ <> Notation)
                |> List.filter (fun (path, _) -> not (is_subproof path))
                |> List.filter (fun (path, _) -> not (is_blacklisted path))
-               |> List.map (fun (path, typ) -> item_of (EntryKind typ) module_ path)
+               |> List.map (fun (path, typ) -> item_of (EntryKind (Glob_kind.to_string typ)) module_ path)
                |> fun is -> is @ store
             | range, Ref _ -> store) xref_table []
         in

@@ -6,13 +6,13 @@ end
 module Map = Map.Make (Key)
 
 type xref =
-  | Defs of (string * string) list    (* path, type *)
-  | Ref of string * string * string (* unit, path, type *)
+  | Defs of (string * Glob_kind.t) list    (* path, type *)
+  | Ref of string * string * Glob_kind.t (* unit, path, type *)
 
 let sxref = function
   | Defs defs -> "Defs[" ^ (List.map fst defs |> String.concat ", ")^"]"
   | Ref (unit, path, ty) ->
-    Printf.sprintf "Ref(%s,%s,%s)" unit path ty
+    Printf.sprintf "Ref(%s,%s,%s)" unit path (Glob_kind.to_string ty)
 
 type t = (Range.t * xref) Map.t
 
@@ -26,7 +26,7 @@ let find map module_name pos =
 let empty = Map.empty
 
 let add_reference xref_table curmod pos_from pos_to dp path ty =
-  if ty = "sec" then xref_table else
+  if ty = Glob_kind.Other "sec" then xref_table else
   let range = (pos_from, pos_to) in
   match Map.find_opt (curmod, pos_from) xref_table with
   | Some (range0, xref) when range = range ->
@@ -39,7 +39,7 @@ let add_reference xref_table curmod pos_from pos_to dp path ty =
   Map.add (curmod, pos_from) (range, Ref (dp, path, ty)) xref_table
 
 let add_definition xref_table curmod pos_from pos_to path ty =
-  if ty = "sec" then xref_table else
+  if ty = Glob_kind.Other "sec" then xref_table else
   (*eprintf "add_definition %s %d %s %s %s\n" curmod pos_from sp id ty;*)
   let range = (pos_from, pos_to) in
   match Map.find_opt (curmod, pos_from) xref_table with
