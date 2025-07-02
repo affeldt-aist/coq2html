@@ -48,19 +48,18 @@ jobs:
       - name: top site
         run: mkdir html && cp -r .github/workflows/resources/* html/
 
-      ## Mathcomp Analysis ----------
-      - name: Clone Mathcomp Analysis
+      ## Amidakuji -------------------
+      - name: Clone amidakuji
         uses: actions/checkout@v4
         with:
-          repository: math-comp/analysis
-          path: analysis
-          ref: 1.10.0
+          repository: yoshihiro503/rocq-amidakuji
+          path: rocq-amidakuji
 
-      - name: Build Mathcomp Analysis
-        run: cd analysis/ && opam install -y --deps-only . && opam exec -- make all install
+      - name: Build Amidakuji
+        run: cd rocq-amidakuji && opam exec -- ./configure.sh && opam exec -- make
       - run: |
-          opam exec -- tools/generate-mathcomp-analysis.sh "1.9.0(rocqnavi-${GITHUB_SHA::8})"
-          tree html/
+             opam exec -- tools/generate-amidakuji.sh "(rocqnavi-${GITHUB_SHA::8})"
+             tree html/
       ## ----------------------------
 
       ## Infotheo -------------------
@@ -76,6 +75,21 @@ jobs:
       - run: |
              opam exec -- tools/generate-infotheo.sh "0.9.4(rocqnavi-${GITHUB_SHA::8})"
              tree html/
+      ## ----------------------------
+
+      ## Mathcomp Analysis ----------
+      - name: Clone Mathcomp Analysis
+        uses: actions/checkout@v4
+        with:
+          repository: math-comp/analysis
+          path: analysis
+          ref: 1.10.0
+
+      - name: Build Mathcomp Analysis
+        run: cd analysis/ && opam install -y --deps-only . && opam exec -- make all install
+      - run: |
+          opam exec -- tools/generate-mathcomp-analysis.sh "1.9.0(rocqnavi-${GITHUB_SHA::8})"
+          tree html/
       ## ----------------------------
 
       - name: Setup Pages
