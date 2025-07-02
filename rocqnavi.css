@@ -156,14 +156,6 @@ img.img-darkmode-enable {
     isolation: auto;
 }
 
-.darkmode--activated .sidebar {
-    color: white;
-}
-
-.darkmode--activated .sidebar h2 {
-    color: #a7f6f6;
-}
-
 .darkmode--activated span.katex {
     color: white;
 }
