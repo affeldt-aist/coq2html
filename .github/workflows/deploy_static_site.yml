@@ -69,7 +69,7 @@ jobs:
         with:
           repository: affeldt-aist/infotheo
           path: infotheo
-          ref: 0.9.1
+          ref: 0.9.3
 
       - name: Build Infotheo
         run: cd infotheo/ && opam install -y --deps-only . && opam exec -- make all install

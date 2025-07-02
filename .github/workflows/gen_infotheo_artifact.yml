@@ -8,6 +8,7 @@ on:
 jobs:
   generate-artifact:
     runs-on: ubuntu-latest
+    continue-on-error: true  # ← If a job fails, do not make it a total failure
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +37,7 @@ jobs:
         with:
           repository: affeldt-aist/infotheo
           path: infotheo
-          fetch-tags: 0.9.1
+          fetch-tags: 0.9.3
 
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2
