@@ -58,6 +58,10 @@ div.sidebar ul {
     padding-inline-start: 10px;
 }
 
+div.content {
+  max-width: 80ch;
+}
+
 div.coq, code {
     padding: 1em;
     font-family: "Fira Code", monospace;
