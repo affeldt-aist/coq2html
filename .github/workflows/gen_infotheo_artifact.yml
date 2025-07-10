@@ -37,7 +37,7 @@ jobs:
         with:
           repository: affeldt-aist/infotheo
           path: infotheo
-          fetch-tags: 0.9.3
+          fetch-tags: 0.9.4
 
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2
@@ -57,7 +57,7 @@ jobs:
         run: cd infotheo/ && opam install -y --deps-only . && opam exec -- make all install
 
       - run: |
-             opam exec -- tools/generate-infotheo.sh "0.9.1(rocqnavi-${GITHUB_SHA::8})"
+             opam exec -- tools/generate-infotheo.sh "0.9.4(rocqnavi-${GITHUB_SHA::8})"
              tree html/
 
       - name: Upload htmldoc as artifacts
