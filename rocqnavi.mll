@@ -791,7 +791,7 @@ let () =
   in
   let all_files = Generate_index.all_files xref_modules in
   if !show_type_infomation_using_coqtop_process then
-    Coqtop_command.using ~coqtop_bin:("coqtop " ^ mapping_options) (fun coqtop_conn ->
+    Coqtop_command.using ~coqtop_bin:("coqtop -emacs " ^ mapping_options) (fun coqtop_conn ->
         coqtop_for_type_infomation := Some coqtop_conn;
         List.iter (process_v_file ~coqtop_conn all_files) (List.rev !v_files))
   else
