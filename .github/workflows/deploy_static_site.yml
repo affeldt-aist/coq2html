@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - mca2html
+  pull_request:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
