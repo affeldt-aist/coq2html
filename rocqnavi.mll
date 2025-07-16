@@ -14,7 +14,14 @@
 
 {
 open Printf
+open Common
 open Generate_index
+
+let warn lexbuf message =
+  let open Lexing in
+  let position = lexbuf.lex_curr_p in
+  Printf.eprintf "File: %s, line %d, culumn %d: %s" position.pos_fname
+    position.pos_lnum position.pos_bol message
 
 (** Cross-referencing *)
 
@@ -356,10 +363,10 @@ let end_comment () =
   fprintf !oc "*)</span>"
 
 let start_bracket () =
-  fprintf !oc "<span class=\"bracket\">"
+  fprintf !oc "<code class=\"bracket\">"
 
 let end_bracket () =
-  fprintf !oc "</span>"
+  fprintf !oc "</code>"
 
 let start_string () =
   fprintf !oc  "<span class=\"string\">\""
@@ -439,6 +446,7 @@ rule coq_bol = parse
   (* Enter verbatim mode *)
   | space* ("(***" "*"+ "***)" "\n")
       { fprintf !oc "<pre class=\"ssrdoc\">\n";
+        Lexing.new_line lexbuf;
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</pre>\n";
 	skip_newline lexbuf
@@ -446,12 +454,14 @@ rule coq_bol = parse
   (* Enter ssrdoc with special syntax mode e.g. markdown syntax *)
   | space* ("(**" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n")
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
+        Lexing.new_line lexbuf; 
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
 	skip_newline lexbuf
       }
   | space* ("(***" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n")
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
+        Lexing.new_line lexbuf; 
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
 	skip_newline lexbuf
@@ -464,7 +474,7 @@ rule coq_bol = parse
 
 and skip_newline = parse
   | space* "\n"
-      { coq_bol lexbuf }
+      { Lexing.new_line lexbuf; coq_bol lexbuf }
   | ""
       { coq lexbuf }
 
@@ -489,7 +499,7 @@ and coq = parse
 	skip_newline lexbuf ;
         coq lexbuf }
   | "\n"
-      { newline(); coq_bol lexbuf }
+      { Lexing.new_line lexbuf; newline(); coq_bol lexbuf }
   | eof
       { () }
   | quoted as q
@@ -523,13 +533,17 @@ and string = parse
   | _ as c
       { character c; string lexbuf }
 
-and bracket = parse
+and bracket level = parse
+  | "*)"
+      { warn lexbuf "Warning: unterminated `]`\n"; end_bracket() }
+  | "\\[" { character '['; bracket level lexbuf }
+  | "\\]" { character ']'; bracket level lexbuf }
   | ']'
-      { () }
+      { if level = 0 then (end_bracket(); doc lexbuf) else (character ']'; bracket (level - 1) lexbuf) }
   | '['
-      { character '['; bracket lexbuf; character ']'; bracket lexbuf }
+      { character '['; bracket (level + 1) lexbuf;}
   | path as id
-      { idents (Lexing.lexeme_start lexbuf) id; bracket lexbuf }
+      { idents (Lexing.lexeme_start lexbuf) id; bracket level lexbuf }
   | "\""
       { start_string();
         string lexbuf;
@@ -538,7 +552,7 @@ and bracket = parse
   | eof
       { () }
   | _ as c
-      { character c; bracket lexbuf }
+      { character c; bracket level lexbuf }
 
 and comment = parse
   | "*)"
@@ -550,6 +564,7 @@ and comment = parse
       { () }
   | "\n"
       { if !in_proof then newline();
+        Lexing.new_line lexbuf;
         comment lexbuf }
   | space* as s
       { if !in_proof then space s;
@@ -569,7 +584,7 @@ and doc_bol = parse
   | "-"+ as d
       { dashes d; doc lexbuf }
   | "\n"
-      { set_enum_depth 0; doc_bol lexbuf }
+      { Lexing.new_line lexbuf; set_enum_depth 0; doc_bol lexbuf }
   | ""
       { doc lexbuf }
 
@@ -577,9 +592,9 @@ and doc = parse
   | "*)"
       { () }
   | "\n"
-      { character '\n'; doc_bol lexbuf }
+      { Lexing.new_line lexbuf; character '\n'; doc_bol lexbuf }
   | "["
-      { start_bracket(); bracket lexbuf; end_bracket(); doc lexbuf }
+      { start_bracket(); bracket 0 lexbuf }
   | "#" ([^ '\n' '#']* as html) "#"
       { output_string !oc html; doc lexbuf }
   | eof
@@ -603,7 +618,7 @@ and ssr_doc_bol = parse
   | "(* "
       { ssr_doc_bol lexbuf }
   | "\n"
-      { ssr_doc_bol lexbuf }
+      { Lexing.new_line lexbuf; ssr_doc_bol lexbuf }
   | ""
       { ssr_doc lexbuf }
 
@@ -611,7 +626,7 @@ and ssr_doc = parse
   | space* "*)"
       { ssr_doc lexbuf }
   | "\n"
-      { character '\n'; ssr_doc_bol lexbuf }
+      { Lexing.new_line lexbuf; character '\n'; ssr_doc_bol lexbuf }
   | eof
       { () }
   | _ as c
@@ -619,7 +634,7 @@ and ssr_doc = parse
 
 and verbatim = parse
   | "\n>>" space* "\n"
-      { () }
+      { Lexing.new_line lexbuf; () }
   | eof
       { () }
   | _ as c
@@ -681,7 +696,9 @@ let process_v_file all_files f =
   oc := open_out (Filename.concat !output_dir (module_name ^ ".html"));
   enum_depth := 0; in_proof := false;
   start_html_page friendly_name all_files;
-  coq_bol (Lexing.from_channel ic);
+  let lexbuf = Lexing.from_channel ~with_positions:true ic in
+  Lexing.set_filename lexbuf f;
+  coq_bol lexbuf;
   end_html_page();
   close_out !oc; oc := stdout;
   close_in ic;
