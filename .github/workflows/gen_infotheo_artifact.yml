@@ -53,6 +53,10 @@ jobs:
       - name: Build rocqnavi
         run: opam install -y --deps-only . && opam exec -- make
 
+      - name: Set-up Rocq
+        run: |
+          opam install -y coq.8.20.1
+
       - name: Build Infotheo
         run: cd infotheo/ && opam install -y --deps-only . && opam exec -- make all install
 
