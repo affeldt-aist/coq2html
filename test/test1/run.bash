@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -eux
 
 DIR=$(cd $(dirname $0) && pwd)
 
