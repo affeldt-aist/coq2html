@@ -7,9 +7,17 @@ let read_available ?(max=4096) ch =
   let fd = Unix.descr_of_in_channel ch in
   let ready, _, _ = Unix.select [fd] [] [] 0.1 in
   if ready <> [] then begin
-      let buf = Bytes.create max in
-      let len = input ch buf 0 max in
-      Some (Bytes.sub_string buf 0 len)
+      let rec iter store =
+        let buf = Bytes.create max in
+        let len = input ch buf 0 max in
+        if len < max then
+          let s = Bytes.sub_string buf 0 len in
+          String.concat "" @@ List.rev (s :: store)
+        else
+          let s = Bytes.to_string buf in
+          iter (s :: store)
+      in
+      Some (iter [])
     end
   else None
 
@@ -34,7 +42,6 @@ let close command ioe =
 let using command f =
   let env = Unix.environment () in
   let (i, o, e) = Unix.open_process_full command env in
-  show_errors (i,o,e);
   try
     let y = f (i, o, e) in
     close command (i, o, e);

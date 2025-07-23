@@ -21,6 +21,7 @@ let wait_prompt e =
   iter []
 
 let send ?(wait=0.05) (i, o, e) coq_command =
+  prerr_string (!%"Coqtop_command: %s" coq_command); flush stderr;
   Command.send o coq_command; flush o;
   wait_prompt e;
   match Command.read_available i with

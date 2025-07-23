@@ -276,7 +276,8 @@ let nested_ids_anchor ?coqtop classes ids text =
   in
   let closes = List.map (fun _ -> "</span>") ids |> String.concat "" in
   match coqtop with
-  | Some conn when kind0 = K.Definition ->
+  | Some conn when kind0 = K.Definition
+                   || kind0 = K.Other "prf" ->
      let type_infomation =
        match Coqtop_command.about conn id0 with
        | Ok info -> info
