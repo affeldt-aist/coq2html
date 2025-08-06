@@ -28,6 +28,30 @@ let warn lexbuf message =
 
 let current_module = ref ""
 
+(* Whether type should be displayed or not *)
+let coqtop_for_type_infomation : Coqtop_command.conn option ref = ref None
+
+let current_command = ref ""
+let proceed_current_command s =
+  current_command := !current_command ^ s
+let end_current_command s =
+  proceed_current_command s;
+  let is_loading_command s =
+    let cmd = String.trim s in
+    String.starts_with ~prefix:"Require" cmd
+    || String.starts_with ~prefix:"Import" cmd 
+    || String.starts_with ~prefix:"Export" cmd
+    || String.starts_with ~prefix:"From" cmd
+  in
+  begin match !coqtop_for_type_infomation with
+  | Some conn ->
+     let cmd = !current_command in
+     if is_loading_command cmd then
+       Coqtop_command.send conn cmd |> ignore
+  | _ -> ()
+  end;
+  current_command := ""
+
 (* Record cross-references found in .glob files *)
 
 (* (name of module, character position in file) -> cross-reference *)
@@ -270,9 +294,6 @@ let end_doc () =
   set_enum_depth 0;
   fprintf !oc "</div>\n"
 
-(* Whether type should be displayed or not *)
-let coqtop_for_type_infomation : Coqtop_command.conn option ref = ref None
-
 let nested_ids_anchor ?coqtop classes ids text =
   let (id0, kind0) = List.hd ids in
   let ids = List.map fst ids in
@@ -435,9 +456,12 @@ let non_whites = (['A'-'Z' 'a'-'z' '0'-'9'] | symbol | utf8)+
 let xref = (['A'-'Z' 'a'-'z' '0'-'9' '!' '#'-'~'] | utf8)+ | "<>"
 let integer = ['0'-'9']+
 
+let end_of_command = '.' (space | '\n')
+
 rule coq_bol = parse
   | (space* as s) (start_proof as sp)
       { start_proof s sp;
+        end_current_command (Lexing.lexeme lexbuf);
         skip_newline lexbuf }
   (* Enter special syntax mode e.g. markdown syntax *)
   | space* "(**" (['a'-'z' '-']+ as mode)
@@ -486,6 +510,7 @@ rule coq_bol = parse
       { () }
   | space* as s
       { space s;
+        proceed_current_command (Lexing.lexeme lexbuf);
         coq lexbuf }
 
 and skip_newline = parse
@@ -497,6 +522,7 @@ and skip_newline = parse
 and coq = parse
   | (space* as s) (end_proof as ep)
       { if !in_proof then end_proof s ep;
+        end_current_command (Lexing.lexeme lexbuf);
         skip_newline lexbuf }
   | "(**r "
       { start_doc_right();
@@ -509,8 +535,21 @@ and coq = parse
         coq lexbuf }
 (*  | path as id
       { ident (Lexing.lexeme_start lexbuf) id; coq lexbuf }*)
+  | '.' '\n'
+      {
+        end_current_command (Lexing.lexeme lexbuf);
+        character '.'; Lexing.new_line lexbuf; newline();
+        coq_bol lexbuf
+      }
+  | '.' space as s
+      {
+        end_current_command (Lexing.lexeme lexbuf);
+        output_string !oc s;
+        coq lexbuf
+      }
   | (". ") (space* as s) (start_proof as sp)
       { newline();
+        proceed_current_command (Lexing.lexeme lexbuf);
         start_proof s sp;
 	skip_newline lexbuf ;
         coq lexbuf }
@@ -519,7 +558,10 @@ and coq = parse
   | eof
       { () }
   | quoted as q
-      {idents (Lexing.lexeme_start lexbuf) q; coq lexbuf}
+      {
+        proceed_current_command (Lexing.lexeme lexbuf);
+        idents (Lexing.lexeme_start lexbuf) q; coq lexbuf
+      }
   | (' '? non_whites+ as id)
       {(*output_char !oc ' ';*)
        (* special hack:
@@ -532,12 +574,15 @@ and coq = parse
          | Nolink -> pos + 1
          | _ -> pos
          in*)
-
+       proceed_current_command (Lexing.lexeme lexbuf);
        idents (Lexing.lexeme_start lexbuf) id; coq lexbuf}
 (*  | non_whites as id
       {idents (Lexing.lexeme_start lexbuf) id; coq lexbuf}*)
   | _ as c
-      { character c; coq lexbuf }
+      {
+        proceed_current_command (Lexing.lexeme lexbuf);
+        character c; coq lexbuf
+      }
 
 and string = parse
   | "\"\""
