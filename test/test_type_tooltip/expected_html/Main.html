@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Main</title>
+<meta name="description" content="Documentation of Coq module Main" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="rocqnavi.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="rocqnavi.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      <li><a href="Main.html">Main</a></li>
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module Main</h1>
+<span class="vernacular">Require</span><span class="vernacular"> Import</span><span class="id"> </span><span class="id"><a href="https://coq.inria.fr/library/Coq.Bool.Bool.html">Bool</a></span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> </span><span id="eqdec" class="id"><a name="eqdec" class="" title="eqdec : forall x y : bool, {x = y} + {x <> y}
+
+eqdec is not universe polymorphic
+Arguments eqdec (x y)%bool_scope
+eqdec is transparent
+Expands to: Constant Main.eqdec
+">eqdec</a></span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> </span><span id="x:1" class="id"><a name="x:1" class="">x</a></span><span class="id"> </span><span id="y:2" class="id"><a name="y:2" class="">y</a></span><span class="id">:</span><span class="id"> </span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span><span class="id">,</span><span class="id"> </span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da">{</a></span><span class="id"><a href="Main.html#x:1">x</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"> =</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"> </a></span><span class="id"><a href="Main.html#y:2">y</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da">}</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da"> +</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da"> {</a></span><span class="id"><a href="Main.html#x:1">x</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#::type_scope:x_'&lt;&gt;'_x"> &lt;&gt;</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Logic.html#::type_scope:x_'&lt;&gt;'_x"> </a></span><span class="id"><a href="Main.html#y:2">y</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#87727981cdc1579fef00b9d9c1d3b9da">}</a></span><span class="id"> :=</span><span class="id"> </span><span class="id"><a href="https://coq.inria.fr/library/Coq.Bool.Bool.html#bool_dec">bool_dec</a></span>.<br/>
+<br/>
+<span class="vernacular">Require</span><span class="vernacular"> Import</span><span class="id"> </span><span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> </span><span id="hoge" class="id"><a name="hoge" class="" title="hoge : {y : Z | (y >= 12)%Z}
+
+hoge is not universe polymorphic
+hoge is transparent
+Expands to: Constant Main.hoge
+">hoge</a></span><span class="id">:</span><span class="id"> </span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#bc4528e836ab0e91ea7e942fb09e898f">{</a></span><span id="y:3" class="id"><a name="y:3" class="">y</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#bc4528e836ab0e91ea7e942fb09e898f"> |</a></span> (<span class="id"><a href="Main.html#y:3">y</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.BinInt.html#b1f0780291abe9bd18804d2c9a5039d4"> &gt;=</a></span><span class="id"><a href="https://coq.inria.fr/library/Coq.ZArith.BinInt.html#b1f0780291abe9bd18804d2c9a5039d4"> </a></span><span class="id">12</span>)<span class="id">%Z</span><span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#bc4528e836ab0e91ea7e942fb09e898f">}</a></span>.<br/>
+&nbsp;&nbsp;<span class="id">refine</span> (<span class="id"><a href="https://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span><span class="id"> _</span><span class="id"> 12%Z</span><span class="id"> _</span>). <span class="id">now</span><span class="id"> auto</span><span class="gallina-kwd"> with</span><span class="id"> zarith</span>.<br/>
+<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/affeldt-aist/rocqnavi/">rocqnavi</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>
