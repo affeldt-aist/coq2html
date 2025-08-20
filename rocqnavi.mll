@@ -81,10 +81,17 @@ let add_definition curmod pos_from pos_to sp id ty =
 
 (* Map module names to URLs *)
 
-let coqlib_url = "https://coq.inria.fr/library/"
+let default_coqlib_url_coq8 = "https://coq.inria.fr/library/"
+let default_stdlib_url_rocq = "https://rocq-prover.org/stdlib/"
+let default_corelib_url_rocq = "https://rocq-prover.org/corelib/"
 
 (* logical name with final '.' -> absolute or relative URL *)
-let documentation_urls : (string * string) list ref = ref [("Coq.", coqlib_url)]
+let documentation_urls : (string * string) list ref =
+  ref [
+      ("Coq.",     default_coqlib_url_coq8);
+      ("Stdlib.",  default_stdlib_url_rocq);
+      ("Corelib.", default_corelib_url_rocq);
+    ]
 
 let add_documentation_url logicalname url =
   documentation_urls := (logicalname ^ ".", url) :: !documentation_urls
@@ -795,8 +802,9 @@ let () =
       "<title>  Set the title of the index.html";
     "-base", Arg.String (fun s -> logical_name_base := s ^ "."),
       "DEPRECATED: use -Q\n<coqdir>  Set the name space for the modules being processed";
-    "-coqlib", Arg.String (fun s -> add_documentation_url "Coq" s),
-      "<url>   Set base URL for Coq standard library";
+    "-coqlib", Arg.String (fun s -> add_documentation_url "Stdlib" s),
+      (!%"<url>   Set URL for Rocq standard library (default: %s)"
+         default_stdlib_url_rocq);
     "-d", Arg.Set_string output_dir,
       "<dir>   Output files to directory <dir> (default: current directory)";
     "-Q",
