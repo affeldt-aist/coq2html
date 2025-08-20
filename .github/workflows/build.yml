@@ -19,7 +19,7 @@ jobs:
           - 5
           - 4.14
         coq_version:
-          - "8.20.1"
+          - "9.0.0"
 
     runs-on: ${{ matrix.os }}
 
