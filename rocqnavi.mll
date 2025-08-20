@@ -29,7 +29,7 @@ let warn lexbuf message =
 let current_module = ref ""
 
 (* Whether type should be displayed or not *)
-let coqtop_for_type_infomation : Coqtop_command.conn option ref = ref None
+let coqtop_for_type_information : Coqtop_command.conn option ref = ref None
 
 let current_command = ref ""
 let proceed_current_command s =
@@ -43,7 +43,7 @@ let end_current_command s =
     || String.starts_with ~prefix:"Export" cmd
     || String.starts_with ~prefix:"From" cmd
   in
-  begin match !coqtop_for_type_infomation with
+  begin match !coqtop_for_type_information with
   | Some conn ->
      let cmd = !current_command in
      if is_loading_command cmd then
@@ -305,13 +305,13 @@ let nested_ids_anchor ?coqtop classes ids text =
   match coqtop with
   | Some conn when kind0 = K.Definition
                    || kind0 = K.Other "prf" ->
-     let type_infomation =
+     let type_information =
        match Coqtop_command.about conn id0 with
        | Ok info -> info
        | Error e -> !%"ERR:%s" e
      in
      sprintf {|%s<a name="%s" class="%s" title="%s">%s</a>%s|}
-       opens id0 classes type_infomation (escaped text) closes
+       opens id0 classes type_information (escaped text) closes
   | _ ->
      sprintf {|%s<a name="%s" class="%s">%s</a>%s|} opens id0 classes
        (escaped text) closes
@@ -360,7 +360,7 @@ let idents pos id =
 (*  eprintf "idents: %d '%s'\n" pos id;*)
   let rec iter pos id =
     if id = "" then () else begin
-      let (pos', tags) = ident_partial ?coqtop:!coqtop_for_type_infomation pos id in
+      let (pos', tags) = ident_partial ?coqtop:!coqtop_for_type_information pos id in
       fprintf !oc "%s" tags;
       let rpos' = pos' - pos in
       if pos' <= pos then begin
@@ -746,7 +746,7 @@ let generate_redirects = ref false
 let hierarchy_graph_dot_file = ref ""
 let dependency_graph_dot_file = ref ""
 let index_blacklist_file = ref ""
-let show_type_infomation_using_coqtop_process = ref false
+let show_type_information_using_coqtop_process = ref false
 
 let process_v_file ?coqtop_conn all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
@@ -824,8 +824,8 @@ let () =
       "   Show the dependency graph of <dot-file> on the index.html";
     "-index-blacklist", Arg.Set_string index_blacklist_file,
       "   Exclude specified items from the index";
-    "-show-type-infomation-using-coqtop-process", Arg.Set show_type_infomation_using_coqtop_process,
-      "  Show type infomation of definitions as a tooltip";
+    "-show-type-information-using-coqtop-process", Arg.Set show_type_information_using_coqtop_process,
+      "  Show type information of definitions as a tooltip";
   ])
   process_file
   "Usage: rocqnavi [options] file.glob ... file.v ...\nOptions are:";
@@ -852,9 +852,9 @@ let () =
                         |> String.concat " "
   in
   let all_files = Generate_index.all_files xref_modules in
-  if !show_type_infomation_using_coqtop_process then
+  if !show_type_information_using_coqtop_process then
     Coqtop_command.using ~coqtop_bin:("coqtop -emacs " ^ mapping_options) (fun coqtop_conn ->
-        coqtop_for_type_infomation := Some coqtop_conn;
+        coqtop_for_type_information := Some coqtop_conn;
         List.iter (process_v_file ~coqtop_conn all_files) (List.rev !v_files))
   else
     List.iter (process_v_file ?coqtop_conn:None all_files) (List.rev !v_files);

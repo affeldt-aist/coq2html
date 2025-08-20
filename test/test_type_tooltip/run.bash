@@ -14,7 +14,7 @@ coqc $VFiles
 
 GlobFiles="Main.glob"
 $RocqNavi -title "test_type_tooltip" -d ./html $VFiles $GlobFiles \
-    -show-type-infomation-using-coqtop-process
+    -show-type-information-using-coqtop-process
 
 
 # Check html files

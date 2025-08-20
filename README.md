@@ -43,6 +43,7 @@ Option                     | Summary
 `-Q` _DIR_ _COQDIR_        | Map the directory _DIR_ to correspond to the module name _COQDIR_ (similar to `coqc`)
 `-hierarchy-graph` _FILE_  | Show the hierarchy graph of <dot-file> on the index.html (You need Graphviz command line tool)
 `-index-blacklist` _FILE_  | Exclude specified items from the index
+`-show-type-information-using-coqtop-process` | Show type information of definitions as a tooltip
 
 ### Usage example
 
