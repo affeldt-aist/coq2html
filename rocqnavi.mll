@@ -336,25 +336,29 @@ let ident_partial ?coqtop pos id =
     else String.sub id 0 (pos' - pos)
   in
   if id = "_" then (pos + 1, "_") else
-  match is_gallina_keyword (String.trim id), is_vernacular (String.trim id) with
-  | Some keyword, _ ->
-    let tags = sprintf "<span class=\"gallina-kwd\">%s</span>" (escaped id) in
-    (pos + String.length id, tags)
-  | None, Some vernac ->
-    let tags = sprintf "<span class=\"vernacular\">%s</span>" (escaped id) in
-    (pos + String.length id, tags)
-  | None, None ->
     let max_pos = pos + String.length id in
-    match crossref !current_module pos max_pos with
+    begin match crossref !current_module pos max_pos with
     | Nolink None ->
+       begin match
+         is_gallina_keyword (String.trim id),
+         is_vernacular (String.trim id)
+       with
+       | Some keyword, _ ->
+          let tags = sprintf "<span class=\"gallina-kwd\">%s</span>" (escaped id) in
+          (pos + String.length id, tags)
+       | None, Some vernac ->
+          let tags = sprintf "<span class=\"vernacular\">%s</span>" (escaped id) in
+          (pos + String.length id, tags)
+       | None, None ->
 (*      eprintf "   Nolink '%s'\n" id; *)
-      pos, sprintf "<span class=\"id\">%s</span>" (escaped id)
+          pos, sprintf "<span class=\"id\">%s</span>" (escaped id)
+       end
     | Nolink (Some pos') ->
 (*      eprintf "   Nolink '%s'\n" (name pos' id); *)
-      pos', sprintf "<span class=\"id\">%s</span>" (escaped (name pos' id))
+       pos', sprintf "<span class=\"id\">%s</span>" (escaped (name pos' id))
     | Link (pos', p) ->
 (*      eprintf "   Link '%s'\n" (name pos' id); *)
-      pos', sprintf "<span class=\"id\"><a href=\"%s\">%s</a></span>" p (escaped (name pos' id))
+       pos', sprintf "<span class=\"id\"><a href=\"%s\">%s</a></span>" p (escaped (name pos' id))
     | Anchors (pos', ps) ->
 (*      eprintf "   Anchors '%s'\n" (name pos' id); *)
        let classes =
@@ -362,6 +366,8 @@ let ident_partial ?coqtop pos id =
            "hierarchy-builder" else ""
        in
        pos', nested_ids_anchor ?coqtop classes ps (name pos' id)
+    end
+
 
 let idents pos id =
 (*  eprintf "idents: %d '%s'\n" pos id;*)
