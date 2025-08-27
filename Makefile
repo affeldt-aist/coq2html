@@ -48,10 +48,11 @@ clean:
 	rm -f *.o *.cm?
 	$(MAKE) -C ocamldot/ clean
 
-PREFIX=/usr/local
+PREFIX?=/usr/local
 BINDIR=$(PREFIX)/bin
 
 install:
+	mkdir -p $(BINDIR)
 	install $(OUTPUT) $(BINDIR)/$(OUTPUT)
 
 depend:
