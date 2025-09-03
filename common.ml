@@ -84,3 +84,6 @@ let list_group_by f xs =
 
 let list_sort_by f xs =
   List.sort (fun x y -> compare (f x) (f y)) xs
+
+let warn s = prerr_endline ("Warning: " ^ s)
+

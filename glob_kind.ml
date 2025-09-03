@@ -69,7 +69,10 @@ let of_string = function
   | "prf" -> Other "prf"
   | "abbrev" -> Other "abbrev"
   | "vardef" -> Other "vardef"
-  | other -> failwith (!%"unknown kind: '%s'" other)
+  | "vardefax" -> Other "vardefax"
+  | other ->
+     warn (!%"unknown kind: '%s'" other);
+     Other other
 
 let to_string = function
   | Axiom      -> "ax"
@@ -104,4 +107,7 @@ let to_string = function
   | Other "prf" -> "prf"
   | Other "abbrev" -> "abbrev"
   | Other "vardef" -> "vardef"
-  | Other other -> failwith (!%"unknown kind: '%s'" other)
+  | Other "vardefax" -> "vardefax"
+  | Other other ->
+     warn (!%"unknown kind: '%s'" other);
+     other

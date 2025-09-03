@@ -9,3 +9,5 @@ val grep : string -> string -> bool
 
 val list_group_by : ('a -> 'b) -> 'a list -> ('b * 'a list) list
 val list_sort_by : ('a -> 'b) -> 'a list -> 'a list
+
+val warn : string -> unit
