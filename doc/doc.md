@@ -1,31 +1,32 @@
-#+title: Documentation for Developers
-#+author: Yoshihiro Imai
+---
+title: "Documentation for Developers"
+author: "Yoshihiro Imai"
+---
 
-* Main data flow
+## Main data flow
 
-#+CAPTION: Overview
-[[./overview.jpg]]
+![Overview](./overview.jpg)
 
- * [[https://github.com/affeldt-aist/coq2html/blob/cc7abb5e987c6028b61f1aa1163286e68dbc83b8/coq2html.mll#L690][~process_glob_file~]]
+ * [~process_glob_file~](https://github.com/affeldt-aist/coq2html/blob/cc7abb5e987c6028b61f1aa1163286e68dbc83b8/coq2html.mll#L690)
 A glob file is a text file that contains reference information for the location information of tokens when the v-file is divided into tokens.
 This process creates a table for each glob file that can look up the reference information using the location information as a key.
 
- * [[https://github.com/affeldt-aist/coq2html/blob/cc7abb5e987c6028b61f1aa1163286e68dbc83b8/coq2html.mll#L672][~process_v_file~]]
+ * [~process_v_file~](https://github.com/affeldt-aist/coq2html/blob/cc7abb5e987c6028b61f1aa1163286e68dbc83b8/coq2html.mll#L672)
 Generates html files while parsing v files.
 The above-mentioned reference information table is also used to generate the html file so that the user can click on lemmas or function names to jump to the referenced destination.
 
- * [[https://github.com/affeldt-aist/coq2html/blob/cc7abb5e987c6028b61f1aa1163286e68dbc83b8/generate_index.mli#L23][~Generate_index.generate~]]
+ * [~Generate_index.generate~](https://github.com/affeldt-aist/coq2html/blob/cc7abb5e987c6028b61f1aa1163286e68dbc83b8/generate_index.mli#L23)
 
 Create an index page like the one in coqdoc for each module from the reference table.
 
-* Implementation overview
+## Implementation overview
 
 Main (OCaml) files:
 - Main file, modified from the original version of coq2html:
-  + [rocqnavi.mll](https://github.com/affeldt-aist/coq2html/blob/master/rocqnavi.mll)
+    - [rocqnavi.mll](https://github.com/affeldt-aist/coq2html/blob/master/rocqnavi.mll)
 - Added by this fork of coq2html to generate an index like coqdoc and a sidebar:
-  + [generate_index.ml](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.ml)
-  + [generate_index.mli](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.mli)
+    - [generate_index.ml](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.ml)
+    - [generate_index.mli](https://github.com/affeldt-aist/coq2html/blob/master/generate_index.mli)
 
 Static HTML/CSS/JavaScript files:
 - [rocqnavi.header](https://github.com/affeldt-aist/coq2html/blob/master/rocqnavi.header): HTML
@@ -41,7 +42,7 @@ Dependencies (via `rocqnavi.header`):
 File automatically generated from the HTML/CSS/JavaScript files by the Makefile:
 - `resources.ml`: OCaml (where the HTML/CSS/JavaScript files are turned into OCaml strings)
 
-* How markdown + TeX notation is available
-* Darkmode
-* How the State of the menu toggles are kept by page transitions
+## How markdown + TeX notation is available
+## Darkmode
+## How the State of the menu toggles are kept by page transitions
 Save the status to localStorage property of window

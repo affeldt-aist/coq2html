@@ -31,6 +31,3 @@ authors: [
   "Yoshihiro Imai <y.imai@aist.go.jp>"
 ]
 
-url {
-  src: "https://github.com/affeldt-aist/rocqnavi/archive/refs/tags/rocqnavi.0.2.1.tar.gz"
-}
