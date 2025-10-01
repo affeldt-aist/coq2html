@@ -787,6 +787,10 @@ let write_file txt filename =
   output_string oc txt;
   close_out oc
 
+let arg_deprecated_set_string msg sref : Arg.spec =
+  Arg.String (fun s ->
+      Common.warn (!%"DEPRECATED: %s" msg); sref := s)
+
 let () =
   let v_files = ref [] and glob_files = ref [] in
   let process_file f =
@@ -826,10 +830,14 @@ let () =
       "   Generate redirection files modname.html -> coqdir.modname.html";
     "-short-names", Arg.Set use_short_names,
       "   Use short, unqualified module names in the output";
-    "-hierarchy-graph", Arg.Set_string hierarchy_graph_dot_file,
+    "-structure-graph", Arg.Set_string hierarchy_graph_dot_file,
       "   Show the hierarchy graph of <dot-file> on the index.html";
-    "-dependency-graph", Arg.Set_string dependency_graph_dot_file,
+    "-hierarchy-graph", arg_deprecated_set_string "Use `-structure-graph`" hierarchy_graph_dot_file,
+      "";
+    "-file-graph", Arg.Set_string dependency_graph_dot_file,
       "   Show the dependency graph of <dot-file> on the index.html";
+    "-dependency-graph", arg_deprecated_set_string "Use `-file-graph`" dependency_graph_dot_file,
+      "";
     "-index-blacklist", Arg.Set_string index_blacklist_file,
       "   Exclude specified items from the index";
     "-show-type-information-using-coqtop-process", Arg.Set show_type_information_using_coqtop_process,

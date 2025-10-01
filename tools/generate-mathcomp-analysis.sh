@@ -52,7 +52,7 @@ $DIR/rocqnavi -title "MathComp-Analysis-$REVISION" -d $OUTDIR \
   -Q analysis_stdlib mathcomp.analysis_stdlib \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.ssreflect \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.algebra \
-  -hierarchy-graph $OUTDIR/"hierarchy-graph.dot" \
-  -dependency-graph $OUTDIR/"depend.dot" \
+  -structure-graph $OUTDIR/"hierarchy-graph.dot" \
+  -file-graph $OUTDIR/"depend.dot" \
   -index-blacklist $INDEX_BLACKLIST_FILE \
   $FILES

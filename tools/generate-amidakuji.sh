@@ -22,7 +22,7 @@ sed -i 's/Src\//T\./' depend.dot
 
 $DIR/rocqnavi -title "rocqnavi-sample ($COMMIT_HASH)" -d $OUTDIR \
   -coqlib https://coq.inria.fr/doc/V8.20.1/stdlib/ \
-  -dependency-graph "depend.dot" \
+  -file-graph "depend.dot" \
   -Q src T \
   -show-type-information-using-coqtop-process \
   $FILES

@@ -33,7 +33,7 @@ $DIR/rocqnavi -title "Infotheo-$REVISION" -d $OUTDIR -base infotheo \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.ssreflect \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.algebra \
   -external https://math-comp.github.io/analysis/htmldoc_1_9_0/ mathcomp.analysis \
-  -dependency-graph "depend.dot" \
+  -file-graph "depend.dot" \
   -show-type-information-using-coqtop-process \
   $FILES
 
