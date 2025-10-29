@@ -28,26 +28,25 @@ let warn lexbuf message =
 
 let current_module = ref ""
 
-(* Whether type should be displayed or not *)
-let coqtop_for_type_information : Coqtop_command.conn option ref = ref None
-
+(* Track the vernacular commands being read for when the option to display type
+   information is specified. However, this may not be necessary when using LSP.
+ *)
 let current_command = ref ""
 let proceed_current_command s =
   current_command := !current_command ^ s
-let end_current_command s =
+let end_current_command ?type_lookup s =
   proceed_current_command s;
   let is_loading_command s =
     let cmd = String.trim s in
     String.starts_with ~prefix:"Require" cmd
-    || String.starts_with ~prefix:"Import" cmd 
+    || String.starts_with ~prefix:"Import" cmd
     || String.starts_with ~prefix:"Export" cmd
     || String.starts_with ~prefix:"From" cmd
   in
-  begin match !coqtop_for_type_information with
+  begin match type_lookup with
   | Some conn ->
      let cmd = !current_command in
-     if is_loading_command cmd then
-       Coqtop_command.send conn cmd |> ignore
+     if is_loading_command cmd then Type_lookup.load cmd conn
   | _ -> ()
   end;
   current_command := ""
@@ -301,7 +300,13 @@ let end_doc () =
   set_enum_depth 0;
   fprintf !oc "</div>\n"
 
-let nested_ids_anchor ?coqtop classes ids text =
+let lookup_type_info ?type_lookup id =
+  type_lookup
+  |> Option.map (fun conn ->
+      let default = !%"Err:lookup_type_info: '%s'" id in
+      Result.value ~default (Type_lookup.ask_type_info_of id conn))
+
+let nested_ids_anchor ?type_lookup classes ids text =
   let (id0, kind0) = List.hd ids in
   let ids = List.map fst ids in
   let opens =
@@ -309,14 +314,9 @@ let nested_ids_anchor ?coqtop classes ids text =
     |> String.concat ""
   in
   let closes = List.map (fun _ -> "</span>") ids |> String.concat "" in
-  match coqtop with
-  | Some conn when kind0 = K.Definition
-                   || kind0 = K.Other "prf" ->
-     let type_information =
-       match Coqtop_command.about conn id0 with
-       | Ok info -> info
-       | Error e -> !%"ERR:%s" e
-     in
+  match lookup_type_info ?type_lookup id0 with
+  | Some type_information when kind0 = K.Definition
+                               || kind0 = K.Other "prf" ->
      sprintf {|%s<a name="%s" class="%s" title="%s">%s</a>%s|}
        opens id0 classes type_information (escaped text) closes
   | _ ->
@@ -330,7 +330,7 @@ let is_vernacular id =
   StringSet.to_seq coq_vernaculars
   |> Seq.find (fun key -> String.starts_with ~prefix:key id)
 
-let ident_partial ?coqtop pos id =
+let ident_partial ?type_lookup pos id =
   let name pos' id =
     if pos' - pos > String.length id then id
     else String.sub id 0 (pos' - pos)
@@ -365,15 +365,15 @@ let ident_partial ?coqtop pos id =
          if StringSet.mem id mathcomp_hierarchy_builders then
            "hierarchy-builder" else ""
        in
-       pos', nested_ids_anchor ?coqtop classes ps (name pos' id)
+       pos', nested_ids_anchor ?type_lookup classes ps (name pos' id)
     end
 
 
-let idents pos id =
+let idents ?type_lookup pos id =
 (*  eprintf "idents: %d '%s'\n" pos id;*)
   let rec iter pos id =
     if id = "" then () else begin
-      let (pos', tags) = ident_partial ?coqtop:!coqtop_for_type_information pos id in
+      let (pos', tags) = ident_partial ?type_lookup pos id in
       fprintf !oc "%s" tags;
       let rpos' = pos' - pos in
       if pos' <= pos then begin
@@ -449,6 +449,8 @@ let start_html_page modname all_files =
 let end_html_page () =
   output_string !oc Resources.footer
 
+let type_lookup : Type_lookup.conn option ref = ref None
+
 }
 
 let space = [' ' '\t']
@@ -474,7 +476,7 @@ let end_of_command = '.' (space | '\n')
 rule coq_bol = parse
   | (space* as s) (start_proof as sp)
       { start_proof s sp;
-        end_current_command (Lexing.lexeme lexbuf);
+        end_current_command ?type_lookup:!type_lookup (Lexing.lexeme lexbuf);
         skip_newline lexbuf }
   (* Enter special syntax mode e.g. markdown syntax *)
   | space* "(**" (['a'-'z' '-']+ as mode)
@@ -535,7 +537,7 @@ and skip_newline = parse
 and coq = parse
   | (space* as s) (end_proof as ep)
       { if !in_proof then end_proof s ep;
-        end_current_command (Lexing.lexeme lexbuf);
+        end_current_command ?type_lookup:!type_lookup (Lexing.lexeme lexbuf);
         skip_newline lexbuf }
   | "(**r "
       { start_doc_right();
@@ -550,13 +552,13 @@ and coq = parse
       { ident (Lexing.lexeme_start lexbuf) id; coq lexbuf }*)
   | '.' '\n'
       {
-        end_current_command (Lexing.lexeme lexbuf);
+        end_current_command ?type_lookup:!type_lookup (Lexing.lexeme lexbuf);
         character '.'; Lexing.new_line lexbuf; newline();
         coq_bol lexbuf
       }
   | '.' space as s
       {
-        end_current_command (Lexing.lexeme lexbuf);
+        end_current_command ?type_lookup:!type_lookup (Lexing.lexeme lexbuf);
         output_string !oc s;
         coq lexbuf
       }
@@ -573,7 +575,7 @@ and coq = parse
   | quoted as q
       {
         proceed_current_command (Lexing.lexeme lexbuf);
-        idents (Lexing.lexeme_start lexbuf) q; coq lexbuf
+        idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) q; coq lexbuf
       }
   | (' '? non_whites+ as id)
       {(*output_char !oc ' ';*)
@@ -588,7 +590,7 @@ and coq = parse
          | _ -> pos
          in*)
        proceed_current_command (Lexing.lexeme lexbuf);
-       idents (Lexing.lexeme_start lexbuf) id; coq lexbuf}
+       idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) id; coq lexbuf}
 (*  | non_whites as id
       {idents (Lexing.lexeme_start lexbuf) id; coq lexbuf}*)
   | _ as c
@@ -617,7 +619,7 @@ and bracket level = parse
   | '['
       { character '['; bracket (level + 1) lexbuf;}
   | path as id
-      { idents (Lexing.lexeme_start lexbuf) id; bracket level lexbuf }
+      { idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) id; bracket level lexbuf }
   | "\""
       { start_string();
         string lexbuf;
@@ -761,11 +763,11 @@ let dependency_graph_dot_file = ref ""
 let index_blacklist_file = ref ""
 let show_type_information_using_coqtop_process = ref false
 
-let process_v_file ?coqtop_conn all_files f =
+let process_v_file ?type_lookup all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
   let base_f = Filename.basename pref_f in
   let module_name = !logical_name_base ^ module_name_of_file_name pref_f in
-  Option.iter (fun conn -> ignore @@ Coqtop_command.send ~wait:3.0 conn (!%"Require Import %s.\n" module_name)) coqtop_conn;
+  Option.iter (fun conn -> Type_lookup.load (!%"Require Import %s.\n" module_name) conn) type_lookup;
   current_module := module_name;
   let friendly_name = if !use_short_names then base_f else module_name in
   let ic = open_in f in
@@ -847,7 +849,7 @@ let () =
     "-index-blacklist", Arg.Set_string index_blacklist_file,
       "   Exclude specified items from the index";
     "-show-type-information-using-coqtop-process", Arg.Set show_type_information_using_coqtop_process,
-      "  Show type information of definitions as a tooltip";
+      "   Show type information of definitions as a tooltip (consider using -show-type-infomation-using-rocq-lsp)";
   ])
   process_file
   "Usage: rocqnavi [options] file.glob ... file.v ...\nOptions are:";
@@ -875,11 +877,11 @@ let () =
   in
   let all_files = Generate_index.all_files xref_modules in
   if !show_type_information_using_coqtop_process then
-    Coqtop_command.using ~coqtop_bin:("coqtop -emacs " ^ mapping_options) (fun coqtop_conn ->
-        coqtop_for_type_information := Some coqtop_conn;
-        List.iter (process_v_file ~coqtop_conn all_files) (List.rev !v_files))
+    Type_lookup.using (Coqtop_emacs ("coqtop -emacs " ^ mapping_options)) (fun conn ->
+        type_lookup := Some conn;
+        List.iter (process_v_file ~type_lookup:conn all_files) (List.rev !v_files))
   else
-    List.iter (process_v_file ?coqtop_conn:None all_files) (List.rev !v_files);
+    List.iter (process_v_file all_files) (List.rev !v_files);
   let index_blacklist_opt =
     if !index_blacklist_file = "" then None
     else Some (Index_blacklist.from_file !index_blacklist_file)
