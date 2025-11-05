@@ -87,3 +87,17 @@ let list_sort_by f xs =
 
 let warn s = prerr_endline ("Warning: " ^ s)
 
+let html_escaped =
+  let buff = Buffer.create 5 in
+  fun s ->
+  Buffer.clear buff;
+  for i = 0 to String.length s - 1 do
+    match s.[i] with
+    | '<' -> Buffer.add_string buff "&lt;"
+    | '>' -> Buffer.add_string buff "&gt;"
+    | '&' -> Buffer.add_string buff "&amp;"
+    | '\"' -> Buffer.add_string buff "&quot;"
+    | c -> Buffer.add_char buff c
+  done;
+  Buffer.contents buff
+

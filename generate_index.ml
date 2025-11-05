@@ -26,23 +26,9 @@ let use_file filename f =
 let read_file filename = use_file filename (fun ch ->
     really_input_string ch (in_channel_length ch))
 
-let escaped =
-  let buff = Buffer.create 5 in
-  fun s ->
-  Buffer.clear buff;
-  for i = 0 to String.length s - 1 do
-    match s.[i] with
-    | '<' -> Buffer.add_string buff "&lt;"
-    | '>' -> Buffer.add_string buff "&gt;"
-    | '&' -> Buffer.add_string buff "&amp;"
-    | '\"' -> Buffer.add_string buff "&quot;"
-    | c -> Buffer.add_char buff c
-  done;
-  Buffer.contents buff
-
 let sanitize_linkname s =
   let rec loop esc i =
-    if i < 0 then if esc then escaped s else s
+    if i < 0 then if esc then html_escaped s else s
     else match s.[i] with
          | 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' | '_' -> loop esc (i-1)
          | '<' | '>' | '&' | '\'' | '\"' -> loop true (i-1)

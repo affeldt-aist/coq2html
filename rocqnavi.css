@@ -216,3 +216,32 @@ img.img-darkmode-enable {
 .darkmode-toggle {
   z-index: 9999 !important;
 }
+
+/* ↓↓If the option to display type information is enabled, show it in a tooltip */
+
+.tooltip {
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltip-area {
+  opacity: 0;         /* Initially hide it. */
+  visibility: hidden; /* Initially hide it. */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -30px;
+  display: inline-block;
+  padding: 5px;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  background: #333;
+  color: #fff;
+  border-radius: 3px;
+  transition: 0.2s ease-in; /* animation */
+}
+
+.tooltip:hover .tooltip-area {
+  opacity: 1;
+  visibility: visible;
+}

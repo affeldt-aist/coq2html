@@ -12,8 +12,6 @@
 
 type range = Range.t
 
-val escaped : string -> string
-
 val sanitize_linkname : string -> string
 
 type file_path

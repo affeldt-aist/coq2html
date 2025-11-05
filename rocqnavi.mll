@@ -22,7 +22,7 @@ let warn lexbuf message =
   let open Lexing in
   let position = lexbuf.lex_curr_p in
   Printf.eprintf "File: %s, line %d, culumn %d: %s" position.pos_fname
-    position.pos_lnum position.pos_bol message
+    position.pos_lnum (position.pos_cnum - position.pos_bol) message
 
 (** Cross-referencing *)
 
@@ -300,13 +300,19 @@ let end_doc () =
   set_enum_depth 0;
   fprintf !oc "</div>\n"
 
-let lookup_type_info ?type_lookup id =
+(* If the option to show type infomation is enabled, return the type infomation *)
+let lookup_type_info ?type_lookup id loc =
   type_lookup
   |> Option.map (fun conn ->
-      let default = !%"Err:lookup_type_info: '%s'" id in
-      Result.value ~default (Type_lookup.ask_type_info_of id conn))
 
-let nested_ids_anchor ?type_lookup classes ids text =
+      let position = Lexing.(loc.pos_lnum - 1, loc.pos_cnum - loc.pos_bol + 1) in
+      let filename = Lexing.(loc.pos_fname) in
+      match Type_lookup.ask_type_info_of id filename position conn with
+      | Ok ty -> ty
+      | Error message -> !%"Err:lookup_type_info '%s':\n\n%s" id message
+       )
+
+let nested_ids_anchor ?type_lookup classes ids text loc =
   let (id0, kind0) = List.hd ids in
   let ids = List.map fst ids in
   let opens =
@@ -314,14 +320,14 @@ let nested_ids_anchor ?type_lookup classes ids text =
     |> String.concat ""
   in
   let closes = List.map (fun _ -> "</span>") ids |> String.concat "" in
-  match lookup_type_info ?type_lookup id0 with
+  match lookup_type_info ?type_lookup id0 loc with
   | Some type_information when kind0 = K.Definition
                                || kind0 = K.Other "prf" ->
-     sprintf {|%s<a name="%s" class="%s" title="%s">%s</a>%s|}
-       opens id0 classes type_information (escaped text) closes
+     let atag = Tooltip.tag_with_tooltip "a" id0 classes type_information text in
+     sprintf {|%s%s%s|} opens atag closes
   | _ ->
      sprintf {|%s<a name="%s" class="%s">%s</a>%s|} opens id0 classes
-       (escaped text) closes
+       (html_escaped text) closes
 
 let is_gallina_keyword id =
   StringSet.find_opt id coq_gallina_keywords
@@ -330,7 +336,7 @@ let is_vernacular id =
   StringSet.to_seq coq_vernaculars
   |> Seq.find (fun key -> String.starts_with ~prefix:key id)
 
-let ident_partial ?type_lookup pos id =
+let ident_partial ?type_lookup pos id loc =
   let name pos' id =
     if pos' - pos > String.length id then id
     else String.sub id 0 (pos' - pos)
@@ -344,36 +350,36 @@ let ident_partial ?type_lookup pos id =
          is_vernacular (String.trim id)
        with
        | Some keyword, _ ->
-          let tags = sprintf "<span class=\"gallina-kwd\">%s</span>" (escaped id) in
+          let tags = sprintf "<span class=\"gallina-kwd\">%s</span>" (html_escaped id) in
           (pos + String.length id, tags)
        | None, Some vernac ->
-          let tags = sprintf "<span class=\"vernacular\">%s</span>" (escaped id) in
+          let tags = sprintf "<span class=\"vernacular\">%s</span>" (html_escaped id) in
           (pos + String.length id, tags)
        | None, None ->
 (*      eprintf "   Nolink '%s'\n" id; *)
-          pos, sprintf "<span class=\"id\">%s</span>" (escaped id)
+          pos, sprintf "<span class=\"id\">%s</span>" (html_escaped id)
        end
     | Nolink (Some pos') ->
 (*      eprintf "   Nolink '%s'\n" (name pos' id); *)
-       pos', sprintf "<span class=\"id\">%s</span>" (escaped (name pos' id))
+       pos', sprintf "<span class=\"id\">%s</span>" (html_escaped (name pos' id))
     | Link (pos', p) ->
 (*      eprintf "   Link '%s'\n" (name pos' id); *)
-       pos', sprintf "<span class=\"id\"><a href=\"%s\">%s</a></span>" p (escaped (name pos' id))
+       pos', sprintf "<span class=\"id\"><a href=\"%s\">%s</a></span>" p (html_escaped (name pos' id))
     | Anchors (pos', ps) ->
 (*      eprintf "   Anchors '%s'\n" (name pos' id); *)
        let classes =
          if StringSet.mem id mathcomp_hierarchy_builders then
            "hierarchy-builder" else ""
        in
-       pos', nested_ids_anchor ?type_lookup classes ps (name pos' id)
+       pos', nested_ids_anchor ?type_lookup classes ps (name pos' id) loc
     end
 
 
-let idents ?type_lookup pos id =
+let idents ?type_lookup pos id loc =
 (*  eprintf "idents: %d '%s'\n" pos id;*)
   let rec iter pos id =
     if id = "" then () else begin
-      let (pos', tags) = ident_partial ?type_lookup pos id in
+      let (pos', tags) = ident_partial ?type_lookup pos id loc in
       fprintf !oc "%s" tags;
       let rpos' = pos' - pos in
       if pos' <= pos then begin
@@ -575,7 +581,7 @@ and coq = parse
   | quoted as q
       {
         proceed_current_command (Lexing.lexeme lexbuf);
-        idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) q; coq lexbuf
+        idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) q (Lexing.lexeme_start_p lexbuf); coq lexbuf
       }
   | (' '? non_whites+ as id)
       {(*output_char !oc ' ';*)
@@ -590,7 +596,7 @@ and coq = parse
          | _ -> pos
          in*)
        proceed_current_command (Lexing.lexeme lexbuf);
-       idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) id; coq lexbuf}
+       idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) id  (Lexing.lexeme_start_p lexbuf); coq lexbuf}
 (*  | non_whites as id
       {idents (Lexing.lexeme_start lexbuf) id; coq lexbuf}*)
   | _ as c
@@ -619,7 +625,7 @@ and bracket level = parse
   | '['
       { character '['; bracket (level + 1) lexbuf;}
   | path as id
-      { idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) id; bracket level lexbuf }
+      { idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) id (Lexing.lexeme_start_p lexbuf); bracket level lexbuf }
   | "\""
       { start_string();
         string lexbuf;
@@ -762,12 +768,14 @@ let hierarchy_graph_dot_file = ref ""
 let dependency_graph_dot_file = ref ""
 let index_blacklist_file = ref ""
 let show_type_information_using_coqtop_process = ref false
+let show_type_information_using_rocq_lsp_process = ref false
 
 let process_v_file ?type_lookup all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
   let base_f = Filename.basename pref_f in
   let module_name = !logical_name_base ^ module_name_of_file_name pref_f in
-  Option.iter (fun conn -> Type_lookup.load (!%"Require Import %s.\n" module_name) conn) type_lookup;
+  let filepath = Sys.getcwd() ^ "/" ^ f in
+  Option.iter (Type_lookup.open_file filepath module_name) type_lookup;
   current_module := module_name;
   let friendly_name = if !use_short_names then base_f else module_name in
   let ic = open_in f in
@@ -775,11 +783,12 @@ let process_v_file ?type_lookup all_files f =
   enum_depth := 0; in_proof := false;
   start_html_page friendly_name all_files;
   let lexbuf = Lexing.from_channel ~with_positions:true ic in
-  Lexing.set_filename lexbuf f;
+  Lexing.set_filename lexbuf filepath;
   coq_bol lexbuf;
   end_html_page();
   close_out !oc; oc := stdout;
   close_in ic;
+  Option.iter (Type_lookup.close_file filepath module_name) type_lookup;
   if !generate_redirects && !logical_name_base <> "" then
     make_redirect (Filename.concat !output_dir (base_f ^ ".html"))
                   (module_name ^ ".html")
@@ -850,6 +859,8 @@ let () =
       "   Exclude specified items from the index";
     "-show-type-information-using-coqtop-process", Arg.Set show_type_information_using_coqtop_process,
       "   Show type information of definitions as a tooltip (consider using -show-type-infomation-using-rocq-lsp)";
+    "-show-type-information-using-rocq-lsp", Arg.Set show_type_information_using_rocq_lsp_process,
+      "   Show type information of definitions as a tooltip";
   ])
   process_file
   "Usage: rocqnavi [options] file.glob ... file.v ...\nOptions are:";
@@ -875,9 +886,15 @@ let () =
   let mapping_options = List.map (fun (phy, log) -> !%"-Q %s %s" (String.concat "/" phy) log) !directory_mappings
                         |> String.concat " "
   in
+(*  XrefTable.dump !xref_table;*)
   let all_files = Generate_index.all_files xref_modules in
-  if !show_type_information_using_coqtop_process then
-    Type_lookup.using (Coqtop_emacs ("coqtop -emacs " ^ mapping_options)) (fun conn ->
+  if !show_type_information_using_coqtop_process
+     || !show_type_information_using_rocq_lsp_process then
+    let method_ = if !show_type_information_using_coqtop_process then
+                    Type_lookup.Coqtop_emacs ("coqtop -emacs " ^ mapping_options)
+                  else Rocq_LSP
+    in
+    Type_lookup.using method_ (fun conn ->
         type_lookup := Some conn;
         List.iter (process_v_file ~type_lookup:conn all_files) (List.rev !v_files))
   else
