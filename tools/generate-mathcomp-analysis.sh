@@ -55,4 +55,5 @@ $DIR/rocqnavi -title "MathComp-Analysis-$REVISION" -d $OUTDIR \
   -structure-graph $OUTDIR/"hierarchy-graph.dot" \
   -file-graph $OUTDIR/"depend.dot" \
   -index-blacklist $INDEX_BLACKLIST_FILE \
+  -show-type-information-using-rocq-lsp \
   $FILES

@@ -44,6 +44,7 @@ jobs:
             startGroup "Build Rocqnavi"
               sudo apt-get install -y graphviz
               sudo chown -R 1000:1000 .
+              opam install -y coq-lsp
               make
             endGroup
           script: |

@@ -302,14 +302,13 @@ let end_doc () =
 
 (* If the option to show type infomation is enabled, return the type infomation *)
 let lookup_type_info ?type_lookup id loc =
-  type_lookup
-  |> Option.map (fun conn ->
-
+  Option.bind type_lookup (fun conn ->
       let position = Lexing.(loc.pos_lnum - 1, loc.pos_cnum - loc.pos_bol + 1) in
       let filename = Lexing.(loc.pos_fname) in
       match Type_lookup.ask_type_info_of id filename position conn with
-      | Ok ty -> ty
-      | Error message -> !%"Err:lookup_type_info '%s':\n\n%s" id message
+      | Ok ty -> Some ty
+      | Error message -> Common.warn (!%"Err:lookup_type_info '%s':\n\n%s" id message);
+                         None
        )
 
 let nested_ids_anchor ?type_lookup classes ids text loc =

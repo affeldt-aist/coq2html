@@ -10,3 +10,10 @@ html/
 
 ocamldot/ocamldot
 ocamldot/ocamldot.ml
+
+*.vo
+*.aux
+*.glob
+*.vo[ks]
+
+coq_lsp_log_*.txt

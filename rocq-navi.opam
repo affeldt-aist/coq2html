@@ -18,6 +18,7 @@ depends: [
   "ocamlfind"
   "dune-glob" # Parsing glob syntax like "*_unnamed_mixin_*"
   "yojson"
+  "coq-lsp" {with-test}
 ]
 
 tags: [

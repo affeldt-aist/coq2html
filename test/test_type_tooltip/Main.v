@@ -1,3 +1,5 @@
+Definition aiueo := 123.
+Definition kakik := true.
 Require Import Bool.
 Definition eqdec : forall x y: bool, {x = y} + {x <> y} := bool_dec.
 
