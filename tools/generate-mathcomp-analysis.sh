@@ -5,7 +5,7 @@ REVISION=${REVISION:-"no"}
 DIR=$(pwd `dirname .`)
 OUTDIR=${OUTDIR:-$DIR/html/analysis-$REVISION}
 ANALYSIS_SRC=${ANALYSIS_SRC:-$OPAM_SWITCH_PREFIX/.opam-switch/sources/coq-mathcomp-analysis.dev}
-INDEX_BLACKLIST_FILE=$DIR/tools/index-blacklist
+INDEX_BLACKLIST_FILE=$DIR/sample_blacklist/index_blacklist
 
 rm -rf $OUTDIR
 mkdir -p $OUTDIR

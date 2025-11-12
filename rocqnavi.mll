@@ -16,6 +16,7 @@
 open Printf
 open Common
 open Generate_index
+open Env
 module K = Glob_kind
 
 let warn lexbuf message =
@@ -34,7 +35,7 @@ let current_module = ref ""
 let current_command = ref ""
 let proceed_current_command s =
   current_command := !current_command ^ s
-let end_current_command ?type_lookup s =
+let end_current_command env s =
   proceed_current_command s;
   let is_loading_command s =
     let cmd = String.trim s in
@@ -43,7 +44,7 @@ let end_current_command ?type_lookup s =
     || String.starts_with ~prefix:"Export" cmd
     || String.starts_with ~prefix:"From" cmd
   in
-  begin match type_lookup with
+  begin match env.type_lookup with
   | Some conn ->
      let cmd = !current_command in
      if is_loading_command cmd then Type_lookup.load cmd conn
@@ -309,8 +310,7 @@ let lookup_type_info conn id loc =
       | Error message -> Common.warn (!%"fail: lookup_type_info '%s'" id);
                          None
 
-
-let nested_ids_anchor ?type_lookup classes ids text loc =
+let nested_ids_anchor env classes ids text loc =
   let (id0, kind0) = List.hd ids in
   let ids = List.map fst ids in
   let opens =
@@ -318,8 +318,13 @@ let nested_ids_anchor ?type_lookup classes ids text loc =
     |> String.concat ""
   in
   let closes = List.map (fun _ -> "</span>") ids |> String.concat "" in
-  match type_lookup, kind0 with
-  | Some conn, K.Definition ->
+  let is_black =
+    match env.definition_blacklist with
+    | None -> false
+    | Some list -> Index_blacklist.is_listed list id0
+  in
+  match env.type_lookup, kind0 with
+  | Some conn, K.Definition when is_black = false ->
      let type_information = lookup_type_info conn id0 loc
                             |> Option.value ~default:"Null"
      in
@@ -336,7 +341,7 @@ let is_vernacular id =
   StringSet.to_seq coq_vernaculars
   |> Seq.find (fun key -> String.starts_with ~prefix:key id)
 
-let ident_partial ?type_lookup pos id loc =
+let ident_partial env pos id loc =
   let name pos' id =
     if pos' - pos > String.length id then id
     else String.sub id 0 (pos' - pos)
@@ -371,15 +376,15 @@ let ident_partial ?type_lookup pos id loc =
          if StringSet.mem id mathcomp_hierarchy_builders then
            "hierarchy-builder" else ""
        in
-       pos', nested_ids_anchor ?type_lookup classes ps (name pos' id) loc
+       pos', nested_ids_anchor env classes ps (name pos' id) loc
     end
 
 
-let idents ?type_lookup pos id loc =
+let idents env pos id loc =
 (*  eprintf "idents: %d '%s'\n" pos id;*)
   let rec iter pos id =
     if id = "" then () else begin
-      let (pos', tags) = ident_partial ?type_lookup pos id loc in
+      let (pos', tags) = ident_partial env pos id loc in
       fprintf !oc "%s" tags;
       let rpos' = pos' - pos in
       if pos' <= pos then begin
@@ -455,8 +460,7 @@ let start_html_page modname all_files =
 let end_html_page () =
   output_string !oc Resources.footer
 
-let type_lookup : Type_lookup.conn option ref = ref None
-
+let env : Env.t ref = ref Env.default
 }
 
 let space = [' ' '\t']
@@ -482,7 +486,7 @@ let end_of_command = '.' (space | '\n')
 rule coq_bol = parse
   | (space* as s) (start_proof as sp)
       { start_proof s sp;
-        end_current_command ?type_lookup:!type_lookup (Lexing.lexeme lexbuf);
+        end_current_command !env (Lexing.lexeme lexbuf);
         skip_newline lexbuf }
   (* Enter special syntax mode e.g. markdown syntax *)
   | space* "(**" (['a'-'z' '-']+ as mode)
@@ -515,14 +519,14 @@ rule coq_bol = parse
   (* Enter ssrdoc with special syntax mode e.g. markdown syntax *)
   | space* ("(**" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n")
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
-        Lexing.new_line lexbuf; 
+        Lexing.new_line lexbuf;
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
 	skip_newline lexbuf
       }
   | space* ("(***" (['a'-'z' '-']+ as mode) "*"+ "***)" "\n")
       { fprintf !oc "<div class=\"ssrdoc %s\">\n" mode;
-        Lexing.new_line lexbuf; 
+        Lexing.new_line lexbuf;
         ssr_doc_bol lexbuf;
 	fprintf !oc "%s" "</div>\n";
 	skip_newline lexbuf
@@ -543,7 +547,7 @@ and skip_newline = parse
 and coq = parse
   | (space* as s) (end_proof as ep)
       { if !in_proof then end_proof s ep;
-        end_current_command ?type_lookup:!type_lookup (Lexing.lexeme lexbuf);
+        end_current_command !env (Lexing.lexeme lexbuf);
         skip_newline lexbuf }
   | "(**r "
       { start_doc_right();
@@ -558,13 +562,13 @@ and coq = parse
       { ident (Lexing.lexeme_start lexbuf) id; coq lexbuf }*)
   | '.' '\n'
       {
-        end_current_command ?type_lookup:!type_lookup (Lexing.lexeme lexbuf);
+        end_current_command !env (Lexing.lexeme lexbuf);
         character '.'; Lexing.new_line lexbuf; newline();
         coq_bol lexbuf
       }
   | '.' space as s
       {
-        end_current_command ?type_lookup:!type_lookup (Lexing.lexeme lexbuf);
+        end_current_command !env (Lexing.lexeme lexbuf);
         output_string !oc s;
         coq lexbuf
       }
@@ -581,7 +585,7 @@ and coq = parse
   | quoted as q
       {
         proceed_current_command (Lexing.lexeme lexbuf);
-        idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) q (Lexing.lexeme_start_p lexbuf); coq lexbuf
+        idents !env (Lexing.lexeme_start lexbuf) q (Lexing.lexeme_start_p lexbuf); coq lexbuf
       }
   | (' '? non_whites+ as id)
       {(*output_char !oc ' ';*)
@@ -596,7 +600,7 @@ and coq = parse
          | _ -> pos
          in*)
        proceed_current_command (Lexing.lexeme lexbuf);
-       idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) id  (Lexing.lexeme_start_p lexbuf); coq lexbuf}
+       idents !env (Lexing.lexeme_start lexbuf) id  (Lexing.lexeme_start_p lexbuf); coq lexbuf}
 (*  | non_whites as id
       {idents (Lexing.lexeme_start lexbuf) id; coq lexbuf}*)
   | _ as c
@@ -625,7 +629,7 @@ and bracket level = parse
   | '['
       { character '['; bracket (level + 1) lexbuf;}
   | path as id
-      { idents ?type_lookup:!type_lookup (Lexing.lexeme_start lexbuf) id (Lexing.lexeme_start_p lexbuf); bracket level lexbuf }
+      { idents !env (Lexing.lexeme_start lexbuf) id (Lexing.lexeme_start_p lexbuf); bracket level lexbuf }
   | "\""
       { start_string();
         string lexbuf;
@@ -770,12 +774,12 @@ let index_blacklist_file = ref ""
 let show_type_information_using_coqtop_process = ref false
 let show_type_information_using_rocq_lsp_process = ref false
 
-let process_v_file ?type_lookup all_files f =
+let process_v_file env all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
   let base_f = Filename.basename pref_f in
   let module_name = !logical_name_base ^ module_name_of_file_name pref_f in
   let filepath = Sys.getcwd() ^ "/" ^ f in
-  Option.iter (Type_lookup.open_file filepath module_name) type_lookup;
+  Option.iter (Type_lookup.open_file filepath module_name) env.type_lookup;
   current_module := module_name;
   let friendly_name = if !use_short_names then base_f else module_name in
   let ic = open_in f in
@@ -788,7 +792,7 @@ let process_v_file ?type_lookup all_files f =
   end_html_page();
   close_out !oc; oc := stdout;
   close_in ic;
-  Option.iter (Type_lookup.close_file filepath module_name) type_lookup;
+  Option.iter (Type_lookup.close_file filepath module_name) env.type_lookup;
   if !generate_redirects && !logical_name_base <> "" then
     make_redirect (Filename.concat !output_dir (base_f ^ ".html"))
                   (module_name ^ ".html")
@@ -819,6 +823,7 @@ let () =
       eprintf "Don't know what to do with file %s\n" f; exit 2
     end in
   Arg.parse (Arg.align [
+    "-debug", Arg.Set Log.debug_flag, "Print debug messages to stderr";
     "-title", Arg.String (fun s -> title := s),
       "<title>  Set the title of the index.html";
     "-base", Arg.String (fun s -> logical_name_base := s ^ "."),
@@ -878,7 +883,7 @@ let () =
     exit 1
   end;
   if "" <> !index_blacklist_file && not (Sys.file_exists !index_blacklist_file) then begin
-    eprintf "Error: The file you specified with the -index-blacklist option does not exist: '%s'\n"
+    eprintf "Error: The file '%s' does not exists, which file was specified by the -index-blacklist option.\n"
       !index_blacklist_file;
     exit 1
   end;
@@ -888,6 +893,10 @@ let () =
   in
 (*  XrefTable.dump !xref_table;*)
   let all_files = Generate_index.all_files xref_modules in
+  let index_blacklist_opt =
+    if !index_blacklist_file = "" then None
+    else Some (Index_blacklist.from_file !index_blacklist_file)
+  in
   if !show_type_information_using_coqtop_process
      || !show_type_information_using_rocq_lsp_process then
     let method_ = if !show_type_information_using_coqtop_process then
@@ -895,14 +904,10 @@ let () =
                   else Rocq_LSP
     in
     Type_lookup.using method_ (fun conn ->
-        type_lookup := Some conn;
-        List.iter (process_v_file ~type_lookup:conn all_files) (List.rev !v_files))
+        env := Env.{type_lookup=Some conn; definition_blacklist=index_blacklist_opt;};
+        List.iter (process_v_file !env all_files) (List.rev !v_files))
   else
-    List.iter (process_v_file all_files) (List.rev !v_files);
-  let index_blacklist_opt =
-    if !index_blacklist_file = "" then None
-    else Some (Index_blacklist.from_file !index_blacklist_file)
-  in
+    List.iter (process_v_file !env all_files) (List.rev !v_files);
   Generate_index.generate !output_dir !xref_table xref_modules !title
     !hierarchy_graph_dot_file !dependency_graph_dot_file index_blacklist_opt;
   write_file Resources.js (Filename.concat !output_dir "rocqnavi.js");

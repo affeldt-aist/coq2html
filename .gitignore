@@ -11,6 +11,7 @@ html/
 ocamldot/ocamldot
 ocamldot/ocamldot.ml
 
+*.d
 *.vo
 *.aux
 *.glob
