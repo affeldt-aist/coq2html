@@ -22,7 +22,7 @@ let warn lexbuf message =
   let open Lexing in
   let position = lexbuf.lex_curr_p in
   Printf.eprintf "File: %s, line %d, culumn %d: %s" position.pos_fname
-    position.pos_lnum (position.pos_cnum - position.pos_bol) message
+    position.pos_lnum (position.pos_cnum - position.pos_bol + 1) message
 
 (** Cross-referencing *)
 
@@ -301,15 +301,14 @@ let end_doc () =
   fprintf !oc "</div>\n"
 
 (* If the option to show type infomation is enabled, return the type infomation *)
-let lookup_type_info ?type_lookup id loc =
-  Option.bind type_lookup (fun conn ->
+let lookup_type_info conn id loc =
       let position = Lexing.(loc.pos_lnum - 1, loc.pos_cnum - loc.pos_bol + 1) in
       let filename = Lexing.(loc.pos_fname) in
       match Type_lookup.ask_type_info_of id filename position conn with
       | Ok ty -> Some ty
-      | Error message -> Common.warn (!%"Err:lookup_type_info '%s':\n\n%s" id message);
+      | Error message -> Common.warn (!%"fail: lookup_type_info '%s'" id);
                          None
-       )
+
 
 let nested_ids_anchor ?type_lookup classes ids text loc =
   let (id0, kind0) = List.hd ids in
@@ -319,9 +318,11 @@ let nested_ids_anchor ?type_lookup classes ids text loc =
     |> String.concat ""
   in
   let closes = List.map (fun _ -> "</span>") ids |> String.concat "" in
-  match lookup_type_info ?type_lookup id0 loc with
-  | Some type_information when kind0 = K.Definition
-                               || kind0 = K.Other "prf" ->
+  match type_lookup, kind0 with
+  | Some conn, K.Definition ->
+     let type_information = lookup_type_info conn id0 loc
+                            |> Option.value ~default:"Null"
+     in
      let atag = Tooltip.tag_with_tooltip "a" id0 classes type_information text in
      sprintf {|%s%s%s|} opens atag closes
   | _ ->
