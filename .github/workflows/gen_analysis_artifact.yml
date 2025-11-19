@@ -1,9 +1,10 @@
+name: Analysis [Build HTML and upload as Artifact]
+
 on:
   push:
-    branches: ["mca2html"]
   pull_request:
   schedule:
-    - cron: 0 0 * * * # every morning
+    - cron: 0 18 * * * # every night (03:00 JST)
 
 jobs:
   generate-artifact:

@@ -1,7 +1,8 @@
+name: Deploy artifact
+
 on:
   push:
     branches:
-      - mca2html
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -49,7 +50,7 @@ jobs:
             default: https://github.com/ocaml/opam-repository.git
 
       - name: Build rocqnavi
-        run: opam install -y --deps-only . && opam exec -- make
+        run: opam install -y . --deps-only --with-test && opam exec -- make
 
       - name: Setup Coq temporary fix for the Dependency Graph
         run: opam install -y coq.8.20.1
@@ -96,6 +97,9 @@ jobs:
               ./tools/generate-mathcomp-analysis.sh
               sed -i "/<!-- ADD_ITEM -->/ i <li><a href=\"analysis-$REVISION\">Math-Comp Analysis</a></li>" html/index.html
             endGroup
+          export: 'OPAMWITHTEST'  # space-separated list of variables
+        env:
+          OPAMWITHTEST: 'true'
       ## ----------------------------
 
       - name: Setup Pages
@@ -105,6 +109,19 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'html/'
+
+  deploy:
+    if: github.ref == 'refs/heads/mca2html'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
