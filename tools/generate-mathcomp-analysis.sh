@@ -39,7 +39,7 @@ cp hierarchy-graph.dot depend.dot $OUTDIR/
 
 
 cd $MATHCOMP_ANALYSIS
-FILES=$(find analysis classical reals -name "*.v" -or -name "*.glob")
+FILES=$(find analysis/topology_theory -name "*.v" -or -name "*.glob")
 
 $DIR/rocqnavi -title "MathComp-Analysis-$REVISION" -d $OUTDIR \
   -coqlib https://coq.inria.fr/doc/V8.20.1/stdlib/ \
