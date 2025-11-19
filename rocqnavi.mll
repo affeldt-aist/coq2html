@@ -326,7 +326,7 @@ let nested_ids_anchor env classes ids text loc =
   match env.type_lookup, kind0 with
   | Some conn, K.Definition when is_black = false ->
      let type_information = lookup_type_info conn id0 loc
-                            |> Option.value ~default:"Null"
+                            |> Option.value ~default:(Type_lookup.PlainText "")
      in
      let atag = Tooltip.tag_with_tooltip "a" id0 classes type_information text in
      sprintf {|%s%s%s|} opens atag closes

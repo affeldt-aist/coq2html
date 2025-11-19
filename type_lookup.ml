@@ -33,17 +33,22 @@ let close_file filepath module_name = function
   | Rocq_LSP_conn conn ->
      Lsp_client.did_close filepath conn
 
+type info =
+  | Markdown of string
+  | PlainText of string
+
 let ask_type_info_of name filepath (line, col) conn =
   match conn with
   | Coqtop_emacs_conn conn ->
      Coqtop_command.about conn name
+     |> Result.map (fun t -> PlainText t)
   | Rocq_LSP_conn conn ->
      let open Json.Util in
      let pos = Lsp_client.Location.{line; character=col} in
      try
        let json = Lsp_client.hover pos filepath conn in
        let content = json |> member "contents" |> member "value" |> to_string in
-       Ok content
+       Ok (Markdown content)
      with
      | Json.Util.Type_error (msg, json) ->
         let params = !%"%s, %s [%d,%d]" name filepath line col in
