@@ -19,7 +19,7 @@ val all_files : (string, unit) Hashtbl.t -> file_path list
 val sidebar_files : file_path list -> string
 val end_html_page : out_channel -> unit
 
-val start_html_page : out_channel -> ?link_to_source:string -> string -> string -> file_path list -> unit
+val start_html_page : out_channel -> ?link_to_source:string -> string -> string -> string -> file_path list -> unit
 val generate : ?link_to_source:string -> string -> XrefTable.t
                -> (string, unit) Hashtbl.t -> string
                -> string -> string -> Index_blacklist.t option -> unit

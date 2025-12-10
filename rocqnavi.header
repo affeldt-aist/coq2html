@@ -3,8 +3,8 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Module $NAME</title>
-<meta name="description" content="Documentation of Coq module $NAME" />
+<title>$NAME</title>
+<meta name="description" content="Documentation of Coq module $PROJECT" />
 <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>

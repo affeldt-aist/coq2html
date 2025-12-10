@@ -767,7 +767,7 @@ let show_type_information_using_coqtop_process = ref false
 let show_type_information_using_rocq_lsp_process = ref false
 let link_to_source = ref ""
 
-let process_v_file ?link_to_source env all_files f =
+let process_v_file ?link_to_source proj_name env all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
   let base_f = Filename.basename pref_f in
   let module_name = !logical_name_base ^ module_name_of_file_name pref_f in
@@ -775,10 +775,11 @@ let process_v_file ?link_to_source env all_files f =
   Option.iter (Type_lookup.open_file filepath module_name) env.type_lookup;
   current_module := module_name;
   let friendly_name = if !use_short_names then base_f else module_name in
+  let title = "Module " ^ friendly_name in
   let ic = open_in f in
   oc := open_out (Filename.concat !output_dir (module_name ^ ".html"));
   enum_depth := 0; in_proof := false;
-  Generate_index.start_html_page !oc ?link_to_source friendly_name ("Module " ^ friendly_name) all_files;
+  Generate_index.start_html_page !oc ?link_to_source title title proj_name all_files;
   let lexbuf = Lexing.from_channel ~with_positions:true ic in
   Lexing.set_filename lexbuf filepath;
   coq_bol lexbuf;
@@ -906,7 +907,7 @@ let () =
     in
     Type_lookup.using method_ (fun conn ->
         env := Env.{type_lookup=Some conn; definition_blacklist=index_blacklist_opt;};
-        List.iter (process_v_file ?link_to_source !env all_files) (List.rev !v_files))
+        List.iter (process_v_file ?link_to_source !title !env all_files) (List.rev !v_files))
   else
-    List.iter (process_v_file ?link_to_source !env all_files) (List.rev !v_files)
+    List.iter (process_v_file ?link_to_source !title !env all_files) (List.rev !v_files)
 }
