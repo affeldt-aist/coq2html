@@ -95,16 +95,23 @@ let sidebar_files all_files =
   |> List.map (tag_of_file_path [])
   |> String.concat "\n"
 
-let write_html_file all_files txt filename title =
+let start_html_page ch ?link_to_source title h1 all_files =
+  let open Str in
+  let link_to_source_tag = Option.map (!%{|<a href="%s">source</a>|}) link_to_source |> Option.value ~default:"" in
+  global_replace (regexp_string "$NAME") title Resources.header
+  |> global_replace (regexp_string "$H1") h1
+  |> global_replace (regexp_string "$FILES") (sidebar_files all_files)
+  |> global_replace (regexp_string "$LINK_TO_SOURCE") link_to_source_tag
+  |> output_string ch
+
+let end_html_page ch =
+  output_string ch Resources.footer
+
+let write_html_file ?link_to_source all_files txt filename title =
   let oc = open_out filename in
-  let header =
-    Str.global_replace (Str.regexp "<h1.*</h1>") (!%"<h1>%s</h1>" title) Resources.header
-    |> Str.global_replace (Str.regexp "<title>.*</title>") (!%"<title>%s</title>" title)
-    |> Str.global_replace (Str.regexp_string "$FILES") (sidebar_files all_files)
-  in
-  output_string oc header;
+  start_html_page oc ?link_to_source title title all_files;
   output_string oc txt;
-  output_string oc Resources.footer;
+  end_html_page oc;
   close_out oc
 
 type kind = Global | EntryKind of string
@@ -220,7 +227,7 @@ let html_of_notation scope notation item =
   in
   !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (show notation) (linkname_of_kind item.kind) item.module_ scope
 
-let generate_notation_list output_dir table all_files items =
+let generate_notation_list ?link_to_source output_dir table all_files items =
   let grouped =
     List.map notation_of_item items
     |> Common.list_group_by (fun (scope, not, item) -> scope)
@@ -237,7 +244,7 @@ let generate_notation_list output_dir table all_files items =
   in
   let filename = Filename.concat output_dir notations_html_filename in
   let title = "Notations" in
-  write_html_file all_files body filename title
+  write_html_file ?link_to_source all_files body filename title
 
 let compare_case_insensitive s1 s2 =
   String.(compare (lowercase_ascii s1) (lowercase_ascii s2))
@@ -245,7 +252,7 @@ let compare_case_insensitive s1 s2 =
 (*
  * generate an html file, e.g., mathcomp.classical.functions.html
  *)
-let generate_with_capital output_dir table all_files kind (c, items) =
+let generate_with_capital ?link_to_source output_dir table all_files kind (c, items) =
   let html_of_item item =
     !%{|<a href="%s">%s</a> [%s, in %s]|} item.linkname item.name (linkname_of_kind item.kind) item.module_
   in
@@ -261,7 +268,7 @@ let generate_with_capital output_dir table all_files kind (c, items) =
     let filename = Filename.concat output_dir
         (!%"index_%s_%s.html" (linkname_of_kind kind) (linkname_of_capital c))
     in
-    write_html_file all_files body filename title
+    write_html_file ?link_to_source all_files body filename title
 
 let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
   let dot_content = String.concat "\n" (Common.read_lines dot_file) in
@@ -322,7 +329,7 @@ let generate_dependency_graph xref_table output_dir dot_file =
 (*
  * generate index.html
  *)
-let generate_topfile output_dir all_files xrefs title xref_table hierarchy_graph_dot_file dependency_dot_file =
+let generate_topfile ?link_to_source output_dir all_files xrefs title xref_table hierarchy_graph_dot_file dependency_dot_file =
   let hierarchy_graph =
     if hierarchy_graph_dot_file = "" then "" else
       generate_hierarchy_graph title xref_table output_dir hierarchy_graph_dot_file
@@ -332,7 +339,7 @@ let generate_topfile output_dir all_files xrefs title xref_table hierarchy_graph
       generate_dependency_graph xref_table output_dir dependency_dot_file
   in
   let body = table xrefs ^ hierarchy_graph ^ dependency_graph in
-  write_html_file all_files body (Filename.concat output_dir "index.html") title
+  write_html_file ?link_to_source all_files body (Filename.concat output_dir "index.html") title
 
 let is_initial init s =
   if s = "" then false else
@@ -376,8 +383,8 @@ let item_of kind module_ path =
   let linkname = !%"%s.html#%s" module_ (sanitize_linkname path) in
   {kind; name=path; linkname; module_}
 
-let generate output_dir (xref_table:XrefTable.t) xref_modules title
-      hierarchy_dot_file dependency_dot_file index_blacklist =
+let generate ?link_to_source output_dir (xref_table:XrefTable.t) xref_modules
+      title hierarchy_dot_file dependency_dot_file index_blacklist =
   let is_blacklisted =
     match index_blacklist with
     | None -> fun name -> false
@@ -425,7 +432,7 @@ let generate output_dir (xref_table:XrefTable.t) xref_modules title
   let all_files = all_files xref_modules in
   let table = table indexed_items in
   List.iter (fun kind ->
-      List.iter (generate_with_capital output_dir table all_files kind) indexed_items)
+      List.iter (generate_with_capital ?link_to_source output_dir table all_files kind) indexed_items)
     kinds;
-  generate_notation_list output_dir table all_files notation_items;
-  generate_topfile output_dir all_files indexed_items title xref_table hierarchy_dot_file dependency_dot_file
+  generate_notation_list ?link_to_source output_dir table all_files notation_items;
+  generate_topfile ?link_to_source output_dir all_files indexed_items title xref_table hierarchy_dot_file dependency_dot_file

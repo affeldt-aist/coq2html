@@ -452,14 +452,6 @@ let end_proof spaces kwd =
 let global_replace re subst txt =
   Str.global_substitute re (fun _ -> subst) txt
 
-let start_html_page modname all_files =
-  global_replace (Str.regexp "\\$NAME") modname Resources.header
-  |> global_replace (Str.regexp_string "$FILES") (sidebar_files all_files)
-  |> output_string !oc
-
-let end_html_page () =
-  output_string !oc Resources.footer
-
 let env : Env.t ref = ref Env.default
 }
 
@@ -773,8 +765,9 @@ let dependency_graph_dot_file = ref ""
 let index_blacklist_file = ref ""
 let show_type_information_using_coqtop_process = ref false
 let show_type_information_using_rocq_lsp_process = ref false
+let link_to_source = ref ""
 
-let process_v_file env all_files f =
+let process_v_file ?link_to_source env all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
   let base_f = Filename.basename pref_f in
   let module_name = !logical_name_base ^ module_name_of_file_name pref_f in
@@ -785,11 +778,11 @@ let process_v_file env all_files f =
   let ic = open_in f in
   oc := open_out (Filename.concat !output_dir (module_name ^ ".html"));
   enum_depth := 0; in_proof := false;
-  start_html_page friendly_name all_files;
+  Generate_index.start_html_page !oc ?link_to_source friendly_name ("Module " ^ friendly_name) all_files;
   let lexbuf = Lexing.from_channel ~with_positions:true ic in
   Lexing.set_filename lexbuf filepath;
   coq_bol lexbuf;
-  end_html_page();
+  Generate_index.end_html_page !oc;
   close_out !oc; oc := stdout;
   close_in ic;
   Option.iter (Type_lookup.close_file filepath module_name) env.type_lookup;
@@ -866,6 +859,8 @@ let () =
       "   Show type information of definitions as a tooltip (consider using -show-type-infomation-using-rocq-lsp)";
     "-show-type-information-using-rocq-lsp", Arg.Set show_type_information_using_rocq_lsp_process,
       "   Show type information of definitions as a tooltip";
+    "-link-to-source", Arg.Set_string link_to_source,
+      "   The Link to the source repository";
   ])
   process_file
   "Usage: rocqnavi [options] file.glob ... file.v ...\nOptions are:";
@@ -897,6 +892,12 @@ let () =
     if !index_blacklist_file = "" then None
     else Some (Index_blacklist.from_file !index_blacklist_file)
   in
+  let link_to_source = if !link_to_source = "" then None else Some !link_to_source in
+  write_file Resources.js (Filename.concat !output_dir "rocqnavi.js");
+  if !generate_css then
+    write_file Resources.css (Filename.concat !output_dir "rocqnavi.css");
+  Generate_index.generate ?link_to_source !output_dir !xref_table xref_modules !title
+    !hierarchy_graph_dot_file !dependency_graph_dot_file index_blacklist_opt;
   if !show_type_information_using_coqtop_process
      || !show_type_information_using_rocq_lsp_process then
     let method_ = if !show_type_information_using_coqtop_process then
@@ -905,12 +906,7 @@ let () =
     in
     Type_lookup.using method_ (fun conn ->
         env := Env.{type_lookup=Some conn; definition_blacklist=index_blacklist_opt;};
-        List.iter (process_v_file !env all_files) (List.rev !v_files))
+        List.iter (process_v_file ?link_to_source !env all_files) (List.rev !v_files))
   else
-    List.iter (process_v_file !env all_files) (List.rev !v_files);
-  Generate_index.generate !output_dir !xref_table xref_modules !title
-    !hierarchy_graph_dot_file !dependency_graph_dot_file index_blacklist_opt;
-  write_file Resources.js (Filename.concat !output_dir "rocqnavi.js");
-  if !generate_css then
-    write_file Resources.css (Filename.concat !output_dir "rocqnavi.css")
+    List.iter (process_v_file ?link_to_source !env all_files) (List.rev !v_files)
 }
