@@ -24,7 +24,7 @@ do
     if type xq > /dev/null 2>&1; then
         diff <(xq $exp_html) <(xq $act_html)
     else
-        diff $exp_html $act_html
+        diff -w $exp_html $act_html
     fi
 done
 
