@@ -761,11 +761,18 @@ let generate_css = ref true
 let use_short_names = ref false
 let generate_redirects = ref false
 let hierarchy_graph_dot_file = ref ""
-let dependency_graph_dot_file = ref ""
+let file_graph_dot_file = ref ""
+let file_graph_depend_file = ref ""
 let index_blacklist_file = ref ""
 let show_type_information_using_coqtop_process = ref false
 let show_type_information_using_rocq_lsp_process = ref false
 let link_to_source = ref ""
+
+let file_graph dot_file depend_file =
+  match dot_file, depend_file with
+  | "", ""     -> None
+  | "", depend -> Some (File_graph.FromDependFile depend)
+  | dot, _     -> Some (File_graph.FromDotFile dot)
 
 let process_v_file ?link_to_source proj_name env all_files f =
   let pref_f = Filename.chop_suffix f ".v" in
@@ -850,10 +857,12 @@ let () =
       "   Show the hierarchy graph of <dot-file> on the index.html";
     "-hierarchy-graph", arg_deprecated_set_string "Use `-structure-graph`" hierarchy_graph_dot_file,
       "";
-    "-file-graph", Arg.Set_string dependency_graph_dot_file,
+    "-file-graph", Arg.Set_string file_graph_dot_file,
       "   Show the dependency graph of <dot-file> on the index.html";
-    "-dependency-graph", arg_deprecated_set_string "Use `-file-graph`" dependency_graph_dot_file,
-      "";
+    "-dependency-graph", arg_deprecated_set_string "Use `-file-graph`" file_graph_dot_file,
+    "";
+    "-file-graph-from-depend", Arg.Set_string file_graph_depend_file,
+      "   Show the file dependency graph from <depend.d> on the index.html";
     "-index-blacklist", Arg.Set_string index_blacklist_file,
       "   Exclude specified items from the index";
     "-show-type-information-using-coqtop-process", Arg.Set show_type_information_using_coqtop_process,
@@ -897,8 +906,9 @@ let () =
   write_file Resources.js (Filename.concat !output_dir "rocqnavi.js");
   if !generate_css then
     write_file Resources.css (Filename.concat !output_dir "rocqnavi.css");
+  let file_graph_input = file_graph !file_graph_dot_file !file_graph_depend_file in
   Generate_index.generate ?link_to_source !output_dir !xref_table xref_modules !title
-    !hierarchy_graph_dot_file !dependency_graph_dot_file index_blacklist_opt;
+    !hierarchy_graph_dot_file file_graph_input index_blacklist_opt;
   if !show_type_information_using_coqtop_process
      || !show_type_information_using_rocq_lsp_process then
     let method_ = if !show_type_information_using_coqtop_process then

@@ -318,11 +318,11 @@ let generate_hierarchy_graph title xref_table output_dir dot_file =
   Printf.sprintf {|<h2>Mathematical Structures (%s only)</h2><img src="%s" title usemap="#Hierarchy" class="img-darkmode-enable"/>
 %s|} title png_filename map
 
-let generate_dependency_graph xref_table output_dir dot_file =
+let generate_dependency_graph_from_dot output_dir dot =
   let png_filename = "dependency_graph.png" in
   let png_path = Filename.concat output_dir png_filename in
   let map_path = Filename.concat output_dir "dependency_graph.map" in
-  Graphviz.from_file dot_file
+  dot
   |> Graphviz.generate_file png_path map_path;
   let map = read_file map_path in
   Printf.sprintf {|<h2>Clickable Dependency Graph of Files</h2><img src="%s" usemap="#depend" class="img-darkmode-enable"/>%s|} png_filename map
@@ -330,17 +330,28 @@ let generate_dependency_graph xref_table output_dir dot_file =
 (*
  * generate index.html
  *)
-let generate_topfile ?link_to_source output_dir all_files xrefs title xref_table hierarchy_graph_dot_file dependency_dot_file =
+let generate_topfile ?link_to_source output_dir all_files xrefs title xref_table
+      hierarchy_graph_dot_file file_graph_input =
+
   let hierarchy_graph =
     if hierarchy_graph_dot_file = "" then "" else
       generate_hierarchy_graph title xref_table output_dir hierarchy_graph_dot_file
   in
-  let dependency_graph =
-    if dependency_dot_file = "" then "" else
-      generate_dependency_graph xref_table output_dir dependency_dot_file
+  let file_graph_dot =
+    file_graph_input
+    |> Option.map (function
+           | File_graph.FromDotFile dot -> Graphviz.from_file dot
+           | File_graph.FromDependFile dep ->
+
+              File_graph.parse_dep_file dep)
   in
-  let body = table xrefs ^ hierarchy_graph ^ dependency_graph in
+  let file_graph =
+    Option.map (generate_dependency_graph_from_dot output_dir) file_graph_dot
+    |> Option.value ~default:""
+  in
+  let body = table xrefs ^ hierarchy_graph ^ file_graph in
   write_html_file ?link_to_source all_files body (Filename.concat output_dir "index.html") title title
+
 
 let is_initial init s =
   if s = "" then false else
@@ -385,7 +396,7 @@ let item_of kind module_ path =
   {kind; name=path; linkname; module_}
 
 let generate ?link_to_source output_dir (xref_table:XrefTable.t) xref_modules
-      title hierarchy_dot_file dependency_dot_file index_blacklist =
+      title file_graph_input dependency_dot_file index_blacklist =
   let is_blacklisted =
     match index_blacklist with
     | None -> fun name -> false
@@ -436,4 +447,5 @@ let generate ?link_to_source output_dir (xref_table:XrefTable.t) xref_modules
       List.iter (generate_with_capital ?link_to_source output_dir title table all_files kind) indexed_items)
     kinds;
   generate_notation_list ?link_to_source output_dir title table all_files notation_items;
-  generate_topfile ?link_to_source output_dir all_files indexed_items title xref_table hierarchy_dot_file dependency_dot_file
+  generate_topfile ?link_to_source output_dir all_files indexed_items title xref_table
+    file_graph_input dependency_dot_file

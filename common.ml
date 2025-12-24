@@ -85,6 +85,11 @@ let list_group_by f xs =
 let list_sort_by f xs =
   List.sort (fun x y -> compare (f x) (f y)) xs
 
+let list_uniq xs =
+  List.fold_left (fun store x ->
+      if List.mem x store then store else x :: store) [] xs
+  |> List.rev
+
 let warn s = prerr_endline ("Warning: " ^ s)
 
 let html_escaped =
@@ -100,4 +105,3 @@ let html_escaped =
     | c -> Buffer.add_char buff c
   done;
   Buffer.contents buff
-
