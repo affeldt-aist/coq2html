@@ -27,14 +27,14 @@ let parse_line directory_mappings (nodes, edges) line =
   let open Str in
   if string_match (regexp {|\([^ ]*\)\.vo.*: \(.*\)|}) line 0 then begin
       let file = matched_group 1 line ^ ".vo" in
-      let src = parse_filepath directory_mappings file in
-      let dests =
+      let dst = parse_filepath directory_mappings file in
+      let srcs =
         matched_group 2 line |> String.trim |> String.split_on_char ' '
         |> List.map (parse_filepath directory_mappings)
         |> List.filter (fun (_,_,ext) -> ext = ".vo")
       in
-      let new_edges = List.map (fun dst -> (src, dst)) dests in
-      (list_uniq (src :: nodes @ dests), edges @ new_edges)
+      let new_edges = List.map (fun src -> (src, dst)) srcs in
+      (list_uniq (dst :: nodes @ srcs), edges @ new_edges)
     end
   else (nodes, edges)
 

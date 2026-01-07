@@ -67,7 +67,6 @@ let of_string = function
   | "abbrev" -> Other "abbrev"
   | "sec" -> Other "sec"
   | "prf" -> Other "prf"
-  | "abbrev" -> Other "abbrev"
   | "vardef" -> Other "vardef"
   | "vardefax" -> Other "vardefax"
   | other ->

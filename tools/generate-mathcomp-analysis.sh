@@ -31,6 +31,7 @@ cd $MATHCOMP_ANALYSIS
 FILES=$(find analysis/topology_theory -name "*.v" -or -name "*.glob")
 
 $DIR/rocqnavi -title "MathComp-Analysis-$REVISION" -d $OUTDIR \
+  -debug \
   -coqlib https://coq.inria.fr/doc/V8.20.1/stdlib/ \
   -Q analysis mathcomp.analysis \
   -Q classical mathcomp.classical \
