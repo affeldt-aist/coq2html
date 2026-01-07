@@ -2,10 +2,10 @@ let (!%) s = Printf.sprintf s
 
 (* simple execution of external command *)
 let shell cmd =
-  Printf.eprintf " $ %s\n" cmd;
+  Log.debug (!%" $ %s" cmd);
   let status = Sys.command cmd in
   if status <> 0 then begin
-    prerr_endline ("Common.shell Error: " ^ cmd);
+    Log.error ("Common.shell: " ^ cmd);
     exit status
   end
 
@@ -114,8 +114,6 @@ let list_max_by measure xs =
        (measure x0, x0) xs
      |> snd
      |> Option.some
-
-let warn s = prerr_endline ("Warning: " ^ s)
 
 let html_escaped =
   let buff = Buffer.create 5 in

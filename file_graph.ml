@@ -52,6 +52,7 @@ let make_dot (nodes, edges) : string =
   ^ "\n\n"
   ^ String.concat "\n" (List.map sedge edges)
   ^ "\n}"
+  |> (fun s -> Log.debug s; s)
 
 let make_graphviz (nodes, edges) =
   Graphviz.of_string @@ make_dot (nodes, edges)

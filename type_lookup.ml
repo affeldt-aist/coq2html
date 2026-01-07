@@ -18,7 +18,7 @@ let using method_ f =
      Lsp_client.using (fun conn ->
          let rootpath = Sys.getcwd () in
          Lsp_client.initialize rootpath conn
-         |> fun json -> warn (!%"DID OPEN(%s): %s" rootpath (Json.pretty_to_string json));
+         |> fun json -> Log.warn (!%"DID OPEN(%s): %s" rootpath (Json.pretty_to_string json));
          f (Rocq_LSP_conn conn))
 
 let open_file filepath module_name = function

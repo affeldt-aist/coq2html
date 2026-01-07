@@ -21,11 +21,9 @@ let read_available ?(max=4096) ch =
     end
   else None
 
-let warn msg = prerr_endline msg
-
 let show_errors (i, o, e) =
   match read_available e with
-  | Some msg -> warn msg
+  | Some msg -> Log.warn msg
   | None -> ()
 
 let close command ioe =
@@ -33,11 +31,11 @@ let close command ioe =
   match Unix.close_process_full ioe with
   | Unix.WEXITED 0 -> ()
   | WEXITED other ->
-     warn (!%"Command '%s': exit %d" command other)
+     Log.warn (!%"Command '%s': exit %d" command other)
   | WSIGNALED signal ->
-     warn (!%"Command '%s': killed by a signal:%d" command signal)
+     Log.warn (!%"Command '%s': killed by a signal:%d" command signal)
   | WSTOPPED signal ->
-     warn (!%"Command '%s': stopped by a signal:%d" command signal)
+     Log.warn (!%"Command '%s': stopped by a signal:%d" command signal)
 
 let using command f =
   let env = Unix.environment () in

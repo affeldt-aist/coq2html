@@ -10,6 +10,5 @@ let generate_file pngfile mapfile srcfile =
 
 let of_string body =
   let filename = "__tmp__.dot" in
-  prerr_endline "Graphviz.of_string";
   file_using_w filename (fun ch -> output_string ch body);
   filename

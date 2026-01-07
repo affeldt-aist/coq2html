@@ -22,8 +22,9 @@ module K = Glob_kind
 let warn lexbuf message =
   let open Lexing in
   let position = lexbuf.lex_curr_p in
-  Printf.eprintf "File: %s, line %d, culumn %d: %s" position.pos_fname
-    position.pos_lnum (position.pos_cnum - position.pos_bol + 1) message
+  Log.warn
+    (!%"File: %s, line %d, culumn %d: %s" position.pos_fname
+       position.pos_lnum (position.pos_cnum - position.pos_bol + 1) message)
 
 (** Cross-referencing *)
 
@@ -261,7 +262,7 @@ let lookup_type_info conn id loc =
       let filename = Lexing.(loc.pos_fname) in
       match Type_lookup.ask_type_info_of id filename position conn with
       | Ok ty -> Some ty
-      | Error message -> Common.warn (!%"fail: lookup_type_info '%s'" id);
+      | Error message -> Log.warn (!%"fail: lookup_type_info '%s'" id);
                          None
 
 let nested_ids_anchor env classes ids text loc =
@@ -567,7 +568,7 @@ and string = parse
 
 and bracket level = parse
   | "*)"
-      { warn lexbuf "Warning: unterminated `]`\n"; end_bracket() }
+      { warn lexbuf "Warning: unterminated `]`"; end_bracket() }
   | "\\[" { character '['; bracket level lexbuf }
   | "\\]" { character ']'; bracket level lexbuf }
   | ']'
@@ -765,7 +766,7 @@ let write_file txt filename =
 
 let arg_deprecated_set_string msg sref : Arg.spec =
   Arg.String (fun s ->
-      Common.warn (!%"DEPRECATED: %s" msg); sref := s)
+      Log.warn (!%"DEPRECATED: %s" msg); sref := s)
 
 let () =
   let v_files = ref [] and glob_files = ref [] in
