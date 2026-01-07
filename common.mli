@@ -11,7 +11,9 @@ val grep : string -> string -> bool
 val list_group_by : ('a -> 'b) -> 'a list -> ('b * 'a list) list
 val list_sort_by : ('a -> 'b) -> 'a list -> 'a list
 val list_uniq : 'a list -> 'a list
-
+val list_take : int -> 'a list -> 'a list
+val list_drop : int -> 'a list -> 'a list
+val list_max_by : ('a -> 'b) -> 'a list -> 'a option
 val warn : string -> unit
 
 val html_escaped : string -> string

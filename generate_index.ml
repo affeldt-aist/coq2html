@@ -331,7 +331,7 @@ let generate_dependency_graph_from_dot output_dir dot =
  * generate index.html
  *)
 let generate_topfile ?link_to_source output_dir all_files xrefs title xref_table
-      hierarchy_graph_dot_file file_graph_input =
+      directory_mapping hierarchy_graph_dot_file file_graph_input =
 
   let hierarchy_graph =
     if hierarchy_graph_dot_file = "" then "" else
@@ -342,8 +342,7 @@ let generate_topfile ?link_to_source output_dir all_files xrefs title xref_table
     |> Option.map (function
            | File_graph.FromDotFile dot -> Graphviz.from_file dot
            | File_graph.FromDependFile dep ->
-
-              File_graph.parse_dep_file dep)
+              File_graph.parse_dep_file directory_mapping dep)
   in
   let file_graph =
     Option.map (generate_dependency_graph_from_dot output_dir) file_graph_dot
@@ -396,7 +395,7 @@ let item_of kind module_ path =
   {kind; name=path; linkname; module_}
 
 let generate ?link_to_source output_dir (xref_table:XrefTable.t) xref_modules
-      title file_graph_input dependency_dot_file index_blacklist =
+      title directory_mapping file_graph_input dependency_dot_file index_blacklist =
   let is_blacklisted =
     match index_blacklist with
     | None -> fun name -> false
@@ -448,4 +447,4 @@ let generate ?link_to_source output_dir (xref_table:XrefTable.t) xref_modules
     kinds;
   generate_notation_list ?link_to_source output_dir title table all_files notation_items;
   generate_topfile ?link_to_source output_dir all_files indexed_items title xref_table
-    file_graph_input dependency_dot_file
+    directory_mapping file_graph_input dependency_dot_file

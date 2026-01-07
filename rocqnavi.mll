@@ -116,61 +116,15 @@ let url_for_module m =
       if starts_with m pref then url_concat url m ^ ".html" else url_for rem
   in url_for !documentation_urls
 
-let directory_mappings : (string list * string) list ref = ref []
+let directory_mappings : Directory_mappings.t ref = ref Directory_mappings.empty
 
 let add_directory_mapping physical_dir path =
-  let physical_dir =
-    if physical_dir = "." then []
-    else String.split_on_char '/' physical_dir
-  in
-  directory_mappings := (physical_dir, path) :: !directory_mappings
-
-let list_take n xs =
-  let rec iter store = function
-    | (n, _) when n <= 0 -> List.rev store
-    | (n, []) -> List.rev store
-    | (n, x :: xs) -> iter (x :: store) (n - 1, xs)
-  in
-  iter [] (n, xs)
-
-let list_drop n xs =
-  let rec iter = function
-    | (n, xs) when n <= 0 -> xs
-    | (n, []) -> []
-    | (n, _ :: xs) -> iter (n - 1, xs)
-  in
-  iter (n, xs)
-
-let list_max_by measure xs =
-  match xs with
-  | [] -> None
-  | x0 :: xs ->
-     List.fold_left (fun (m, y) x -> if measure x > m then (measure x, x) else (m, y))
-       (measure x0, x0) xs
-     |> snd
-     |> Option.some
-
-let find_directory_mapping physical_path =
-  let is_prefix prefix =
-    list_take (List.length prefix) physical_path = prefix
-  in
-  List.filter_map (fun (dir, path) ->
-      if is_prefix dir then Some (dir, path) else None)
-    !directory_mappings
-  |> list_max_by (fun (dir, _) -> List.length dir)
+  directory_mappings := Directory_mappings.add !directory_mappings physical_dir path
 
 let module_name_of_file_name f =
-(*  let concat f =
-    String.split_on_char '/' f
-    |> List.filter (fun s -> s <> "." && s <> "..")
-    |> String.concat "."
-  in*)
   let file_path = String.split_on_char '/' f |> List.filter ((<>) ".") in
-  match find_directory_mapping file_path with
-  | Some (physical_dir, path) ->
-     path :: list_drop (List.length physical_dir) file_path
-     |> String.concat "."
-  | None -> String.concat "." file_path
+  Directory_mappings.apply !directory_mappings file_path
+  |> String.concat "."
 
 (* Produce a HTML link if possible *)
 
@@ -893,8 +847,8 @@ let () =
     exit 1
   end;
   List.iter process_glob_file (List.rev !glob_files);
-  let mapping_options = List.map (fun (phy, log) -> !%"-Q %s %s" (String.concat "/" phy) log) !directory_mappings
-                        |> String.concat " "
+  let mapping_options =
+    Directory_mappings.to_mapping_options !directory_mappings
   in
 (*  XrefTable.dump !xref_table;*)
   let all_files = Generate_index.all_files xref_modules in
@@ -907,8 +861,10 @@ let () =
   if !generate_css then
     write_file Resources.css (Filename.concat !output_dir "rocqnavi.css");
   let file_graph_input = file_graph !file_graph_dot_file !file_graph_depend_file in
-  Generate_index.generate ?link_to_source !output_dir !xref_table xref_modules !title
-    !hierarchy_graph_dot_file file_graph_input index_blacklist_opt;
+  Generate_index.generate ?link_to_source !output_dir !xref_table xref_modules
+    !title !directory_mappings !hierarchy_graph_dot_file file_graph_input
+    index_blacklist_opt;
+
   if !show_type_information_using_coqtop_process
      || !show_type_information_using_rocq_lsp_process then
     let method_ = if !show_type_information_using_coqtop_process then

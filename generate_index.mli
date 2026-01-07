@@ -25,4 +25,5 @@ val end_html_page : out_channel -> unit
 
 val generate : ?link_to_source:string -> string -> XrefTable.t
                -> (string, unit) Hashtbl.t -> string
+               -> Directory_mappings.t
                -> string -> File_graph.input option -> Index_blacklist.t option -> unit

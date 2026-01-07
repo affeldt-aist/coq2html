@@ -90,6 +90,31 @@ let list_uniq xs =
       if List.mem x store then store else x :: store) [] xs
   |> List.rev
 
+let list_take n xs =
+  let rec iter store = function
+    | (n, _) when n <= 0 -> List.rev store
+    | (n, []) -> List.rev store
+    | (n, x :: xs) -> iter (x :: store) (n - 1, xs)
+  in
+  iter [] (n, xs)
+
+let list_drop n xs =
+  let rec iter = function
+    | (n, xs) when n <= 0 -> xs
+    | (n, []) -> []
+    | (n, _ :: xs) -> iter (n - 1, xs)
+  in
+  iter (n, xs)
+
+let list_max_by measure xs =
+  match xs with
+  | [] -> None
+  | x0 :: xs ->
+     List.fold_left (fun (m, y) x -> if measure x > m then (measure x, x) else (m, y))
+       (measure x0, x0) xs
+     |> snd
+     |> Option.some
+
 let warn s = prerr_endline ("Warning: " ^ s)
 
 let html_escaped =
