@@ -25,7 +25,7 @@ let basename (_path, base, _ext) = base
 
 let parse_line directory_mappings (nodes, edges) line =
   let open Str in
-  if string_match (regexp {|\([^ \t\n]*\)\.vo.*: \(.*\)|}) line 0 then begin
+  if string_match (regexp {|\([^ ]*\)\.vo.*: \(.*\)|}) line 0 then begin
       let file = matched_group 1 line ^ ".vo" in
       let src = parse_filepath directory_mappings file in
       let dests =

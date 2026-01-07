@@ -21,21 +21,10 @@ ls -l
 
 coqdep -f _CoqProject > depend.d
 cat -n depend.d >&2
-$DIR/ocamldot/ocamldot --style "bgcolor=white; splines=true; nodesep=1; node [fontsize=18, shape=rect, color=\"#dbc3b6\", style=filled];" depend.d > depend.dot
-cat -n depend.dot >&2
 
-sed -i 's|classical/|mathcomp.classical.|' depend.dot
-sed -i 's|theories/|mathcomp.analysis.|' depend.dot
-sed -i 's|reals_stdlib/|mathcomp.reals_stdlib.|' depend.dot
-sed -i 's|experimental_reals/|mathcomp.experimental_reals.|' depend.dot
-sed -i 's|reals/|mathcomp.reals.|' depend.dot
-sed -i 's|analysis_stdlib/|mathcomp.analysis_stdlib.|' depend.dot
-sed -i 's|/|.|g' depend.dot
-
-cat -n depend.dot >&2
 $DIR/tools/generate-hierarchy-graph.sh
 
-cp hierarchy-graph.dot depend.dot $OUTDIR/
+cp hierarchy-graph.dot depend.d $OUTDIR/
 
 
 cd $MATHCOMP_ANALYSIS
@@ -53,7 +42,7 @@ $DIR/rocqnavi -title "MathComp-Analysis-$REVISION" -d $OUTDIR \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.ssreflect \
   -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.algebra \
   -structure-graph $OUTDIR/"hierarchy-graph.dot" \
-  -file-graph $OUTDIR/"depend.dot" \
+  -file-graph-from-depend $OUTDIR/"depend.d" \
   -index-blacklist $INDEX_BLACKLIST_FILE \
   -show-type-information-using-rocq-lsp \
   $FILES
