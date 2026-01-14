@@ -1,4 +1,6 @@
 let (!%) s = Printf.sprintf s
+let (<<) g f = fun x -> g (f x)
+let (>>) f g = fun x -> g (f x)
 
 (* simple execution of external command *)
 let shell cmd =
@@ -70,6 +72,10 @@ let strstr ~haystack ~needle =
 let grep word contents =
   strstr ~haystack:contents ~needle:word
   |> Option.is_some
+
+let list_hd_opt = function
+  | [] -> None
+  | x :: _ -> Some x
 
 let list_group_by f xs =
   let rec iter store = function

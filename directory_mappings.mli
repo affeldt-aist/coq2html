@@ -1,8 +1,14 @@
 type t
 
 val empty : t
+
 val add : t -> string -> string -> t
-(*val find : t -> string list -> (string list * string) option*)
+(**
+   Example: [add "theories" "mathcomp.analysis"] register the
+   correspondence between physical path 'theories/' and logical path
+   'mathcomp.analysis'.
+ *)
+
 val apply : t -> string list -> string list
 
 val to_mapping_options : t -> string

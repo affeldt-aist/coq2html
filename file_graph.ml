@@ -4,6 +4,9 @@ type input =
   | FromDependFile of string
   | FromDotFile of string
 
+type node = string list * string * string
+type edge = node * node
+
 let parse_filepath directory_mappings name =
   let ext = Filename.extension name in
   match List.rev @@ String.split_on_char '/' name with
@@ -19,8 +22,8 @@ let parse_filepath directory_mappings name =
 let url (path, base, _ext) =
   String.concat "." path ^ "." ^ base ^ ".html"
 
+let path (path, _base, _ext) = path
 let key (path, base, _ext) = String.concat "." (path @ [base])
-
 let basename (_path, base, _ext) = base
 
 let parse_line directory_mappings (nodes, edges) line =
@@ -38,17 +41,48 @@ let parse_line directory_mappings (nodes, edges) line =
     end
   else (nodes, edges)
 
+type dir_tree =
+  | Dir of string * dir_tree list
+  | File of node
+
+let make_namespace_tree (nodes: node list) : dir_tree list =
+  let chop_path_head (rel_path, node) = (List.tl rel_path, node) in
+  let rec iter path_nodes =
+  list_group_by (fun (rel_path, node) ->
+      match rel_path with
+      | dir :: _ -> `Dirname dir
+      | [] -> `File (basename node)) path_nodes
+  |> List.map (function
+         | `Dirname dir, grp ->
+            let sub_nodes = List.map chop_path_head grp in
+            Dir (dir, iter sub_nodes)
+         | `File name, [(_,node)] -> File node)
+  in
+  iter (List.map (fun node -> (path node, node)) nodes)
+
 let make_dot (nodes, edges) : string =
+  let trees = make_namespace_tree nodes in
+  let indent depth = String.make (2 + 2 * depth) ' ' in
+  let color = function 0 -> "white" | 1 -> "#ababab" | _ -> "1" in
+  let rec snode depth = function
+    | Dir (dir, trees) ->
+       let ind = indent depth in
+       !%"%ssubgraph cluster_%s {\n" ind dir
+       ^ !%{|%slabel = "%s";|} (indent (depth+1)) dir ^ "\n"
+       ^ !%{|%sfillcolor = "%s";|} (indent (depth+1)) (color depth) ^ "\n"
+       ^ String.concat "\n" (List.map (snode (depth + 1)) trees)
+       ^ !%"\n%s};" ind
+    | File node -> !%{|%s"%s" [label="%s", URL="%s"]|}
+                     (indent depth)
+                     (key node) (basename node) (url node)
+  in
   let style =
     {|  bgcolor=white; splines=true; nodesep=1; node [fontsize=18, shape=rect, color="#dbc3b6", style="rounded,filled"];|}
-  in
-  let snode node =
-    !%{|  "%s" [label="%s" URL="%s"]|} (key node) (basename node) (url node)
   in
   let sedge (src, dst) = !%{|  "%s" -> "%s";|} (key src) (key dst) in
   "digraph depend {\n"
   ^ style ^ "\n"
-  ^ String.concat "\n" (List.map snode nodes)
+  ^ String.concat "\n" (List.map (snode 0) trees)
   ^ "\n\n"
   ^ String.concat "\n" (List.map sedge edges)
   ^ "\n}"
@@ -57,7 +91,7 @@ let make_dot (nodes, edges) : string =
 let make_graphviz (nodes, edges) =
   Graphviz.of_string @@ make_dot (nodes, edges)
 
-let parse directory_mappings ch =
+let parse_dep directory_mappings ch =
   let rec loop store =
     try
       let line = input_line ch in
@@ -69,4 +103,4 @@ let parse directory_mappings ch =
   loop ([], []) |> make_graphviz
 
 let parse_dep_file directory_mappings filename =
-  file_using_r filename (fun ch -> parse directory_mappings ch)
+  file_using_r filename (fun ch -> parse_dep directory_mappings ch)

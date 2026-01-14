@@ -1,9 +1,9 @@
 (**
-   mappings of phisical path -> logical path 
+   mappings of phisical path -> logical path
 *)
 open Common
 
-type t = (string list * string) list
+type t = (string list * string list) list
 
 let empty = []
 
@@ -12,7 +12,8 @@ let add mappings physical_dir path =
     if physical_dir = "." then []
     else String.split_on_char '/' physical_dir
   in
-  (physical_dir, path) :: mappings
+  let logical_path = String.split_on_char '.' path in
+  (physical_dir, logical_path) :: mappings
 
 let find (mappings: t) physical_path =
   let is_prefix prefix =
@@ -26,11 +27,13 @@ let find (mappings: t) physical_path =
 let apply (mappings: t) physical_path =
   match find mappings physical_path with
   | Some (physical_dir, path) ->
-     path :: list_drop (List.length physical_dir) physical_path
+     path @ list_drop (List.length physical_dir) physical_path
   | None -> physical_path
 
 
 let to_mapping_options mappings =
-  List.map (fun (phy, log) -> !%"-Q %s %s" (String.concat "/" phy) log) mappings
-  |> String.concat " "
+  let smapping (phy, log) =
+    !%"-Q %s %s" (String.concat "/" phy) (String.concat "." log)
+  in
+  String.concat " " @@ List.map smapping mappings
 

@@ -4,7 +4,7 @@ MATHCOMP_ANALYSIS=${MATHCOMP_ANALYSIS:-"$OPAM_SWITCH_PREFIX/lib/coq/user-contrib
 REVISION=${REVISION:-"no"}
 DIR=$(pwd `dirname .`)
 OUTDIR=${OUTDIR:-$DIR/html/analysis-$REVISION}
-ANALYSIS_SRC=${ANALYSIS_SRC:-$OPAM_SWITCH_PREFIX/.opam-switch/sources/coq-mathcomp-analysis.dev}
+ANALYSIS_SRC=${ANALYSIS_SRC:-$OPAM_SWITCH_PREFIX/.opam-switch/sources/coq-mathcomp-analysis.1.14.0}
 INDEX_BLACKLIST_FILE=$DIR/sample_blacklist/index_blacklist
 
 rm -rf $OUTDIR

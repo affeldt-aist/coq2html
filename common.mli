@@ -1,4 +1,6 @@
 val (!%) : ('a, unit, string) format -> 'a
+val (<<) : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c)
+val (>>) : ('a -> 'b) -> ('b -> 'c) -> ('a -> 'c)
 val shell : string -> unit
 
 val file_using_r : string -> (in_channel -> 'a) -> 'a
@@ -8,6 +10,7 @@ val write_lines : string -> string list -> unit
 
 val grep : string -> string -> bool
 
+val list_hd_opt : 'a list -> 'a option
 val list_group_by : ('a -> 'b) -> 'a list -> ('b * 'a list) list
 val list_sort_by : ('a -> 'b) -> 'a list -> 'a list
 val list_uniq : 'a list -> 'a list
