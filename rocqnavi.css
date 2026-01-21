@@ -224,6 +224,11 @@ img.img-darkmode-enable {
   cursor: pointer;
 }
 
+/* Since dark mode is not applied to relative elements, configure them individually. */
+.darkmode--activated .tooltip {
+    color: white;
+}
+
 .tooltip-area {
   opacity: 0;         /* Initially hide it. */
   visibility: hidden; /* Initially hide it. */
