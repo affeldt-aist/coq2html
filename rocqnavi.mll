@@ -19,6 +19,8 @@ open Generate_index
 open Env
 module K = Glob_kind
 
+let lineno lexbuf = lexbuf.Lexing.lex_curr_p.pos_lnum
+
 let warn lexbuf message =
   let open Lexing in
   let position = lexbuf.lex_curr_p in
@@ -356,8 +358,13 @@ let idents env pos id loc =
 let space s =
   for _ = 1 to String.length s do fprintf !oc "&nbsp;" done
 
+let begin_of_line oc lineno =
+  let a_ext_link = {|<a class="ext-link" href="https:/github.com"><i class="bi bi-github"></i></a>|} in
+  let a_lineno = !%{|<a class="lineno" href="#L%d">%d</a>|} lineno lineno in
+  fprintf oc {|<div class="code-line" id="#L%d">%s%s|} lineno a_ext_link a_lineno
+
 let newline () =
-  fprintf !oc "<br/>\n"
+  fprintf !oc "</div>\n"
 
 let dashes = function
   | "-" -> set_enum_depth 1
@@ -481,7 +488,9 @@ rule coq_bol = parse
   | eof
       { () }
   | space* as s
-      { space s;
+      {
+        begin_of_line !oc (lineno lexbuf);
+        space s;
         proceed_current_command (Lexing.lexeme lexbuf);
         coq lexbuf }
 

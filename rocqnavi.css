@@ -14,6 +14,7 @@
 */
 
 @import url(https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/fira_code.css);
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
 
 * {
     box-sizing: border-box;
@@ -71,6 +72,7 @@ div.coq li {
 }
 
 div.doc {
+  padding-left: 4.5em;
   margin-left: 0%;
   margin-top: 0.2em;
   margin-bottom: 0.5em;
@@ -79,6 +81,7 @@ div.doc {
 }
 
 summary.toggleproof {
+  padding-left: 4.5em;
   list-style-position: outside;
   font-size: 0.8em;
   text-decoration: underline;
@@ -249,4 +252,41 @@ img.img-darkmode-enable {
 .tooltip:hover .tooltip-area {
   opacity: 1;
   visibility: visible;
+}
+
+.code-block {
+}
+
+.code-line {
+  position: relative;
+  padding-left: 4.5em;
+  white-space: pre;
+  min-height: 1em; /* for empty line */
+}
+
+.ext-link {
+  width: 1.2em;
+  position: absolute;
+  left: 0;
+  opacity: 0;
+  text-decoration: none;
+  user-select: none;
+}
+
+.code-line:hover .ext-link {
+  opacity: 1;
+}
+
+.lineno {
+  position: absolute;
+  left: 0;
+  width: 4em;
+  text-align: right;
+  color: #888;
+  text-decoration: none;
+  user-select: none;
+}
+
+.lineno:hover {
+  text-decoration: underline;
 }
