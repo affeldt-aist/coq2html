@@ -259,13 +259,13 @@ img.img-darkmode-enable {
 
 .code-line {
   position: relative;
-  padding-left: 4.5em;
+  padding-left: 4.5rem;
   white-space: pre;
-  min-height: 1em; /* for empty line */
+  min-height: 1lh; /* for empty line */
 }
 
 .ext-link {
-  width: 1.2em;
+  width: 1.2rem;
   position: absolute;
   left: 0;
   opacity: 0;
@@ -279,8 +279,8 @@ img.img-darkmode-enable {
 
 .lineno {
   position: absolute;
-  left: 0;
-  width: 4em;
+  left: 1.2rem;
+  width: 2.8rem;
   text-align: right;
   color: #888;
   text-decoration: none;

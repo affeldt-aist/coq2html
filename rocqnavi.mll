@@ -402,8 +402,7 @@ let in_proof = ref false
 let start_proof s kwd =
   in_proof := true;
   fprintf !oc "<details>\n";
-  space s;
-  fprintf !oc "<summary class=\"toggleproof\">%s</summary>\n" kwd;
+  fprintf !oc "<summary class=\"toggleproof\">%s</summary>\n" (s ^ kwd);
   fprintf !oc "<div class=\"proofscript\">\n"
 
 let end_proof spaces kwd =
@@ -440,8 +439,9 @@ let end_of_command = '.' (space | '\n')
 rule coq_bol = parse
   | (space* as s) (start_proof as sp)
       { start_proof s sp;
+        begin_of_line !oc (lineno lexbuf);
         end_current_command !env (Lexing.lexeme lexbuf);
-        skip_newline lexbuf }
+        coq lexbuf }
   (* Enter special syntax mode e.g. markdown syntax *)
   | space* "(**" (['a'-'z' '-']+ as mode)
       { fprintf !oc "<div class=\"doc %s\">" mode;
@@ -501,10 +501,11 @@ and skip_newline = parse
       { coq lexbuf }
 
 and coq = parse
-  | (space* as s) (end_proof as ep)
-      { if !in_proof then end_proof s ep;
+  | (space* as s) (end_proof as ep) space* "\n"
+      { if !in_proof then end_proof s ep else newline ();
         end_current_command !env (Lexing.lexeme lexbuf);
-        skip_newline lexbuf }
+        Lexing.new_line lexbuf;
+        coq_bol lexbuf }
   | "(**r "
       { start_doc_right();
         doc lexbuf;
@@ -528,12 +529,13 @@ and coq = parse
         output_string !oc s;
         coq lexbuf
       }
-  | (". ") (space* as s) (start_proof as sp)
+  | (". ") (space* as s) (start_proof as sp) space* "\n"
       { newline();
+        Lexing.new_line lexbuf;
         proceed_current_command (Lexing.lexeme lexbuf);
         start_proof s sp;
-	skip_newline lexbuf ;
-        coq lexbuf }
+	newline ();
+        coq_bol lexbuf }
   | "\n"
       { Lexing.new_line lexbuf; newline(); coq_bol lexbuf }
   | eof
