@@ -665,6 +665,8 @@ and custom_mode = parse
       { () }
   | eof
       { () }
+  | "\n" as c
+      { Lexing.new_line lexbuf; character c; custom_mode lexbuf}
   | _ as c
       { character c; custom_mode lexbuf }
 
@@ -897,7 +899,10 @@ let () =
     !xref_table xref_modules
     !title !directory_mappings !hierarchy_graph_dot_file file_graph_input
     index_blacklist_opt;
-
+  env := {!env with
+           repository_root_url = repo_root;
+           directory_mappings = !directory_mappings;
+         };
   if !show_type_information_using_coqtop_process
      || !show_type_information_using_rocq_lsp_process then
     let method_ = if !show_type_information_using_coqtop_process then
@@ -905,11 +910,8 @@ let () =
                   else Rocq_LSP
     in
     Type_lookup.using method_ (fun conn ->
-        env := Env.{type_lookup = Some conn;
-                    definition_blacklist = index_blacklist_opt;
-                    repository_root_url = repo_root;
-                    directory_mappings = !directory_mappings;
-               };
+        env := Env.{!env with type_lookup = Some conn;
+                             definition_blacklist = index_blacklist_opt;};
         List.iter (process_v_file ?repo_root !title !env all_files) (List.rev !v_files))
   else
     List.iter (process_v_file ?repo_root !title !env all_files) (List.rev !v_files)
