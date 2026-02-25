@@ -13,7 +13,8 @@ VFiles="Main.v"
 coqc $VFiles
 
 GlobFiles="Main.glob"
-$RocqNavi -title "test1" -d ./html $VFiles $GlobFiles
+$RocqNavi -title "test1" -d ./html $VFiles $GlobFiles \
+  -doc-source-url "https://example.com/unexisting/tree/xxxxxxxxxxxxx/"
 
 # Check html files
 for exp_html in $DIR/expected_html/*.html

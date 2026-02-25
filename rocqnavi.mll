@@ -26,6 +26,8 @@ let warn lexbuf message =
     (!%"File: %s, line %d, culumn %d: %s" position.pos_fname
        position.pos_lnum (position.pos_cnum - position.pos_bol + 1) message)
 
+let linenum loc = loc.Lexing.pos_lnum
+
 (** Cross-referencing *)
 
 let current_module = ref ""
@@ -278,14 +280,37 @@ let nested_ids_anchor env classes ids text loc =
     | None -> false
     | Some list -> Index_blacklist.is_listed list id0
   in
-  match env.type_lookup, kind0 with
-  | Some conn, K.Definition when is_black = false ->
-     let type_information = lookup_type_info conn id0 loc
-                            |> Option.value ~default:(Type_lookup.PlainText "")
-     in
-     let atag = Tooltip.tag_with_tooltip "a" id0 classes type_information text in
-     sprintf {|%s%s%s|} opens atag closes
-  | _ ->
+  let tooltip_content =
+    match env.type_lookup, kind0 with
+    | Some conn, K.Definition when is_black = false ->
+       begin match lookup_type_info conn id0 loc with
+       | None -> ""
+       | Some (Type_lookup.Markdown md) ->
+          !%"<span class='markdown'>%s</span>" md
+       | Some (PlainText txt) -> !%"<p>%s</p>" txt
+       end |> Option.some
+    | _ -> None
+  in
+  let tooltip_content =
+    match env.repository_root_url with
+    | Some repo_root ->
+       let line = linenum loc in
+       let filepath =
+         String.split_on_char '.' !current_module
+         |> Directory_mappings.inverse_apply env.directory_mappings
+         |> String.concat "/"
+       in
+       let url = !%"%s/%s.v#L%d"repo_root filepath line in
+       let link = !%"<hr/><a href='%s' target='_blank'>Source code</a>" url in
+       (Option.value ~default:"" tooltip_content) ^ link
+       |> Option.some
+    | None -> tooltip_content
+  in
+  match tooltip_content with
+  | Some tooltip ->
+     let divtag = Tooltip.tag_with_tooltip "div" id0 classes tooltip text in
+     sprintf {|%s%s%s|} opens divtag closes
+  | None ->
      sprintf {|%s<a name="%s" class="%s">%s</a>%s|} opens id0 classes
        (html_escaped text) closes
 
@@ -880,7 +905,11 @@ let () =
                   else Rocq_LSP
     in
     Type_lookup.using method_ (fun conn ->
-        env := Env.{type_lookup=Some conn; definition_blacklist=index_blacklist_opt;};
+        env := Env.{type_lookup = Some conn;
+                    definition_blacklist = index_blacklist_opt;
+                    repository_root_url = repo_root;
+                    directory_mappings = !directory_mappings;
+               };
         List.iter (process_v_file ?repo_root !title !env all_files) (List.rev !v_files))
   else
     List.iter (process_v_file ?repo_root !title !env all_files) (List.rev !v_files)

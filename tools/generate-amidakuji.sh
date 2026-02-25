@@ -26,6 +26,6 @@ $DIR/rocqnavi -title "rocqnavi-sample ($COMMIT_HASH)" -d $OUTDIR \
   -file-graph-from-depend "depend.d" \
   -Q src T \
   -show-type-information-using-coqtop-process \
-  -link-to-source "https://github.com/yoshihiro503/rocq-amidakuji/tree/252d0b7e02d2d879773f3e6e6386f9a09b2b530c/" \
+  -doc-source-url "https://github.com/yoshihiro503/rocq-amidakuji/tree/252d0b7e02d2d879773f3e6e6386f9a09b2b530c/" \
   $FILES
 
