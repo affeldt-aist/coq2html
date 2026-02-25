@@ -95,9 +95,12 @@ let sidebar_files all_files =
   |> List.map (tag_of_file_path [])
   |> String.concat "\n"
 
-let start_html_page ch ?link_to_source title h1 project_name all_files =
+let start_html_page ch ?repo_file title h1 project_name all_files =
   let open Str in
-  let link_to_source_tag = Option.map (!%{|<a href="%s">source</a>|}) link_to_source |> Option.value ~default:"" in
+  let link_to_source_tag =
+    Option.map (!%{|<a href="%s">source</a>|}) repo_file
+    |> Option.value ~default:""
+  in
   global_replace (regexp_string "$NAME") title Resources.header
   |> global_replace (regexp_string "$H1") h1
   |> global_replace (regexp_string "$PROJECT") project_name
@@ -108,9 +111,10 @@ let start_html_page ch ?link_to_source title h1 project_name all_files =
 let end_html_page ch =
   output_string ch Resources.footer
 
-let write_html_file ?link_to_source all_files txt filename title project_name =
+let write_html_file ?repo_root all_files txt filename title project_name =
   let oc = open_out filename in
-  start_html_page oc ?link_to_source title title project_name all_files;
+  let repo_file = repo_root in
+  start_html_page oc ?repo_file title title project_name all_files;
   output_string oc txt;
   end_html_page oc;
   close_out oc
@@ -228,7 +232,7 @@ let html_of_notation scope notation item =
   in
   !%{|<a href="%s">%s</a> [%s, in %s] (%s)|} item.linkname (show notation) (linkname_of_kind item.kind) item.module_ scope
 
-let generate_notation_list ?link_to_source output_dir proj_name table all_files items =
+let generate_notation_list ?repo_root output_dir proj_name table all_files items =
   let grouped =
     List.map notation_of_item items
     |> Common.list_group_by (fun (scope, not, item) -> scope)
@@ -245,7 +249,7 @@ let generate_notation_list ?link_to_source output_dir proj_name table all_files 
   in
   let filename = Filename.concat output_dir notations_html_filename in
   let title = "Notations" in
-  write_html_file ?link_to_source all_files body filename title proj_name
+  write_html_file ?repo_root all_files body filename title proj_name
 
 let compare_case_insensitive s1 s2 =
   String.(compare (lowercase_ascii s1) (lowercase_ascii s2))
@@ -253,7 +257,7 @@ let compare_case_insensitive s1 s2 =
 (*
  * generate an html file, e.g., mathcomp.classical.functions.html
  *)
-let generate_with_capital ?link_to_source output_dir proj_name table all_files kind (c, items) =
+let generate_with_capital ?repo_root output_dir proj_name table all_files kind (c, items) =
   let html_of_item item =
     !%{|<a href="%s">%s</a> [%s, in %s]|} item.linkname item.name (linkname_of_kind item.kind) item.module_
   in
@@ -269,7 +273,7 @@ let generate_with_capital ?link_to_source output_dir proj_name table all_files k
     let filename = Filename.concat output_dir
         (!%"index_%s_%s.html" (linkname_of_kind kind) (linkname_of_capital c))
     in
-    write_html_file ?link_to_source all_files body filename title proj_name
+    write_html_file ?repo_root all_files body filename title proj_name
 
 let overwrite_dot_file_with_url xref_table dot_file = (* dirty *)
   let dot_content = String.concat "\n" (Common.read_lines dot_file) in
@@ -330,7 +334,7 @@ let generate_dependency_graph_from_dot output_dir dot =
 (*
  * generate index.html
  *)
-let generate_topfile ?link_to_source output_dir all_files xrefs title xref_table
+let generate_topfile ?repo_root output_dir all_files xrefs title xref_table
       directory_mapping hierarchy_graph_dot_file file_graph_input =
 
   let hierarchy_graph =
@@ -349,7 +353,7 @@ let generate_topfile ?link_to_source output_dir all_files xrefs title xref_table
     |> Option.value ~default:""
   in
   let body = table xrefs ^ hierarchy_graph ^ file_graph in
-  write_html_file ?link_to_source all_files body (Filename.concat output_dir "index.html") title title
+  write_html_file ?repo_root all_files body (Filename.concat output_dir "index.html") title title
 
 
 let is_initial init s =
@@ -394,7 +398,7 @@ let item_of kind module_ path =
   let linkname = !%"%s.html#%s" module_ (sanitize_linkname path) in
   {kind; name=path; linkname; module_}
 
-let generate ?link_to_source output_dir (xref_table:XrefTable.t) xref_modules
+let generate ?repo_root output_dir (xref_table:XrefTable.t) xref_modules
       title directory_mapping file_graph_input dependency_dot_file index_blacklist =
   let is_blacklisted =
     match index_blacklist with
@@ -443,8 +447,8 @@ let generate ?link_to_source output_dir (xref_table:XrefTable.t) xref_modules
   let all_files = all_files xref_modules in
   let table = table indexed_items in
   List.iter (fun kind ->
-      List.iter (generate_with_capital ?link_to_source output_dir title table all_files kind) indexed_items)
+      List.iter (generate_with_capital ?repo_root output_dir title table all_files kind) indexed_items)
     kinds;
-  generate_notation_list ?link_to_source output_dir title table all_files notation_items;
-  generate_topfile ?link_to_source output_dir all_files indexed_items title xref_table
+  generate_notation_list ?repo_root output_dir title table all_files notation_items;
+  generate_topfile ?repo_root output_dir all_files indexed_items title xref_table
     directory_mapping file_graph_input dependency_dot_file

@@ -21,9 +21,11 @@ cat -n depend.d >&2
 #sed -i 's/Src\//T\./' depend.dot
 
 $DIR/rocqnavi -title "rocqnavi-sample ($COMMIT_HASH)" -d $OUTDIR \
+  -debug \
   -coqlib https://coq.inria.fr/doc/V8.20.1/stdlib/ \
   -file-graph-from-depend "depend.d" \
   -Q src T \
   -show-type-information-using-coqtop-process \
+  -link-to-source "https://github.com/yoshihiro503/rocq-amidakuji/tree/252d0b7e02d2d879773f3e6e6386f9a09b2b530c/" \
   $FILES
 

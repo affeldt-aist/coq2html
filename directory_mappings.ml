@@ -1,5 +1,9 @@
 (**
    mappings of phisical path -> logical path
+
+   For example, when the option '-Q theories mathcomp.analysis' is provided, the
+   correspondence is expressed by the following mapping.
+   (["theories"], ["mathcomp"; "analysis"])
 *)
 open Common
 
@@ -37,3 +41,6 @@ let to_mapping_options mappings =
   in
   String.concat " " @@ List.map smapping mappings
 
+let inverse_apply mappings logical_path =
+  let inv = List.map (fun (x,y) -> (y,x)) mappings in
+  apply inv logical_path
