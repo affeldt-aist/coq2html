@@ -37,6 +37,9 @@ jobs:
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          opam-repositories: |
+            rocq-released: https://rocq-prover.org/opam/released
+            default: https://github.com/ocaml/opam-repository.git
 
       - name: Set-up Rocq for testing
         run: |

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -eux
 
 DIR=$(cd $(dirname $0) && pwd)
 
@@ -9,12 +9,12 @@ rm -rf $DIR/html
 mkdir $DIR/html
 
 cd $DIR
-VFiles="Main.v"
+VFiles="*.v"
 coqc $VFiles
 
-GlobFiles="Main.glob"
-$RocqNavi -title "test_type_tooltip" -d ./html $VFiles $GlobFiles \
-    -show-type-information-using-rocq-lsp
+GlobFiles="*.glob"
+$RocqNavi -title "test-hb" -d ./html $VFiles $GlobFiles \
+  -doc-source-url "https://github.com/rocq-prover/platform-docs/blob/f9862b19e7d03f6b93194128cfce9a361eefbcfe/src/hierarchy_builder/"
 
 # Check html files
 if command -v xq >/dev/null 2>&1; then

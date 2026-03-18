@@ -19,6 +19,7 @@ depends: [
   "dune-glob" # Parsing glob syntax like "*_unnamed_mixin_*"
   "yojson"
   "coq-lsp" {with-test}
+  "rocq-hierarchy-builder" {with-test}
 ]
 
 tags: [
