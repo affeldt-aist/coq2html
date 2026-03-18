@@ -21,6 +21,14 @@ let read_available ?(max=4096) ch =
     end
   else None
 
+let input_line_with_timeout timeout_sec ch =
+  let fd = Unix.descr_of_in_channel ch in
+  let ready, _, _ = Unix.select [fd] [] [] timeout_sec in
+  if ready = [] then (* Timeout *)
+    None
+  else
+    Some (input_line ch)
+
 let show_errors (i, o, e) =
   match read_available e with
   | Some msg -> Log.warn msg
