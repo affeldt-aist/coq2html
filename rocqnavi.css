@@ -223,6 +223,7 @@ img.img-darkmode-enable {
   position: relative;
   cursor: pointer;
   display: inline-block;
+  white-space: pre-wrap;
 }
 
 /* Since dark mode is not applied to relative elements, configure them individually. */
