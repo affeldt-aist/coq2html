@@ -112,6 +112,7 @@ jobs:
 
   deploy:
     if: github.ref == 'refs/heads/mca2html'
+    needs: generate-deploy
     runs-on: ubuntu-latest
     permissions:
       pages: write
