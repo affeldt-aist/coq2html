@@ -40,7 +40,7 @@ Option                     | Summary
 `-file-graph-from-depend` _FILE_ | Show the file dependency graph from <depend.d> on the index.html
 `-index-blacklist` _FILE_  | Exclude specified items from the index
 `-show-type-information-using-coqtop-process` | Show type information of definitions as a tooltip
-`-show-type-information-using-rocq-lsp`       | Show type information of definitions as a tooltip
+`-show-type-information-using-rocq-lsp`       | Show type information (using Rocq-lsp) of definitions as a tooltip
 `-doc-source-url` _URL_    | The Link to the source repository
 
 
