@@ -47,7 +47,7 @@ let add_definition xref_table curmod pos_from pos_to path ty =
      Map.add (curmod, pos_from) (range, Defs [path, ty]) xref_table
   | Some (range0, Defs defs) ->
     if range <> range0 then
-      Printf.eprintf "Warning: different pathes which have same starting position exists: module '%s', '%s' [%d:%d]\n" curmod path pos_from pos_to;
+      Printf.eprintf "Warning: multiple paths share the same starting position: modules '%s' and '%s' [%d:%d]\n" curmod path pos_from pos_to;
      Map.add (curmod, pos_from) (range, Defs ((path, ty) :: defs)) xref_table
   | Some (_, Ref (unit, path_, typ)) ->
      (* ignore references if the glob file has a reference and definitions at a
