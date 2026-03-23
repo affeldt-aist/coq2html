@@ -333,311 +333,36 @@ let generate_dependency_graph_from_dot output_dir dot =
 
 let generate_dependency_graph_cytoscape _output_dir graph =
   let elements = File_graph.to_cytoscape_elements_json graph in
-  Printf.sprintf {|
-<style>
-  #rocqnavi-graph-section {
-    position: relative;
-    background: #fff;
-  }
-  .rocqnavi-graph-toolbar {
-    display: flex;
-    gap: 6px;
-    margin: 0.5em 0 0.4em;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .rocqnavi-graph-toolbar button {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 5px 11px;
-    font-size: 13px;
-    cursor: pointer;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    background: #f5f5f5;
-    color: #333;
-    user-select: none;
-    white-space: nowrap;
-  }
-  .rocqnavi-graph-toolbar button:hover { background: #e2e2e2; }
-  .rocqnavi-graph-toolbar .sep {
-    color: #bbb;
-    padding: 0 2px;
-    user-select: none;
-  }
-  .rocqnavi-graph-hint {
-    font-size: 12px;
-    color: #888;
-    margin: 0 0 0.4em;
-  }
-  #dependency-graph-cytoscape {
-    width: 100%%;
-    height: 70vh;
-    min-height: 300px;
-    border: 1px solid #d7d7d7;
-    margin: 0 0 1em;
-  }
-</style>
-<div id="rocqnavi-graph-section">
-<h2>Interactive Dependency Graph of Files</h2>
-<div class="rocqnavi-graph-toolbar">
-  <button type="button" id="graph-btn-zoom-in"      title="Zoom in">&#xFF0B; Zoom in</button>
-  <button type="button" id="graph-btn-zoom-out"     title="Zoom out">&#xFF0D; Zoom out</button>
-  <button type="button" id="graph-btn-fit"          title="Fit whole graph in view">&#x229E; Fit</button>
-  <span class="sep">|</span>
-  <button type="button" id="graph-btn-collapse-all" title="Collapse all cluster groups">&#x229F; Collapse groups</button>
-  <button type="button" id="graph-btn-expand-all"   title="Expand all cluster groups">&#x229E; Expand groups</button>
-  <span class="sep">|</span>
-  <button type="button" id="graph-btn-fs"           title="Toggle full-screen">&#x26F6; Full screen</button>
-</div>
-<p class="rocqnavi-graph-hint">Click a group label to collapse or expand it. Click &#xFF0B; inside a collapsed group to expand it. Click a module node to navigate to its documentation.</p>
-<div id="dependency-graph-cytoscape"></div>
-</div>
-<script src="https://unpkg.com/cytoscape@latest/dist/cytoscape.min.js"></script>
-<script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
-<script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
-<script>
-(function () {
-  var dagreLayout = {
-    name: 'dagre',
-    nodeSep: 20,
-    edgeSep: 10,
-    rankSep: 50,
-    padding: 20,
-    fit: false,
-    animate: false
-  };
+  Cytoscape_graph.render_compound_graph
+    ~id_prefix:"file-dependency-graph"
+    ~title:"Interactive Dependency Graph of Files"
+    ~hint:"Click a group label to collapse or expand it. Click + inside a collapsed group to expand it. Click a module node to navigate to its documentation."
+    ~elements_json:elements
 
-  var boot = function () {
-    var container = document.getElementById("dependency-graph-cytoscape");
-    if (!container || typeof cytoscape === "undefined") return;
-
-    var cy = cytoscape({
-      container: container,
-      elements: %s,
-      boxSelectionEnabled: false,
-      autoungrabify: false,
-      wheelSensitivity: 0.15,
-      style: [
-        {
-          selector: '.hidden',
-          style: { 'display': 'none' }
-        },
-        {
-          selector: 'node',
-          style: {
-            'label': 'data(name)',
-            'background-color': '#2f6f9f',
-            'color': '#ffffff',
-            'text-wrap': 'wrap',
-            'text-max-width': 120,
-            'text-valign': 'center',
-            'text-halign': 'center',
-            'font-size': 11,
-            'shape': 'round-rectangle',
-            'padding': '8px'
-          }
-        },
-        {
-          selector: ':parent',
-          style: {
-            'label': 'data(name)',
-            'background-color': '#f4efe9',
-            'background-opacity': 0.35,
-            'border-color': '#c9b6a9',
-            'border-width': 2,
-            'color': '#4a3b32',
-            'text-valign': 'top',
-            'text-halign': 'center',
-            'font-size': 12,
-            'padding': '18px',
-            'cursor': 'pointer'
-          }
-        },
-        {
-          /* '+' expand button node inside each cluster */
-          selector: 'node[name="+"]',
-          style: {
-            'background-color': '#5a8a5a',
-            'color': '#ffffff',
-            'font-size': 16,
-            'font-weight': 'bold',
-            'width': 26,
-            'height': 26,
-            'shape': 'ellipse',
-            'padding': 0,
-            'cursor': 'pointer'
-          }
-        },
-        {
-          selector: 'edge',
-          style: {
-            'curve-style': 'bezier',
-            'width': 2,
-            'line-color': '#8b8b8b',
-            'target-arrow-color': '#8b8b8b',
-            'target-arrow-shape': 'triangle'
-          }
-        },
-        {
-          selector: 'node:selected',
-          style: {
-            'background-color': '#b85042',
-            'border-width': 3,
-            'border-color': '#5e201a'
-          }
-        }
-      ],
-      layout: dagreLayout
-    });
-
-    /* ---- initialise + nodes as hidden (after dagre has placed everything) ---- */
-    cy.nodes().forEach(function (n) {
-      if (n.data('name') === '+') {
-        n.addClass('hidden');
-        n.relativePosition({ x: 0, y: 0 });
-      }
-    });
-    cy.fit(undefined, 30);
-
-    /* ---- collapse / expand helpers ---- */
-    var collapseToggle = function (parent) {
-      parent.children().forEach(function (child) {
-        child.toggleClass('hidden');
-        if (child.data('name') === '+' && !child.hasClass('hidden')) {
-          child.relativePosition({ x: 0, y: 0 });
-        }
-      });
-    };
-
-    var collapseAll = function () {
-      cy.nodes().forEach(function (n) {
-        if (n.isParent()) {
-          n.children().forEach(function (child) {
-            if (child.data('name') === '+') {
-              child.removeClass('hidden');
-              child.relativePosition({ x: 0, y: 0 });
-            } else {
-              child.addClass('hidden');
-            }
-          });
-        }
-      });
-      cy.layout(dagreLayout).run();
-      cy.fit(undefined, 30);
-    };
-
-    var expandAll = function () {
-      cy.nodes().forEach(function (n) {
-        if (n.data('name') === '+') {
-          n.addClass('hidden');
-          n.relativePosition({ x: 0, y: 0 });
-        } else {
-          n.removeClass('hidden');
-        }
-      });
-      cy.layout(dagreLayout).run();
-      cy.fit(undefined, 30);
-    };
-
-    /* ---- toolbar wiring ---- */
-    var section = document.getElementById("rocqnavi-graph-section");
-    var fsBtn   = document.getElementById("graph-btn-fs");
-    var toolbar = section ? section.querySelector(".rocqnavi-graph-toolbar") : null;
-    var heading = section ? section.querySelector("h2") : null;
-
-    var dimensionInPixels = function (value) {
-      var n = parseFloat(value);
-      return Number.isFinite(n) ? n : 0;
-    };
-    var elementOuterHeight = function (elt) {
-      if (!elt) return 0;
-      var style = window.getComputedStyle(elt);
-      var margins = dimensionInPixels(style.marginTop) + dimensionInPixels(style.marginBottom);
-      return elt.getBoundingClientRect().height + margins;
-    };
-    var updateViewportSize = function (refit) {
-      var inFs = (document.fullscreenElement === section) || (document.webkitFullscreenElement === section);
-      if (inFs) {
-        var hint = section ? section.querySelector(".rocqnavi-graph-hint") : null;
-        var available = window.innerHeight
-          - elementOuterHeight(heading)
-          - elementOuterHeight(toolbar)
-          - elementOuterHeight(hint);
-        container.style.height = Math.max(220, Math.floor(available)) + "px";
-      } else {
-        container.style.height = "";
-      }
-      cy.resize();
-      if (refit) cy.fit(undefined, 30);
-    };
-
-    document.getElementById("graph-btn-zoom-in").addEventListener("click", function () {
-      cy.zoom({ level: cy.zoom() * 1.3, renderedPosition: { x: container.offsetWidth / 2, y: container.offsetHeight / 2 } });
-    });
-    document.getElementById("graph-btn-zoom-out").addEventListener("click", function () {
-      cy.zoom({ level: cy.zoom() / 1.3, renderedPosition: { x: container.offsetWidth / 2, y: container.offsetHeight / 2 } });
-    });
-    document.getElementById("graph-btn-fit").addEventListener("click", function () {
-      cy.fit(undefined, 30);
-    });
-    document.getElementById("graph-btn-collapse-all").addEventListener("click", collapseAll);
-    document.getElementById("graph-btn-expand-all").addEventListener("click", expandAll);
-
-    fsBtn.addEventListener("click", function () {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        (section.requestFullscreen || section.webkitRequestFullscreen).call(section);
-      } else {
-        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-      }
-    });
-    var onFsChange = function () {
-      var inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-      fsBtn.innerHTML = inFs ? "&#x2715; Exit full screen" : "&#x26F6; Full screen";
-      updateViewportSize(true);
-    };
-    document.addEventListener("fullscreenchange",       onFsChange);
-    document.addEventListener("webkitfullscreenchange", onFsChange);
-    window.addEventListener("resize", function () { updateViewportSize(false); });
-
-    /* ---- node interactions ---- */
-    cy.on('tap', 'node', function (evt) {
-      var node = evt.target;
-      if (node.data('name') === '+') {
-        /* expand collapsed parent */
-        collapseToggle(node.parent());
-      } else if (node.isParent()) {
-        /* collapse/expand the group */
-        collapseToggle(node);
-      } else {
-        var url = node.data('url');
-        if (url) window.location.href = url;
-      }
-    });
-
-    updateViewportSize(true);
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
-  } else {
-    boot();
-  }
-})();
-</script>
-|} elements
+let generate_hierarchy_graph_cytoscape title xref_table dot_file =
+  overwrite_dot_file_with_url xref_table dot_file;
+  let graph = Structure_graph.parse_dot_file dot_file in
+  let elements = Structure_graph.to_cytoscape_elements_json graph in
+  Cytoscape_graph.render_compound_graph
+    ~id_prefix:"structure-hierarchy-graph"
+    ~title:(!%"Interactive Mathematical Structures (%s only)" title)
+    ~hint:"Structures are grouped by their top-level prefix (e.g., Algebra, Order, GRing). Click a group to collapse or expand; click + to expand collapsed groups; click a structure node to navigate."
+    ~elements_json:elements
 
 (*
  * generate index.html
  *)
 let generate_topfile ?repo_root output_dir all_files xrefs title xref_table
   directory_mapping hierarchy_graph_dot_file file_graph_input
-  file_graph_renderer =
+  structure_graph_renderer file_graph_renderer =
 
   let hierarchy_graph =
-    if hierarchy_graph_dot_file = "" then "" else
-      generate_hierarchy_graph title xref_table output_dir hierarchy_graph_dot_file
+    if hierarchy_graph_dot_file = "" then ""
+    else match structure_graph_renderer with
+      | File_graph.Graphviz ->
+         generate_hierarchy_graph title xref_table output_dir hierarchy_graph_dot_file
+      | File_graph.Cytoscape ->
+         generate_hierarchy_graph_cytoscape title xref_table hierarchy_graph_dot_file
   in
   let file_graph =
      match file_graph_input with
@@ -707,7 +432,7 @@ let item_of kind module_ path =
 
 let generate ?repo_root output_dir (xref_table:XrefTable.t) xref_modules
   title directory_mapping hierarchy_graph_dot_file file_graph_input
-  file_graph_renderer index_blacklist =
+  structure_graph_renderer file_graph_renderer index_blacklist =
   let is_blacklisted =
     match index_blacklist with
     | None -> fun name -> false
@@ -760,4 +485,4 @@ let generate ?repo_root output_dir (xref_table:XrefTable.t) xref_modules
   generate_notation_list ?repo_root output_dir title table all_files notation_items;
   generate_topfile ?repo_root output_dir all_files indexed_items title xref_table
     directory_mapping hierarchy_graph_dot_file file_graph_input
-    file_graph_renderer
+    structure_graph_renderer file_graph_renderer

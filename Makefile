@@ -5,7 +5,7 @@ OUTPUT=rocqnavi
 
 GEN_IDX=generate_index
 
-PROJ_OBJS=log.cmx common.cmx directory_mappings.cmx glob_kind.cmx command.cmx lsp_client.cmx coqtop_command.cmx type_lookup.cmx graphviz.cmx file_graph.cmx range.cmx xrefTable.cmx index_blacklist.cmx env.cmx tooltip.cmx generate_index.cmx
+PROJ_OBJS=log.cmx common.cmx directory_mappings.cmx glob_kind.cmx command.cmx lsp_client.cmx coqtop_command.cmx type_lookup.cmx graphviz.cmx file_graph.cmx structure_graph.cmx cytoscape_graph.cmx range.cmx xrefTable.cmx index_blacklist.cmx env.cmx tooltip.cmx generate_index.cmx
 
 all: $(OUTPUT) ocamldot/ocamldot
 

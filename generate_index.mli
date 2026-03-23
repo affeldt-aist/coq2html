@@ -27,4 +27,5 @@ val generate : ?repo_root:string -> string -> XrefTable.t
                -> (string, unit) Hashtbl.t -> string
                -> Directory_mappings.t
                -> string -> File_graph.input option -> File_graph.renderer
+               -> File_graph.renderer
                -> Index_blacklist.t option -> unit
