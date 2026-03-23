@@ -331,26 +331,232 @@ let generate_dependency_graph_from_dot output_dir dot =
   let map = read_file map_path in
   Printf.sprintf {|<h2>Clickable Dependency Graph of Files</h2><img src="%s" usemap="#depend" class="img-darkmode-enable"/>%s|} png_filename map
 
+let generate_dependency_graph_cytoscape _output_dir graph =
+  let elements = File_graph.to_cytoscape_elements_json graph in
+  Printf.sprintf {|
+<style>
+  #rocqnavi-graph-section {
+    position: relative;
+    background: #fff;
+  }
+  .rocqnavi-graph-toolbar {
+    display: flex;
+    gap: 6px;
+    margin: 0.5em 0 0.5em;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .rocqnavi-graph-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 11px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: #f5f5f5;
+    color: #333;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .rocqnavi-graph-toolbar button:hover { background: #e2e2e2; }
+  #dependency-graph-cytoscape {
+    width: 100%%;
+    height: 70vh;
+    min-height: 300px;
+    border: 1px solid #d7d7d7;
+    margin: 0 0 1em;
+  }
+</style>
+<div id="rocqnavi-graph-section">
+<h2>Interactive Dependency Graph of Files</h2>
+<div class="rocqnavi-graph-toolbar">
+  <button type="button" id="graph-btn-zoom-in"  title="Zoom in">&#xFF0B; Zoom in</button>
+  <button type="button" id="graph-btn-zoom-out" title="Zoom out">&#xFF0D; Zoom out</button>
+  <button type="button" id="graph-btn-fit"      title="Fit whole graph in view">&#x229E; Fit</button>
+  <button type="button" id="graph-btn-fs"       title="Toggle full-screen">&#x26F6; Full screen</button>
+</div>
+<div id="dependency-graph-cytoscape"></div>
+</div>
+<script src="https://unpkg.com/cytoscape@latest/dist/cytoscape.min.js"></script>
+<script>
+(function () {
+  const boot = function () {
+    const container = document.getElementById("dependency-graph-cytoscape");
+    if (!container || typeof cytoscape === "undefined") return;
+    const cy = cytoscape({
+      container,
+      elements: %s,
+      boxSelectionEnabled: false,
+      autoungrabify: false,
+      wheelSensitivity: 0.15,
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'label': 'data(name)',
+            'background-color': '#2f6f9f',
+            'color': '#ffffff',
+            'text-wrap': 'wrap',
+            'text-max-width': 120,
+            'text-valign': 'center',
+            'text-halign': 'center',
+            'font-size': 11,
+            'shape': 'round-rectangle',
+            'padding': '8px'
+          }
+        },
+        {
+          selector: ':parent',
+          style: {
+            'label': 'data(name)',
+            'background-color': '#f4efe9',
+            'background-opacity': 0.35,
+            'border-color': '#c9b6a9',
+            'border-width': 2,
+            'color': '#4a3b32',
+            'text-valign': 'top',
+            'text-halign': 'center',
+            'font-size': 12,
+            'padding': '18px'
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'curve-style': 'bezier',
+            'width': 2,
+            'line-color': '#8b8b8b',
+            'target-arrow-color': '#8b8b8b',
+            'target-arrow-shape': 'triangle'
+          }
+        },
+        {
+          selector: 'node:selected',
+          style: {
+            'background-color': '#b85042',
+            'border-width': 3,
+            'border-color': '#5e201a'
+          }
+        }
+      ],
+      layout: {
+        name: 'breadthfirst',
+        directed: true,
+        padding: 30,
+        spacingFactor: 1.2,
+        animate: false
+      }
+    });
+
+    /* ---- toolbar wiring ---- */
+    const section = document.getElementById("rocqnavi-graph-section");
+    const fsBtn   = document.getElementById("graph-btn-fs");
+    const toolbar = section ? section.querySelector(".rocqnavi-graph-toolbar") : null;
+    const heading = section ? section.querySelector("h2") : null;
+
+    var dimensionInPixels = function (value) {
+      var n = parseFloat(value);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    var elementOuterHeight = function (elt) {
+      if (!elt) return 0;
+      var style = window.getComputedStyle(elt);
+      var margins = dimensionInPixels(style.marginTop) + dimensionInPixels(style.marginBottom);
+      return elt.getBoundingClientRect().height + margins;
+    };
+
+    var updateViewportSize = function (refit) {
+      var inFs = (document.fullscreenElement === section) || (document.webkitFullscreenElement === section);
+      if (inFs) {
+        var available = window.innerHeight - elementOuterHeight(heading) - elementOuterHeight(toolbar);
+        container.style.height = Math.max(220, Math.floor(available)) + "px";
+      } else {
+        container.style.height = "";
+      }
+      cy.resize();
+      if (refit) cy.fit(undefined, 30);
+    };
+
+    document.getElementById("graph-btn-zoom-in").addEventListener("click", function () {
+      cy.zoom({ level: cy.zoom() * 1.3, renderedPosition: { x: container.offsetWidth / 2, y: container.offsetHeight / 2 } });
+    });
+    document.getElementById("graph-btn-zoom-out").addEventListener("click", function () {
+      cy.zoom({ level: cy.zoom() / 1.3, renderedPosition: { x: container.offsetWidth / 2, y: container.offsetHeight / 2 } });
+    });
+    document.getElementById("graph-btn-fit").addEventListener("click", function () {
+      cy.fit(undefined, 30);
+    });
+
+    fsBtn.addEventListener("click", function () {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        (section.requestFullscreen || section.webkitRequestFullscreen).call(section);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      }
+    });
+
+    var onFsChange = function () {
+      var inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      fsBtn.innerHTML = inFs ? "&#x2715; Exit full screen" : "&#x26F6; Full screen";
+      updateViewportSize(true);
+    };
+    document.addEventListener("fullscreenchange",       onFsChange);
+    document.addEventListener("webkitfullscreenchange", onFsChange);
+    window.addEventListener("resize", function () {
+      updateViewportSize(false);
+    });
+
+    /* ---- click node to navigate ---- */
+    cy.on('tap', 'node', function (evt) {
+      const url = evt.target.data('url');
+      if (url) window.location.href = url;
+    });
+
+    updateViewportSize(true);
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+})();
+</script>
+|} elements
+
 (*
  * generate index.html
  *)
 let generate_topfile ?repo_root output_dir all_files xrefs title xref_table
-      directory_mapping hierarchy_graph_dot_file file_graph_input =
+  directory_mapping hierarchy_graph_dot_file file_graph_input
+  file_graph_renderer =
 
   let hierarchy_graph =
     if hierarchy_graph_dot_file = "" then "" else
       generate_hierarchy_graph title xref_table output_dir hierarchy_graph_dot_file
   in
-  let file_graph_dot =
-    file_graph_input
-    |> Option.map (function
-           | File_graph.FromDotFile dot -> Graphviz.from_file dot
-           | File_graph.FromDependFile dep ->
-              File_graph.parse_dep_file directory_mapping dep)
-  in
   let file_graph =
-    Option.map (generate_dependency_graph_from_dot output_dir) file_graph_dot
-    |> Option.value ~default:""
+     match file_graph_input with
+     | None -> ""
+     | Some (File_graph.FromDotFile dot) ->
+       begin match file_graph_renderer with
+       | File_graph.Graphviz ->
+         generate_dependency_graph_from_dot output_dir (Graphviz.from_file dot)
+       | File_graph.Cytoscape ->
+         Log.warn "Cytoscape file graph rendering currently supports only -file-graph-from-depend; falling back to Graphviz for -file-graph.";
+         generate_dependency_graph_from_dot output_dir (Graphviz.from_file dot)
+       end
+     | Some (File_graph.FromDependFile dep) ->
+       let graph = File_graph.parse_dep_file directory_mapping dep in
+       begin match file_graph_renderer with
+       | File_graph.Graphviz ->
+         generate_dependency_graph_from_dot output_dir (File_graph.to_graphviz graph)
+       | File_graph.Cytoscape ->
+         generate_dependency_graph_cytoscape output_dir graph
+       end
   in
   let body = table xrefs ^ hierarchy_graph ^ file_graph in
   write_html_file ?repo_root all_files body (Filename.concat output_dir "index.html") title title
@@ -399,7 +605,8 @@ let item_of kind module_ path =
   {kind; name=path; linkname; module_}
 
 let generate ?repo_root output_dir (xref_table:XrefTable.t) xref_modules
-      title directory_mapping file_graph_input dependency_dot_file index_blacklist =
+  title directory_mapping hierarchy_graph_dot_file file_graph_input
+  file_graph_renderer index_blacklist =
   let is_blacklisted =
     match index_blacklist with
     | None -> fun name -> false
@@ -451,4 +658,5 @@ let generate ?repo_root output_dir (xref_table:XrefTable.t) xref_modules
     kinds;
   generate_notation_list ?repo_root output_dir title table all_files notation_items;
   generate_topfile ?repo_root output_dir all_files indexed_items title xref_table
-    directory_mapping file_graph_input dependency_dot_file
+    directory_mapping hierarchy_graph_dot_file file_graph_input
+    file_graph_renderer

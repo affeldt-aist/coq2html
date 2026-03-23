@@ -745,6 +745,7 @@ let generate_redirects = ref false
 let hierarchy_graph_dot_file = ref ""
 let file_graph_dot_file = ref ""
 let file_graph_depend_file = ref ""
+let file_graph_renderer = ref File_graph.Graphviz
 let index_blacklist_file = ref ""
 let show_type_information_using_coqtop_process = ref false
 let show_type_information_using_rocq_lsp_process = ref false
@@ -849,6 +850,12 @@ let () =
     "";
     "-file-graph-from-depend", Arg.Set_string file_graph_depend_file,
       "   Show the file dependency graph from <depend.d> on the index.html";
+    "-file-graph-renderer",
+      Arg.Symbol (["graphviz"; "cytoscape"], (function
+          | "graphviz" -> file_graph_renderer := File_graph.Graphviz
+          | "cytoscape" -> file_graph_renderer := File_graph.Cytoscape
+          | _ -> assert false)),
+      "   Render the file dependency graph using graphviz (default) or cytoscape";
     "-index-blacklist", Arg.Set_string index_blacklist_file,
       "   Exclude specified items from the index";
     "-show-type-information-using-coqtop-process", Arg.Set show_type_information_using_coqtop_process,
@@ -898,6 +905,7 @@ let () =
   Generate_index.generate ?repo_root !output_dir
     !xref_table xref_modules
     !title !directory_mappings !hierarchy_graph_dot_file file_graph_input
+    !file_graph_renderer
     index_blacklist_opt;
   env := {!env with
            repository_root_url = repo_root;
