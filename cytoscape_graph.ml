@@ -4,6 +4,7 @@ let render_compound_graph ~id_prefix ~title ~hint ~elements_json =
   #__ID__-section {
     position: relative;
     background: #fff;
+    color: #222;
   }
   .__ID__-toolbar {
     display: flex;
@@ -27,22 +28,39 @@ let render_compound_graph ~id_prefix ~title ~hint ~elements_json =
     white-space: nowrap;
   }
   .__ID__-toolbar button:hover { background: #e2e2e2; }
+  .darkmode--activated #__ID__-section {
+    background: #171717;
+    color: #ececec;
+  }
+  .darkmode--activated .__ID__-toolbar button {
+    border-color: #5d5d5d;
+    background: #2b2b2b;
+    color: #f2f2f2;
+  }
+  .darkmode--activated .__ID__-toolbar button:hover {
+    background: #393939;
+  }
   .__ID__-toolbar .sep {
     color: #bbb;
     padding: 0 2px;
     user-select: none;
   }
+  .darkmode--activated .__ID__-toolbar .sep { color: #888; }
   .__ID__-hint {
     font-size: 12px;
     color: #888;
     margin: 0 0 0.4em;
   }
+  .darkmode--activated .__ID__-hint { color: #b7b7b7; }
   #__ID__-cytoscape {
     width: 100%;
     height: 70vh;
     min-height: 300px;
     border: 1px solid #d7d7d7;
     margin: 0 0 1em;
+  }
+  .darkmode--activated #__ID__-cytoscape {
+    border-color: #4f4f4f;
   }
 </style>
 <div id="__ID__-section">
@@ -75,6 +93,121 @@ let render_compound_graph ~id_prefix ~title ~hint ~elements_json =
     animate: false
   };
 
+  var styleForTheme = function (isDark) {
+    var palette = isDark
+      ? {
+          sectionBg: '#171717',
+          nodeBg: '#5a8fc7',
+          nodeText: '#f7f7f7',
+          parentBg: '#7b6a59',
+          parentBorder: '#c8b7a8',
+          parentText: '#f3ece7',
+          plusBg: '#73b873',
+          edge: '#b7b7b7',
+          selectedBg: '#ff8d72',
+          selectedBorder: '#ffd0c2'
+        }
+      : {
+          sectionBg: '#ffffff',
+          nodeBg: '#2f6f9f',
+          nodeText: '#ffffff',
+          parentBg: '#f4efe9',
+          parentBorder: '#c9b6a9',
+          parentText: '#4a3b32',
+          plusBg: '#5a8a5a',
+          edge: '#8b8b8b',
+          selectedBg: '#b85042',
+          selectedBorder: '#5e201a'
+        }
+    ;
+    return [
+      {
+        selector: '.hidden',
+        style: { 'display': 'none' }
+      },
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(name)',
+          'background-color': palette.nodeBg,
+          'color': palette.nodeText,
+          'text-wrap': 'wrap',
+          'text-max-width': 180,
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'font-size': 11,
+          'shape': 'round-rectangle',
+          'width': 'label',
+          'height': 'label',
+          'padding': '10px',
+          'border-width': 1,
+          'border-color': 'rgba(0, 0, 0, 0.12)'
+        }
+      },
+      {
+        selector: ':parent',
+        style: {
+          'label': 'data(name)',
+          'background-color': palette.parentBg,
+          'background-opacity': isDark ? 0.22 : 0.35,
+          'border-color': palette.parentBorder,
+          'border-width': 2,
+          'color': palette.parentText,
+          'text-valign': 'top',
+          'text-halign': 'center',
+          'text-wrap': 'wrap',
+          'text-max-width': 220,
+          'font-size': 12,
+          'padding': '18px',
+          'min-width': 'label',
+          'min-width-bias-left': '50%',
+          'min-width-bias-right': '50%',
+          'min-height': 'label',
+          'min-height-bias-top': '100%',
+          'min-height-bias-bottom': '0%',
+          'cursor': 'pointer'
+        }
+      },
+      {
+        selector: 'node[name="+"]',
+        style: {
+          'background-color': palette.plusBg,
+          'color': '#ffffff',
+          'font-size': 16,
+          'font-weight': 'bold',
+          'width': 26,
+          'height': 26,
+          'shape': 'ellipse',
+          'padding': 0,
+          'cursor': 'pointer'
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          'curve-style': 'bezier',
+          'width': 2,
+          'line-color': palette.edge,
+          'target-arrow-color': palette.edge,
+          'target-arrow-shape': 'triangle'
+        }
+      },
+      {
+        selector: 'node:selected',
+        style: {
+          'background-color': palette.selectedBg,
+          'border-width': 3,
+          'border-color': palette.selectedBorder
+        }
+      }
+    ];
+  };
+
+  var isDarkMode = function () {
+    return document.body.classList.contains('darkmode--activated')
+      || document.documentElement.classList.contains('darkmode--activated');
+  };
+
   var boot = function () {
     var section   = document.getElementById("__ID__-section");
     var container = document.getElementById("__ID__-cytoscape");
@@ -86,77 +219,17 @@ let render_compound_graph ~id_prefix ~title ~hint ~elements_json =
       boxSelectionEnabled: false,
       autoungrabify: false,
       wheelSensitivity: 0.15,
-      style: [
-        {
-          selector: '.hidden',
-          style: { 'display': 'none' }
-        },
-        {
-          selector: 'node',
-          style: {
-            'label': 'data(name)',
-            'background-color': '#2f6f9f',
-            'color': '#ffffff',
-            'text-wrap': 'wrap',
-            'text-max-width': 120,
-            'text-valign': 'center',
-            'text-halign': 'center',
-            'font-size': 11,
-            'shape': 'round-rectangle',
-            'padding': '8px'
-          }
-        },
-        {
-          selector: ':parent',
-          style: {
-            'label': 'data(name)',
-            'background-color': '#f4efe9',
-            'background-opacity': 0.35,
-            'border-color': '#c9b6a9',
-            'border-width': 2,
-            'color': '#4a3b32',
-            'text-valign': 'top',
-            'text-halign': 'center',
-            'font-size': 12,
-            'padding': '18px',
-            'cursor': 'pointer'
-          }
-        },
-        {
-          selector: 'node[name="+"]',
-          style: {
-            'background-color': '#5a8a5a',
-            'color': '#ffffff',
-            'font-size': 16,
-            'font-weight': 'bold',
-            'width': 26,
-            'height': 26,
-            'shape': 'ellipse',
-            'padding': 0,
-            'cursor': 'pointer'
-          }
-        },
-        {
-          selector: 'edge',
-          style: {
-            'curve-style': 'bezier',
-            'width': 2,
-            'line-color': '#8b8b8b',
-            'target-arrow-color': '#8b8b8b',
-            'target-arrow-shape': 'triangle'
-          }
-        },
-        {
-          selector: 'node:selected',
-          style: {
-            'background-color': '#b85042',
-            'border-width': 3,
-            'border-color': '#5e201a'
-          }
-        }
-      ],
+      style: styleForTheme(isDarkMode()),
       layout: dagreLayout
     });
+
+    var applyTheme = function (refit) {
+      var dark = isDarkMode();
+      section.style.backgroundColor = dark ? '#171717' : '#ffffff';
+      cy.style(styleForTheme(dark));
+      cy.resize();
+      if (refit) cy.fit(undefined, 30);
+    };
 
     cy.nodes().forEach(function (n) {
       if (n.data('name') === '+') {
@@ -263,6 +336,17 @@ let render_compound_graph ~id_prefix ~title ~hint ~elements_json =
     document.addEventListener("webkitfullscreenchange", onFsChange);
     window.addEventListener("resize", function () { updateViewportSize(false); });
 
+    var darkModeTarget = document.body || document.documentElement;
+    if (typeof MutationObserver !== 'undefined' && darkModeTarget) {
+      var darkModeObserver = new MutationObserver(function () {
+        applyTheme(false);
+      });
+      darkModeObserver.observe(darkModeTarget, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+    }
+
     cy.on('tap', 'node', function (evt) {
       var node = evt.target;
       if (node.data('name') === '+') {
@@ -275,6 +359,7 @@ let render_compound_graph ~id_prefix ~title ~hint ~elements_json =
       }
     });
 
+    applyTheme(false);
     updateViewportSize(true);
   };
 
