@@ -36,55 +36,11 @@ let graph_of_store (nodes, edges) =
   { nodes = list_uniq nodes; edges }
 
 let transitive_reduction ({ nodes; edges } as graph) =
-  let node_by_key = Hashtbl.create (List.length nodes) in
-  List.iter (fun node -> Hashtbl.replace node_by_key (key node) node) nodes;
-  let matrix = Hashtbl.create (List.length nodes) in
-  let ensure_row node_key =
-    match Hashtbl.find_opt matrix node_key with
-    | Some row -> row
-    | None ->
-       let row = Hashtbl.create (List.length nodes) in
-       Hashtbl.add matrix node_key row;
-       row
-  in
-  List.iter (fun node -> ignore (ensure_row (key node))) nodes;
-  List.iter (fun (src, dst) ->
-      let row = ensure_row (key src) in
-      Hashtbl.replace row (key dst) true) edges;
-  List.iter (fun mid ->
-      let mid_key = key mid in
-      let mid_row = ensure_row mid_key in
-      List.iter (fun src ->
-          let src_key = key src in
-          let src_row = ensure_row src_key in
-          if Hashtbl.mem src_row mid_key then
-            List.iter (fun dst ->
-                let dst_key = key dst in
-                if Hashtbl.mem mid_row dst_key then
-                  Hashtbl.replace src_row dst_key true) nodes) nodes) nodes;
-  List.iter (fun mid ->
-      let mid_key = key mid in
-      let mid_row = ensure_row mid_key in
-      List.iter (fun src ->
-          let src_key = key src in
-          let src_row = ensure_row src_key in
-          if Hashtbl.mem src_row mid_key then
-            List.iter (fun dst ->
-                let dst_key = key dst in
-                if Hashtbl.mem mid_row dst_key then
-                  Hashtbl.remove src_row dst_key) nodes) nodes) nodes;
   let reduced_edges =
-    List.fold_left (fun store src ->
-        let src_key = key src in
-        let src_row = ensure_row src_key in
-        List.fold_left (fun store dst ->
-            let dst_key = key dst in
-            if Hashtbl.mem src_row dst_key then
-              match Hashtbl.find_opt node_by_key dst_key with
-              | Some dst_node -> (src, dst_node) :: store
-              | None -> store
-            else store) store nodes) [] nodes
-    |> List.rev
+    Graph_reduction.transitive_reduction_by_key
+      ~nodes
+      ~key
+      ~edges
   in
   { graph with edges = reduced_edges }
 
@@ -259,37 +215,25 @@ let to_cytoscape_elements_json ({ nodes; edges } : graph) =
     Hashtbl.fold (fun (s, d) () acc -> s :: d :: acc) raw_meta []
     |> list_uniq
   in
-  let meta_mtx = Hashtbl.copy raw_meta in
-  (* Transitive closure (Floyd-Warshall) *)
-  List.iter (fun mid ->
-    List.iter (fun src ->
-      if Hashtbl.mem meta_mtx (src, mid) then
-        List.iter (fun dst ->
-          if Hashtbl.mem meta_mtx (mid, dst) then
-            Hashtbl.replace meta_mtx (src, dst) ()
-        ) all_meta_cls
-    ) all_meta_cls
-  ) all_meta_cls;
-  (* Transitive reduction *)
-  List.iter (fun mid ->
-    List.iter (fun src ->
-      if Hashtbl.mem meta_mtx (src, mid) then
-        List.iter (fun dst ->
-          if Hashtbl.mem meta_mtx (mid, dst) then
-            Hashtbl.remove meta_mtx (src, dst)
-        ) all_meta_cls
-    ) all_meta_cls
-  ) all_meta_cls;
+  let raw_meta_edges =
+    Hashtbl.fold (fun (src_c, dst_c) () acc -> (src_c, dst_c) :: acc) raw_meta []
+  in
+  let reduced_meta_edges =
+    Graph_reduction.transitive_reduction_by_key
+      ~nodes:all_meta_cls
+      ~key:cluster_id
+      ~edges:raw_meta_edges
+  in
   let meta_edge_elements =
     let i = ref (List.length edges) in
-    Hashtbl.fold (fun (src_c, dst_c) () acc ->
+    List.fold_left (fun acc (src_c, dst_c) ->
       let elt = `Assoc ["data", `Assoc [
           "id",     `String (!%"meta:%d" !i);
           "source", `String (cluster_id src_c);
           "target", `String (cluster_id dst_c)
         ]] in
       incr i; elt :: acc
-    ) meta_mtx []
+    ) [] reduced_meta_edges
   in
   (* One '+' expand/collapse button node per cluster *)
   let plus_element cluster_path =

@@ -34,19 +34,21 @@ let update_node tbl node =
 let parse_dot_file filename =
   let json_tmp = Filename.temp_file "rocqnavi-structure-graph" ".json" in
   let quote = Filename.quote in
-  let run_dot format =
+  let run_dot_to_file format =
     let cmd =
-      !%"tred %s | dot %s > %s"
-        (quote filename) format (quote json_tmp)
+      !%"dot %s %s > %s"
+        format (quote filename) (quote json_tmp)
     in
     Sys.command cmd
   in
-  let status =
-    let s0 = run_dot "-Tdot_json" in
-    if s0 = 0 then s0 else
-      let s1 = run_dot "-Tjson" in
-      if s1 = 0 then s1 else run_dot "-Txdot_json"
+  let run_with_fallback runner =
+    let s0 = runner "-Tdot_json" in
+    if s0 = 0 then s0
+    else
+      let s1 = runner "-Tjson" in
+      if s1 = 0 then s1 else runner "-Txdot_json"
   in
+  let status = run_with_fallback run_dot_to_file in
   if status <> 0 then begin
     Sys.remove json_tmp;
     failwith (!%"Could not convert structure DOT graph '%s' to Graphviz JSON (-Tdot_json/-Tjson/-Txdot_json)." filename)
@@ -114,9 +116,18 @@ let parse_dot_file filename =
          end
       | _ -> ()) json_edges;
 
+  let nodes = Hashtbl.fold (fun _ v acc -> v :: acc) nodes [] |> List.rev in
+  let node_ids = List.map (fun node -> node.id) nodes in
+  let edges =
+    Graph_reduction.transitive_reduction_by_key
+      ~nodes:node_ids
+      ~key:(fun id -> id)
+      ~edges:!edges
+  in
+
   {
-    nodes = Hashtbl.fold (fun _ v acc -> v :: acc) nodes [] |> List.rev;
-    edges = List.rev !edges |> list_uniq;
+    nodes;
+    edges;
   }
 
 let cluster_id grp = "cluster:" ^ grp
@@ -180,30 +191,26 @@ let to_cytoscape_elements_json ({ nodes; edges } : graph) =
     Hashtbl.fold (fun (s, d) () acc -> s :: d :: acc) group_edges []
     |> list_uniq
   in
-  let meta_mtx = Hashtbl.copy group_edges in
-  List.iter (fun mid ->
-      List.iter (fun src ->
-          if Hashtbl.mem meta_mtx (src, mid) then
-            List.iter (fun dst ->
-                if Hashtbl.mem meta_mtx (mid, dst) then
-                  Hashtbl.replace meta_mtx (src, dst) ()) groups_in_meta) groups_in_meta) groups_in_meta;
-  List.iter (fun mid ->
-      List.iter (fun src ->
-          if Hashtbl.mem meta_mtx (src, mid) then
-            List.iter (fun dst ->
-                if Hashtbl.mem meta_mtx (mid, dst) then
-                  Hashtbl.remove meta_mtx (src, dst)) groups_in_meta) groups_in_meta) groups_in_meta;
+  let raw_meta_edges =
+    Hashtbl.fold (fun (sg, dg) () acc -> (sg, dg) :: acc) group_edges []
+  in
+  let reduced_meta_edges =
+    Graph_reduction.transitive_reduction_by_key
+      ~nodes:groups_in_meta
+      ~key:(fun x -> x)
+      ~edges:raw_meta_edges
+  in
 
   let meta_edge_elements =
     let i = ref (List.length edges) in
-    Hashtbl.fold (fun (sg, dg) () acc ->
+    List.fold_left (fun acc (sg, dg) ->
         let elt = `Assoc ["data", `Assoc [
             "id", `String (!%"meta:%d" !i);
             "source", `String (cluster_id sg);
             "target", `String (cluster_id dg)
           ]] in
         incr i;
-        elt :: acc) meta_mtx []
+        elt :: acc) [] reduced_meta_edges
   in
 
   let elements =
