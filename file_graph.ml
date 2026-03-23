@@ -218,6 +218,12 @@ let edge_element i (src, dst) =
         ]
     ]
 
+let rec list_starts_with prefix lst =
+  match prefix, lst with
+  | [], _ -> true
+  | _, [] -> false
+  | x :: xs, y :: ys -> x = y && list_starts_with xs ys
+
 let to_cytoscape_elements_json ({ nodes; edges } : graph) =
   let clusters =
     List.map cluster_paths nodes
@@ -225,9 +231,79 @@ let to_cytoscape_elements_json ({ nodes; edges } : graph) =
     |> list_uniq
     |> List.sort (fun x y -> compare (List.length x, x) (List.length y, y))
   in
+  (* Compute cluster-to-cluster meta-edges.
+     For every module-level edge (src→dst), add a cluster-level meta-edge
+     for every pair of ancestor clusters (one from the src side, one from the
+     dst side) that are not in an ancestor/descendant relationship with each
+     other.  This ensures that, no matter at what depth the user collapses a
+     group, the inter-group connections remain visible.
+     The resulting set is then transitively reduced. *)
+  let path_prefixes lst =
+    let rec aux acc cur = function
+      | [] -> List.rev acc
+      | x :: rest -> let p = cur @ [x] in aux (p :: acc) p rest
+    in aux [] [] lst
+  in
+  let raw_meta = Hashtbl.create 16 in
+  List.iter (fun (src, dst) ->
+    let sp = path_prefixes (path src)
+    and dp = path_prefixes (path dst) in
+    List.iter (fun sc ->
+      List.iter (fun dc ->
+        if not (list_starts_with sc dc) && not (list_starts_with dc sc) then
+          Hashtbl.replace raw_meta (sc, dc) ()
+      ) dp
+    ) sp
+  ) edges;
+  let all_meta_cls =
+    Hashtbl.fold (fun (s, d) () acc -> s :: d :: acc) raw_meta []
+    |> list_uniq
+  in
+  let meta_mtx = Hashtbl.copy raw_meta in
+  (* Transitive closure (Floyd-Warshall) *)
+  List.iter (fun mid ->
+    List.iter (fun src ->
+      if Hashtbl.mem meta_mtx (src, mid) then
+        List.iter (fun dst ->
+          if Hashtbl.mem meta_mtx (mid, dst) then
+            Hashtbl.replace meta_mtx (src, dst) ()
+        ) all_meta_cls
+    ) all_meta_cls
+  ) all_meta_cls;
+  (* Transitive reduction *)
+  List.iter (fun mid ->
+    List.iter (fun src ->
+      if Hashtbl.mem meta_mtx (src, mid) then
+        List.iter (fun dst ->
+          if Hashtbl.mem meta_mtx (mid, dst) then
+            Hashtbl.remove meta_mtx (src, dst)
+        ) all_meta_cls
+    ) all_meta_cls
+  ) all_meta_cls;
+  let meta_edge_elements =
+    let i = ref (List.length edges) in
+    Hashtbl.fold (fun (src_c, dst_c) () acc ->
+      let elt = `Assoc ["data", `Assoc [
+          "id",     `String (!%"meta:%d" !i);
+          "source", `String (cluster_id src_c);
+          "target", `String (cluster_id dst_c)
+        ]] in
+      incr i; elt :: acc
+    ) meta_mtx []
+  in
+  (* One '+' expand/collapse button node per cluster *)
+  let plus_element cluster_path =
+    `Assoc ["data", `Assoc [
+        "id",     `String (cluster_id cluster_path ^ ":plus");
+        "name",   `String "+";
+        "parent", `String (cluster_id cluster_path)
+      ]]
+  in
   let elements =
     List.map cluster_element clusters
+    @ List.map plus_element clusters
     @ List.map node_element nodes
     @ List.mapi edge_element edges
+    @ meta_edge_elements
   in
   pretty_to_string (`List elements)
