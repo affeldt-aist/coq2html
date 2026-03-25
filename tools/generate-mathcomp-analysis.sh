@@ -4,7 +4,7 @@ MATHCOMP_ANALYSIS=${MATHCOMP_ANALYSIS:-"$OPAM_SWITCH_PREFIX/lib/coq/user-contrib
 REVISION=${REVISION:-"no"}
 DIR=$(pwd `dirname .`)
 OUTDIR=${OUTDIR:-$DIR/html/analysis-$REVISION}
-ANALYSIS_SRC=${ANALYSIS_SRC:-$OPAM_SWITCH_PREFIX/.opam-switch/sources/coq-mathcomp-analysis.1.14.0}
+ANALYSIS_SRC=${ANALYSIS_SRC:-$OPAM_SWITCH_PREFIX/.opam-switch/sources/coq-mathcomp-analysis.1.16.0}
 INDEX_BLACKLIST_FILE=$DIR/sample_blacklist/index_blacklist
 
 rm -rf $OUTDIR
@@ -40,8 +40,9 @@ $DIR/rocqnavi -title "MathComp-Analysis-$REVISION" -d $OUTDIR \
   -Q experimental_reals mathcomp.experimental_reals \
   -Q theories mathcomp.analysis \
   -Q analysis_stdlib mathcomp.analysis_stdlib \
-  -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.ssreflect \
-  -external https://math-comp.github.io/htmldoc_2_1_0/ mathcomp.algebra \
+  -external https://math-comp.github.io/htmldoc_2_5_0/ mathcomp.ssreflect \
+  -external https://math-comp.github.io/htmldoc_2_5_0/ mathcomp.algebra \
+  -external https://math-comp.github.io/htmldoc_2_5_0/ mathcomp.order \
   -structure-graph $OUTDIR/"hierarchy-graph.dot" \
   -file-graph-from-depend $OUTDIR/"depend.d" \
   -index-blacklist $INDEX_BLACKLIST_FILE \
