@@ -1,3 +1,9 @@
+(* File-dependency graph: parsing, transitive reduction, and rendering.
+   Pipeline adapted and extended from the Lua script [etc/buildlibgraph]
+   originally written by Maxime Dénès for math-comp, removed in math-comp
+   PR #1534. Initial OCaml draft generated with GitHub Copilot, then
+   reviewed and adapted by hand. *)
+
 open Common
 open Yojson.Safe
 

@@ -1,3 +1,11 @@
+(* Cytoscape rendering shell: emits the inline HTML/JS/CSS used by both
+   the file-dependency and structure graphs. The cytoscape JSON shape was
+   inspired by the Lua script [etc/buildlibgraph] originally written by
+   Maxime Dénès for math-comp, removed in math-comp PR #1534; the
+   surrounding renderer (toolbar, dark-mode, layout tuning) is new.
+   Initial OCaml draft generated with GitHub Copilot, then reviewed and
+   adapted by hand. *)
+
 let render_compound_graph ~id_prefix ~title ~hint ~elements_json =
   let template = {|
 <style>
