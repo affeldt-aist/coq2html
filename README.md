@@ -35,8 +35,10 @@ Option                     | Summary
 `-title` _TITLE_           | Set the title of the index page
 `-Q` _DIR_ _COQDIR_        | Map the directory _DIR_ to correspond to the module name _COQDIR_ (similar to `rocq compile`)
 `-structure-graph` _FILE_  | Show the hierarchy graph of <dot-file> on the index.html (You have need Graphviz command line tool)
+`-structure-graph-renderer` _MODE_ | Render the structure graph with `graphviz` (default) or `cytoscape`
 `-file-graph` _FILE_       | Show the dependency graph from a pre-generated <dot-file> on the index.html
 `-file-graph-from-depend` _FILE_ | Automatically generate and show the dependency graph from a <depend-file> on the index.html
+`-file-graph-renderer` _MODE_ | Render the dependency graph with `graphviz` (default) or `cytoscape`
 `-index-blacklist` _FILE_  | Exclude specified items from the index
 `-show-type-information-using-coqtop-process` | Show type information of definitions as a tooltip
 `-doc-source-url`          | The Link to the source repository
@@ -60,7 +62,9 @@ find . -not -path '*/.*' -name "*.v" -or -name "*.glob" | xargs rocqnavi \
 	-d html -base mathcomp -Q theories analysis \
 	-coqlib https://rocq-prover.org/doc/V9.0.0/stdlib/ \
 	-file-graph-from-depend html/depend.d \
+        -file-graph-renderer cytoscape \
 	-structure-graph html/hierarchy_graph.dot \
+        -structure-graph-renderer cytoscape \
         -index-blacklist etc/rocqnavi_index-blacklist \
         -show-type-information-using-coqtop-process \
 	-external https://math-comp.github.io/htmldoc_2_3_0/ mathcomp

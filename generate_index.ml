@@ -331,26 +331,58 @@ let generate_dependency_graph_from_dot output_dir dot =
   let map = read_file map_path in
   Printf.sprintf {|<h2>Clickable Dependency Graph of Files</h2><img src="%s" usemap="#depend" class="img-darkmode-enable"/>%s|} png_filename map
 
+let generate_dependency_graph_cytoscape _output_dir graph =
+  let elements = File_graph.to_cytoscape_elements_json graph in
+  Cytoscape_graph.render_compound_graph
+    ~id_prefix:"file-dependency-graph"
+    ~title:"Interactive Dependency Graph of Files"
+    ~hint:"Click a group label to collapse or expand it. Click + inside a collapsed group to expand it. Click a module node to navigate to its documentation."
+    ~elements_json:elements
+
+let generate_hierarchy_graph_cytoscape title xref_table dot_file =
+  overwrite_dot_file_with_url xref_table dot_file;
+  let graph = Structure_graph.parse_dot_file dot_file in
+  let elements = Structure_graph.to_cytoscape_elements_json graph in
+  Cytoscape_graph.render_compound_graph
+    ~id_prefix:"structure-hierarchy-graph"
+    ~title:(!%"Interactive Mathematical Structures (%s only)" title)
+    ~hint:"Structures are grouped by their top-level prefix (e.g., Algebra, Order, GRing). Click a group to collapse or expand; click + to expand collapsed groups; click a structure node to navigate."
+    ~elements_json:elements
+
 (*
  * generate index.html
  *)
 let generate_topfile ?repo_root output_dir all_files xrefs title xref_table
-      directory_mapping hierarchy_graph_dot_file file_graph_input =
+  directory_mapping hierarchy_graph_dot_file file_graph_input
+  structure_graph_renderer file_graph_renderer =
 
   let hierarchy_graph =
-    if hierarchy_graph_dot_file = "" then "" else
-      generate_hierarchy_graph title xref_table output_dir hierarchy_graph_dot_file
-  in
-  let file_graph_dot =
-    file_graph_input
-    |> Option.map (function
-           | File_graph.FromDotFile dot -> Graphviz.from_file dot
-           | File_graph.FromDependFile dep ->
-              File_graph.parse_dep_file directory_mapping dep)
+    if hierarchy_graph_dot_file = "" then ""
+    else match structure_graph_renderer with
+      | File_graph.Graphviz ->
+         generate_hierarchy_graph title xref_table output_dir hierarchy_graph_dot_file
+      | File_graph.Cytoscape ->
+         generate_hierarchy_graph_cytoscape title xref_table hierarchy_graph_dot_file
   in
   let file_graph =
-    Option.map (generate_dependency_graph_from_dot output_dir) file_graph_dot
-    |> Option.value ~default:""
+     match file_graph_input with
+     | None -> ""
+     | Some (File_graph.FromDotFile dot) ->
+       begin match file_graph_renderer with
+       | File_graph.Graphviz ->
+         generate_dependency_graph_from_dot output_dir (Graphviz.from_file dot)
+       | File_graph.Cytoscape ->
+         Log.warn "Cytoscape file graph rendering currently supports only -file-graph-from-depend; falling back to Graphviz for -file-graph.";
+         generate_dependency_graph_from_dot output_dir (Graphviz.from_file dot)
+       end
+     | Some (File_graph.FromDependFile dep) ->
+       let graph = File_graph.parse_dep_file directory_mapping dep in
+       begin match file_graph_renderer with
+       | File_graph.Graphviz ->
+         generate_dependency_graph_from_dot output_dir (File_graph.to_graphviz graph)
+       | File_graph.Cytoscape ->
+         generate_dependency_graph_cytoscape output_dir graph
+       end
   in
   let body = table xrefs ^ hierarchy_graph ^ file_graph in
   write_html_file ?repo_root all_files body (Filename.concat output_dir "index.html") title title
@@ -399,7 +431,8 @@ let item_of kind module_ path =
   {kind; name=path; linkname; module_}
 
 let generate ?repo_root output_dir (xref_table:XrefTable.t) xref_modules
-      title directory_mapping file_graph_input dependency_dot_file index_blacklist =
+  title directory_mapping hierarchy_graph_dot_file file_graph_input
+  structure_graph_renderer file_graph_renderer index_blacklist =
   let is_blacklisted =
     match index_blacklist with
     | None -> fun name -> false
@@ -451,4 +484,5 @@ let generate ?repo_root output_dir (xref_table:XrefTable.t) xref_modules
     kinds;
   generate_notation_list ?repo_root output_dir title table all_files notation_items;
   generate_topfile ?repo_root output_dir all_files indexed_items title xref_table
-    directory_mapping file_graph_input dependency_dot_file
+    directory_mapping hierarchy_graph_dot_file file_graph_input
+    structure_graph_renderer file_graph_renderer
