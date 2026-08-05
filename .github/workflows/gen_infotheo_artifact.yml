@@ -6,6 +6,7 @@ on:
   pull_request:
   schedule:
     - cron: 0 0 * * * # every morning
+  workflow_dispatch:
 
 jobs:
   generate-artifact:
@@ -38,6 +39,12 @@ jobs:
         run: |
           name=${{ github.action }}
           echo "destination_dir=nightly_$name" >> $GITHUB_ENV
+
+      - name: set the variables for manual (workflow_dispatch) event
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          short_sha=$(git rev-parse --short ${{ github.sha }})
+          echo "destination_dir=manual_$short_sha" >> $GITHUB_ENV
 
       - uses: coq-community/docker-coq-action@v1
         with:

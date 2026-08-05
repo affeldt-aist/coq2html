@@ -1,7 +1,13 @@
-name: Deploy artifact
+name: Deploy artifacts
 
 on:
-  push:
+  # Triggered by the (expensive, independently-scheduled) doc-build workflows
+  # finishing on mca2html, instead of polling/searching for their runs here.
+  workflow_run:
+    workflows:
+      - "Analysis [Build HTML and upload as Artifact]"
+      - "Infotheo [Build HTML and upload as Artifact]"
+    types: [completed]
     branches: ["mca2html"]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,6 +28,7 @@ concurrency:
 
 jobs:
   generate-deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -34,13 +41,18 @@ jobs:
         run: mkdir html && cp -r .github/workflows/resources/* html/
 
       ## Mathcomp Analysis (built by gen_analysis_artifact.yml) --------
-      - name: Find latest successful analysis-doc run
+      - name: Find analysis-doc run to deploy
         id: analysis_run
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gen_analysis_artifact.yml \
-            --status success --branch mca2html --limit 1 --json databaseId -q '.[0].databaseId')
+          if [ "${{ github.event.workflow_run.name }}" = "Analysis [Build HTML and upload as Artifact]" ]; then
+            # This run itself is what triggered us - use it directly, no lookup needed.
+            run_id=${{ github.event.workflow_run.id }}
+          else
+            run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gen_analysis_artifact.yml \
+              --status success --branch mca2html --limit 1 --json databaseId -q '.[0].databaseId')
+          fi
           if [ -z "$run_id" ]; then
             echo "::error::No successful run of gen_analysis_artifact.yml on mca2html yet - nothing to deploy"
             exit 1
@@ -63,13 +75,18 @@ jobs:
       ## ----------------------------
 
       ## Infotheo (built by gen_infotheo_artifact.yml) -----------------
-      - name: Find latest successful infotheo-doc run
+      - name: Find infotheo-doc run to deploy
         id: infotheo_run
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gen_infotheo_artifact.yml \
-            --status success --branch mca2html --limit 1 --json databaseId -q '.[0].databaseId')
+          if [ "${{ github.event.workflow_run.name }}" = "Infotheo [Build HTML and upload as Artifact]" ]; then
+            # This run itself is what triggered us - use it directly, no lookup needed.
+            run_id=${{ github.event.workflow_run.id }}
+          else
+            run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gen_infotheo_artifact.yml \
+              --status success --branch mca2html --limit 1 --json databaseId -q '.[0].databaseId')
+          fi
           if [ -z "$run_id" ]; then
             echo "::error::No successful run of gen_infotheo_artifact.yml on mca2html yet - nothing to deploy"
             exit 1
@@ -100,7 +117,7 @@ jobs:
           path: 'html/'
 
   deploy:
-    if: github.ref == 'refs/heads/mca2html'
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     needs: generate-deploy
     runs-on: ubuntu-latest
     permissions:
