@@ -54,7 +54,7 @@ jobs:
             startGroup "Build Rocqnavi"
               sudo apt-get install -y graphviz
               sudo chown -R 1000:1000 .
-              dune build
+              dune build bin/rocqnavi.exe
               ln -sf _build/default/bin/rocqnavi.exe rocqnavi
             endGroup
             startGroup "Fetch and build Infotheo"
