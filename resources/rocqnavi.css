@@ -39,8 +39,8 @@ h3 {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: sans-serif;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
 }
 
 div.graph svg {
@@ -69,7 +69,7 @@ div.coq code {
   font-variant-ligatures: none;
 }
 div.coq li {
-  margin-left: 2em;
+  margin-left: 0em;
 }
 
 div.doc {

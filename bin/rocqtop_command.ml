@@ -31,7 +31,7 @@ let read_until_prompt ?(msg="") stderr =
 
 let send (i, o, e) coq_command =
   Log.debug (!%"Rocqtop_command: %s" coq_command);
-  Command.send o coq_command; flush o;
+  Command.send o (coq_command ^ "\n"); flush o;
   (* When the command finishes executing, a prompt appears in stderr. Therefore,
      check the prompt before reading the execution results from standard output.
      c.f. https://github.com/rocq-prover/rocq/blob/V9.1.1/toplevel/coqloop.ml#L542-L544
@@ -50,7 +50,7 @@ let using ?(coqtop_bin = "coqtop -emacs") f =
 
 let about conn ident =
   incr about_count;
-  send conn (!%"About %s.\n" ident)
+  send conn (!%"About %s." ident)
 
 let find_available_command () =
   if Command.is_command_available "rocq" then

@@ -23,7 +23,7 @@ let using method_ f =
 
 let open_file filepath module_name = function
   | Rocqtop_emacs_conn conn ->
-     let cmd = !%"Require Import %s.\n" module_name in
+     let cmd = !%"Require Import %s." module_name in
      Rocqtop_command.send conn cmd |> ignore
   | Rocq_LSP_conn conn ->
      Lsp_client.did_open filepath conn

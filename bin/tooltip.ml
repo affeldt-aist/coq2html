@@ -25,7 +25,7 @@ let make env current_module loc id kind =
     | None -> false
     | Some list -> Index_blacklist.is_listed list id
   in
-  let tooltip_content =
+  let type_information =
     match env.type_lookup, kind with
     | Some conn, Glob_kind.Definition when is_black = false ->
        begin match lookup_type_info conn id loc with
@@ -36,7 +36,18 @@ let make env current_module loc id kind =
        end |> Option.some
     | _ -> None
   in
-  let tooltip_content =
+  let used_by =
+    let defs = UsedByTable.find env.usedby_table (current_module, id) in
+    Option.value ~default:[] defs
+    |> List.map (fun (dmod, _dpath) -> dmod)
+    |> list_uniq
+    |> List.filter (fun m -> m <> current_module)
+    |> List.map !%"<li>%s</li>"
+    |> function
+      | [] -> None
+      | ms -> Some ("Used by\n<ul>" ^ String.concat "" ms ^ "</ul>")
+  in
+  let source_url =
     match env.repository_root_url with
     | Some repo_root ->
        let line = loc.Lexing.pos_lnum in
@@ -46,10 +57,11 @@ let make env current_module loc id kind =
          |> String.concat "/"
        in
        let url = !%"%s/%s.v#L%d"repo_root filepath line in
-       let link = !%"<hr/><a href='%s' target='_blank'>Source code</a>" url in
-       (Option.value ~default:"" tooltip_content) ^ link
-       |> Option.some
-    | None -> tooltip_content
+       Some (!%"<a href='%s' target='_blank'>Source code</a>" url)
+    | None -> None
   in
-  tooltip_content
-
+  [type_information; used_by; source_url]
+  |> List.filter_map Fun.id
+  |> function
+    | [] -> None
+    | contents -> Some (String.concat "<hr/>" contents)

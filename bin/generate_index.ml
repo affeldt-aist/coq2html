@@ -53,7 +53,7 @@ type file_path =
   | Dir of (string * file_path list)
   | File of string
 
-let sidebar_files all_files =
+let left_sidebar_files all_files =
   let sort_for_directories files =
     let comp x y =
       match x, y with
@@ -89,24 +89,65 @@ let start_html_page ch title h1 project_name all_files =
   global_replace (regexp_string "$NAME") title Resources.header
   |> global_replace (regexp_string "$H1") h1
   |> global_replace (regexp_string "$PROJECT") project_name
-  |> global_replace (regexp_string "$FILES") (sidebar_files all_files)
+  |> global_replace (regexp_string "$FILES") (left_sidebar_files all_files)
   |> output_string ch
 
-let end_html_page ?repo_file ch =
+let compare_case_insensitive s1 s2 =
+  String.(compare (lowercase_ascii s1) (lowercase_ascii s2))
+
+let module_list_items modules =
+  modules
+  |> List.sort compare_case_insensitive
+  |> List.map (fun m -> !%{|<li><a href="%s.html">%s</a></li>|} m m)
+  |> String.concat "\n"
+
+let uses_panel usedby_table module_name =
+  let uses_modules =
+    UsedByTable.referenced_modules usedby_table module_name |> module_list_items in
+  let used_modules =
+    UsedByTable.referencing_modules usedby_table module_name |> module_list_items in
+  !%{|<details id="uses-right-pane">
+        <summary>Uses</summary>
+        <ul>
+          %s
+        </ul>
+      </details>
+
+      <details id="usedby-right-pane">
+        <summary>Used By</summary>
+        <ul>
+          %s
+        </ul>
+      </details>|} uses_modules used_modules
+
+let end_page_footer ?repo_file uses_panel_html ch =
   let open Str in
   let link_to_source_tag =
     Option.map (!%{|<a href="%s">Source</a>|}) repo_file
     |> Option.value ~default:""
   in
   global_replace (regexp_string "$LINK_TO_SOURCE") link_to_source_tag Resources.footer
+  |> global_replace (regexp_string "$USES_PANEL") uses_panel_html
   |> output_string ch
+
+(* For a page documenting a single Rocq module: [usedby_table] and
+   [module_name] are mandatory, and are used to fill in the "Uses" /
+   "Used by" panel with the modules it actually references. *)
+let end_html_page ch ?repo_file usedby_table module_name =
+  end_page_footer ?repo_file (uses_panel usedby_table module_name) ch
+
+(* For a generated listing page (index.html, notation index, per-letter
+   indexes) that is not about any single module: there is no "Uses" /
+   "Used by" panel to show at all, so it is omitted entirely. *)
+let end_index_page ch ?repo_file () =
+  end_page_footer ?repo_file "" ch
 
 let write_html_file ?repo_root all_files txt filename title project_name =
   let oc = open_out filename in
   let repo_file = repo_root in
   start_html_page oc title title project_name all_files;
   output_string oc txt;
-  end_html_page ?repo_file oc;
+  end_index_page oc ?repo_file ();
   close_out oc
 
 type kind = Global | EntryKind of string
@@ -160,9 +201,6 @@ let generate_notation_list ?repo_root output_dir proj_name table all_files items
   let filename = Filename.concat output_dir Notation_index.filename in
   let title = "Notations" in
   write_html_file ?repo_root all_files body filename title proj_name
-
-let compare_case_insensitive s1 s2 =
-  String.(compare (lowercase_ascii s1) (lowercase_ascii s2))
 
 (*
  * generate an html file, e.g., mathcomp.classical.functions.html
